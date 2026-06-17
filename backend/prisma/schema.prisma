@@ -1,0 +1,85 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+
+}
+
+enum Role {
+  guest
+  admin
+}
+
+enum JobOfferStatus {
+  wishlist
+  applied
+  interview
+  offer
+  rejected
+  accepted
+}
+
+enum ContactStatus {
+  to_contact
+  contacted
+  replied
+  meeting_scheduled
+  follow_up
+  closed
+}
+
+model User {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  password     String
+  role         Role     @default(guest)
+  refreshToken String?
+  createdAt    DateTime @default(now())
+
+  jobOffers JobOffer[]
+  contacts  Contact[]
+}
+
+model JobOffer {
+  id          String         @id @default(cuid())
+  title       String
+  company     String
+  description String?
+  stack       String[]
+  salary      String?
+  remote      Boolean        @default(false)
+  location    String?
+  url         String?
+  status      JobOfferStatus @default(wishlist)
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  contacts Contact[]
+}
+
+model Contact {
+  id          String        @id @default(cuid())
+  name        String
+  company     String?
+  linkedinUrl String?
+  status      ContactStatus @default(to_contact)
+  notes       String?
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  jobOfferId String?
+  jobOffer   JobOffer? @relation(fields: [jobOfferId], references: [id], onDelete: SetNull)
+}
