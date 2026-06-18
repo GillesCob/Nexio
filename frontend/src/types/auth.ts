@@ -4,8 +4,9 @@ export interface IUser {
   role: 'guest' | 'admin'
 }
 
-export interface ITokens {
+export interface IAuthResponse {
   accessToken: string
+  user: IUser
 }
 
 export interface ILoginPayload {
@@ -16,4 +17,8 @@ export interface ILoginPayload {
 export interface IRegisterPayload {
   email: string
   password: string
+}
+
+export interface IForgotPasswordPayload {
+  email: string
 }

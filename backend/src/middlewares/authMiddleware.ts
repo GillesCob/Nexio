@@ -1,12 +1,7 @@
 import { NextFunction, Request, Response } from 'express'
 import jwt from 'jsonwebtoken'
 import { AppError } from './errorMiddleware'
-
-// FIXME: définir ITokenPayload dans src/types/
-interface ITokenPayload {
-  userId: string
-  role: string
-}
+import type { ITokenPayload } from '../types'
 
 declare global {
   namespace Express {
