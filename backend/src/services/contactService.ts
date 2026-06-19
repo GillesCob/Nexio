@@ -1,0 +1,54 @@
+import { ContactStatus } from '@prisma/client'
+import { AppError } from '../middlewares/errorMiddleware'
+import { prisma } from '../lib/prisma'
+
+interface ICreateContactData {
+  name: string
+  company?: string
+  linkedinUrl?: string
+  status?: ContactStatus
+  notes?: string
+  jobOfferId?: string
+}
+
+interface IUpdateContactData {
+  name?: string
+  company?: string
+  linkedinUrl?: string
+  status?: ContactStatus
+  notes?: string
+  jobOfferId?: string
+}
+
+async function assertOwnership(userId: string, contactId: string) {
+  const contact = await prisma.contact.findUnique({ where: { id: contactId } })
+  if (!contact || contact.userId !== userId) {
+    throw new AppError(404, 'Contact not found')
+  }
+  return contact
+}
+
+export async function createContact(userId: string, data: ICreateContactData) {
+  return prisma.contact.create({ data: { ...data, userId } })
+}
+
+export async function getContacts(userId: string) {
+  return prisma.contact.findMany({
+    where: { userId },
+    orderBy: { createdAt: 'desc' },
+  })
+}
+
+export async function getContactById(userId: string, contactId: string) {
+  return assertOwnership(userId, contactId)
+}
+
+export async function updateContact(userId: string, contactId: string, data: IUpdateContactData) {
+  await assertOwnership(userId, contactId)
+  return prisma.contact.update({ where: { id: contactId }, data })
+}
+
+export async function deleteContact(userId: string, contactId: string) {
+  await assertOwnership(userId, contactId)
+  await prisma.contact.delete({ where: { id: contactId } })
+}

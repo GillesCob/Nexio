@@ -43,8 +43,18 @@ model User {
   refreshToken String?
   createdAt    DateTime @default(now())
 
-  jobOffers JobOffer[]
-  contacts  Contact[]
+  jobOffers           JobOffer[]
+  contacts            Contact[]
+  passwordResetTokens PasswordResetToken[]
+}
+
+model PasswordResetToken {
+  id        String   @id @default(cuid())
+  token     String
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  expiresAt DateTime
+  createdAt DateTime @default(now())
 }
 
 model JobOffer {
