@@ -26,3 +26,12 @@ export interface ICreateContactPayload {
   notes?: string
   jobOfferId?: string
 }
+
+export interface IUpdateContactPayload {
+  name?: string
+  company?: string
+  linkedinUrl?: string
+  status?: ContactStatus
+  notes?: string
+  jobOfferId?: string
+}
