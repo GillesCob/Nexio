@@ -59,22 +59,35 @@ export function CreateContactModal({ open, onClose }: ICreateContactModalProps) 
         <form onSubmit={onSubmit} className="flex flex-col gap-4 mt-2">
           <div className="flex flex-col gap-1.5">
             <Label htmlFor="create-name">Nom *</Label>
-            <Input id="create-name" {...register('name', { required: true })} />
+            <Input
+              id="create-name"
+              className="bg-slate-800 text-slate-100 border-slate-600 placeholder:text-slate-400"
+              {...register('name', { required: true })}
+            />
           </div>
           <div className="flex flex-col gap-1.5">
             <Label htmlFor="create-company">Entreprise</Label>
-            <Input id="create-company" {...register('company')} />
+            <Input
+              id="create-company"
+              className="bg-slate-800 text-slate-100 border-slate-600 placeholder:text-slate-400"
+              {...register('company')}
+            />
           </div>
           <div className="flex flex-col gap-1.5">
             <Label htmlFor="create-linkedinUrl">URL LinkedIn</Label>
-            <Input id="create-linkedinUrl" type="url" {...register('linkedinUrl')} />
+            <Input
+              id="create-linkedinUrl"
+              type="url"
+              className="bg-slate-800 text-slate-100 border-slate-600 placeholder:text-slate-400"
+              {...register('linkedinUrl')}
+            />
           </div>
           <div className="flex flex-col gap-1.5">
             <Label htmlFor="create-status">Statut</Label>
             <select
               id="create-status"
               {...register('status')}
-              className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+              className="flex h-9 w-full rounded-md border border-slate-600 bg-slate-800 text-slate-100 px-3 py-1 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
             >
               {STATUS_OPTIONS.map((s) => (
                 <option key={s} value={s}>{STATUS_LABELS[s]}</option>
@@ -87,7 +100,7 @@ export function CreateContactModal({ open, onClose }: ICreateContactModalProps) 
               id="create-notes"
               {...register('notes')}
               rows={3}
-              className="flex w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring resize-none"
+              className="flex w-full rounded-md border border-slate-600 bg-slate-800 text-slate-100 placeholder:text-slate-400 px-3 py-2 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring resize-none"
             />
           </div>
           <DialogFooter className="mt-2">

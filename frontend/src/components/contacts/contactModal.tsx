@@ -80,22 +80,35 @@ export function ContactModal({ contact, onClose }: IContactModalProps) {
           <form onSubmit={handleSave} className="flex flex-col gap-4 mt-2">
             <div className="flex flex-col gap-1.5">
               <Label htmlFor="name">Nom *</Label>
-              <Input id="name" {...register('name', { required: true })} />
+              <Input
+                id="name"
+                className="bg-slate-800 text-slate-100 border-slate-600 placeholder:text-slate-400"
+                {...register('name', { required: true })}
+              />
             </div>
             <div className="flex flex-col gap-1.5">
               <Label htmlFor="company">Entreprise</Label>
-              <Input id="company" {...register('company')} />
+              <Input
+                id="company"
+                className="bg-slate-800 text-slate-100 border-slate-600 placeholder:text-slate-400"
+                {...register('company')}
+              />
             </div>
             <div className="flex flex-col gap-1.5">
               <Label htmlFor="linkedinUrl">URL LinkedIn</Label>
-              <Input id="linkedinUrl" type="url" {...register('linkedinUrl')} />
+              <Input
+                id="linkedinUrl"
+                type="url"
+                className="bg-slate-800 text-slate-100 border-slate-600 placeholder:text-slate-400"
+                {...register('linkedinUrl')}
+              />
             </div>
             <div className="flex flex-col gap-1.5">
               <Label htmlFor="status">Statut</Label>
               <select
                 id="status"
                 {...register('status')}
-                className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+                className="flex h-9 w-full rounded-md border border-slate-600 bg-slate-800 text-slate-100 px-3 py-1 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
               >
                 {STATUS_OPTIONS.map((s) => (
                   <option key={s} value={s}>{STATUS_LABELS[s]}</option>
@@ -108,7 +121,7 @@ export function ContactModal({ contact, onClose }: IContactModalProps) {
                 id="notes"
                 {...register('notes')}
                 rows={3}
-                className="flex w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring resize-none"
+                className="flex w-full rounded-md border border-slate-600 bg-slate-800 text-slate-100 placeholder:text-slate-400 px-3 py-2 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring resize-none"
               />
             </div>
             <DialogFooter className="mt-2">
@@ -124,22 +137,22 @@ export function ContactModal({ contact, onClose }: IContactModalProps) {
           <div className="mt-2 space-y-3 text-sm">
             {contact.company && (
               <div>
-                <span className="text-slate-500">Entreprise</span>
-                <p className="font-medium">{contact.company}</p>
+                <span className="text-slate-400">Entreprise</span>
+                <p className="font-medium text-slate-100">{contact.company}</p>
               </div>
             )}
             <div>
-              <span className="text-slate-500">Statut</span>
-              <p className="font-medium">{STATUS_LABELS[contact.status]}</p>
+              <span className="text-slate-400">Statut</span>
+              <p className="font-medium text-slate-100">{STATUS_LABELS[contact.status]}</p>
             </div>
             {contact.linkedinUrl && (
               <div>
-                <span className="text-slate-500">LinkedIn</span>
+                <span className="text-slate-400">LinkedIn</span>
                 <a
                   href={contact.linkedinUrl}
                   target="_blank"
                   rel="noreferrer"
-                  className="block font-medium text-blue-600 hover:underline truncate"
+                  className="block font-medium text-blue-400 hover:underline truncate"
                 >
                   {contact.linkedinUrl}
                 </a>
@@ -147,8 +160,8 @@ export function ContactModal({ contact, onClose }: IContactModalProps) {
             )}
             {contact.notes && (
               <div>
-                <span className="text-slate-500">Notes</span>
-                <p className="whitespace-pre-wrap">{contact.notes}</p>
+                <span className="text-slate-400">Notes</span>
+                <p className="whitespace-pre-wrap text-slate-100">{contact.notes}</p>
               </div>
             )}
             <DialogFooter className="mt-4">
