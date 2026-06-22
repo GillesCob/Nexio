@@ -16,9 +16,11 @@ const createContactSchema = z.object({
   name: z.string().min(1),
   company: z.string().optional(),
   linkedinUrl: z.string().url().optional().or(z.literal('')),
+  jobTitle: z.string().optional(),
   status: contactStatusSchema.optional(),
   notes: z.string().optional(),
   jobOfferId: z.string().optional(),
+  companyId: z.string().optional(),
 })
 
 const updateContactSchema = createContactSchema.partial()
@@ -83,6 +85,17 @@ export async function deleteContact(req: Request, res: Response, next: NextFunct
     const { id } = paramsSchema.parse(req.params)
     await contactService.deleteContact(userId, id)
     res.status(204).send()
+  } catch (err) {
+    handleZod(err, next)
+  }
+}
+
+export async function touchContact(req: Request, res: Response, next: NextFunction): Promise<void> {
+  try {
+    const userId = req.user!.userId
+    const { id } = paramsSchema.parse(req.params)
+    const contact = await contactService.touchContact(userId, id)
+    res.json(contact)
   } catch (err) {
     handleZod(err, next)
   }

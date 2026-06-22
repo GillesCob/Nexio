@@ -1,96 +1,199 @@
-import { useForm } from 'react-hook-form'
-import type { ICreateContactPayload, ContactStatus } from '@/types/contact'
-import { useCreateContact } from '@/hooks/useContacts'
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogFooter,
-} from '@/components/ui/dialog'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
+import { useState } from "react";
+import { useForm } from "react-hook-form";
+import type { ICreateContactPayload, ContactStatus, IScoreResult } from "@/types/contact";
+import { useCreateContact, useExtractContact, useScoreContact } from "@/hooks/useContacts";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 
 const STATUS_LABELS: Record<ContactStatus, string> = {
-  to_contact: 'À contacter',
-  contacted: 'Contacté',
-  replied: 'A répondu',
-  meeting_scheduled: 'RDV planifié',
-  follow_up: 'Relance',
-  closed: 'Fermé',
-}
+  to_contact: "À contacter",
+  contacted: "Contacté",
+  replied: "A répondu",
+  meeting_scheduled: "RDV planifié",
+  follow_up: "Relance",
+  closed: "Fermé",
+};
 
 const STATUS_OPTIONS: ContactStatus[] = [
-  'to_contact',
-  'contacted',
-  'replied',
-  'meeting_scheduled',
-  'follow_up',
-  'closed',
-]
+  "to_contact",
+  "contacted",
+  "replied",
+  "meeting_scheduled",
+  "follow_up",
+  "closed",
+];
 
 interface ICreateContactModalProps {
-  open: boolean
-  onClose: () => void
+  open: boolean;
+  onClose: () => void;
 }
 
 export function CreateContactModal({ open, onClose }: ICreateContactModalProps) {
-  const createContact = useCreateContact()
-  const { register, handleSubmit, reset } = useForm<ICreateContactPayload>({
-    defaultValues: { status: 'to_contact' },
-  })
+  const createContact = useCreateContact();
+  const extractContact = useExtractContact();
+  const scoreContact = useScoreContact();
+  const [rawText, setRawText] = useState("");
+  const [scoreResult, setScoreResult] = useState<IScoreResult | null>(null);
+  const [scoreError, setScoreError] = useState(false);
+
+  const { register, handleSubmit, reset, setValue, getValues } = useForm<ICreateContactPayload>({
+    defaultValues: { status: "to_contact" },
+  });
 
   const handleClose = () => {
-    reset()
-    onClose()
-  }
+    reset();
+    setRawText("");
+    setScoreResult(null);
+    setScoreError(false);
+    onClose();
+  };
+
+  const handleExtract = () => {
+    setScoreResult(null);
+    setScoreError(false);
+    extractContact.mutate(rawText, {
+      onSuccess: (data) => {
+        if (data.name) setValue("name", data.name);
+        if (data.company) setValue("company", data.company);
+        if (data.linkedinUrl) setValue("linkedinUrl", data.linkedinUrl);
+        if (data.jobTitle) setValue("jobTitle", data.jobTitle);
+
+        if (!data.name) return;
+
+        scoreContact.mutate(
+          {
+            name: data.name,
+            jobTitle: data.jobTitle ?? undefined,
+            company: data.company ?? undefined,
+          },
+          {
+            onSuccess: (result) => {
+              setScoreResult(result);
+              // if (result.compatible) {
+              //   createContact.mutate(getValues(), { onSuccess: handleClose })
+              // }
+            },
+            onError: () => setScoreError(true),
+          },
+        );
+      },
+    });
+  };
 
   const onSubmit = handleSubmit((data) => {
-    createContact.mutate(data, { onSuccess: handleClose })
-  })
+    createContact.mutate(data, { onSuccess: handleClose });
+  });
 
   return (
-    <Dialog open={open} onOpenChange={(open) => { if (!open) handleClose() }}>
-      <DialogContent>
+    <Dialog
+      open={open}
+      onOpenChange={(open) => {
+        if (!open) handleClose();
+      }}
+    >
+      <DialogContent className="max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Ajouter un contact</DialogTitle>
         </DialogHeader>
-        <form onSubmit={onSubmit} className="flex flex-col gap-4 mt-2">
+
+        <div className="flex flex-col gap-1.5">
+          <Label htmlFor="create-rawText">Coller un profil LinkedIn</Label>
+          <textarea
+            id="create-rawText"
+            value={rawText}
+            onChange={(e) => setRawText(e.target.value)}
+            rows={4}
+            placeholder="Colle ici le texte copié depuis un profil LinkedIn..."
+            className="flex w-full rounded-md border border-input bg-background text-foreground px-3 py-2 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring resize-none"
+          />
+          <Button
+            type="button"
+            variant="outline"
+            onClick={handleExtract}
+            disabled={!rawText.trim() || extractContact.isPending || scoreContact.isPending}
+            className="self-end"
+          >
+            {extractContact.isPending ? "Extraction…" : "Extraire les infos"}
+          </Button>
+        </div>
+
+        {scoreContact.isPending && (
+          <div className="animate-pulse rounded-md bg-gray-100 px-3 py-2 text-sm text-gray-700">
+            Analyse du profil en cours…
+          </div>
+        )}
+
+        {scoreError && (
+          <div className="rounded-md bg-gray-100 px-3 py-2 text-sm text-gray-700">
+            Analyse indisponible. Tu peux ajouter le contact manuellement.
+          </div>
+        )}
+
+        {scoreResult?.compatible && (
+          <div className="rounded-md border border-gray-300 bg-gray-50 px-3 py-2 text-sm text-black">
+            <p className="font-semibold">Profil compatible</p>
+            <ul className="mt-1 list-disc list-inside">
+              {scoreResult.reasons.map((r, i) => (
+                <li key={i}>{r}</li>
+              ))}
+            </ul>
+          </div>
+        )}
+
+        {scoreResult && !scoreResult.compatible && (
+          <div className="rounded-md border border-gray-300 bg-gray-50 px-3 py-2 text-sm text-black">
+            <p className="font-semibold">Profil non compatible</p>
+            <ul className="mt-1 list-disc list-inside">
+              {scoreResult.reasons.map((r, i) => (
+                <li key={i}>{r}</li>
+              ))}
+            </ul>
+            <div className="mt-3 flex justify-end gap-2">
+              <Button type="button" variant="outline" size="sm" onClick={handleClose}>
+                Annuler
+              </Button>
+              <Button
+                type="button"
+                size="sm"
+                disabled={createContact.isPending}
+                onClick={() => createContact.mutate(getValues(), { onSuccess: handleClose })}
+              >
+                {createContact.isPending ? "Ajout…" : "Ajouter quand même"}
+              </Button>
+            </div>
+          </div>
+        )}
+
+        <form onSubmit={onSubmit} className="flex flex-col gap-4">
           <div className="flex flex-col gap-1.5">
             <Label htmlFor="create-name">Nom *</Label>
-            <Input
-              id="create-name"
-              className="bg-slate-800 text-slate-100 border-slate-600 placeholder:text-slate-400"
-              {...register('name', { required: true })}
-            />
+            <Input id="create-name" {...register("name", { required: true })} />
+          </div>
+          <div className="flex flex-col gap-1.5">
+            <Label htmlFor="create-jobTitle">Poste</Label>
+            <Input id="create-jobTitle" {...register("jobTitle")} />
           </div>
           <div className="flex flex-col gap-1.5">
             <Label htmlFor="create-company">Entreprise</Label>
-            <Input
-              id="create-company"
-              className="bg-slate-800 text-slate-100 border-slate-600 placeholder:text-slate-400"
-              {...register('company')}
-            />
+            <Input id="create-company" {...register("company")} />
           </div>
           <div className="flex flex-col gap-1.5">
             <Label htmlFor="create-linkedinUrl">URL LinkedIn</Label>
-            <Input
-              id="create-linkedinUrl"
-              type="url"
-              className="bg-slate-800 text-slate-100 border-slate-600 placeholder:text-slate-400"
-              {...register('linkedinUrl')}
-            />
+            <Input id="create-linkedinUrl" type="url" {...register("linkedinUrl")} />
           </div>
           <div className="flex flex-col gap-1.5">
             <Label htmlFor="create-status">Statut</Label>
             <select
               id="create-status"
-              {...register('status')}
-              className="flex h-9 w-full rounded-md border border-slate-600 bg-slate-800 text-slate-100 px-3 py-1 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+              {...register("status")}
+              className="flex h-9 w-full rounded-md border border-input bg-background text-foreground px-3 py-1 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
             >
               {STATUS_OPTIONS.map((s) => (
-                <option key={s} value={s}>{STATUS_LABELS[s]}</option>
+                <option key={s} value={s}>
+                  {STATUS_LABELS[s]}
+                </option>
               ))}
             </select>
           </div>
@@ -98,23 +201,34 @@ export function CreateContactModal({ open, onClose }: ICreateContactModalProps) 
             <Label htmlFor="create-notes">Notes</Label>
             <textarea
               id="create-notes"
-              {...register('notes')}
+              {...register("notes")}
               rows={3}
-              className="flex w-full rounded-md border border-slate-600 bg-slate-800 text-slate-100 placeholder:text-slate-400 px-3 py-2 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring resize-none"
+              className="flex w-full rounded-md border border-input bg-background text-foreground px-3 py-2 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring resize-none"
             />
           </div>
           <DialogFooter className="mt-2">
             <Button type="button" variant="outline" onClick={handleClose}>
               Annuler
             </Button>
-            <Button type="submit" disabled={createContact.isPending}>
-              {createContact.isPending ? 'Création…' : 'Créer'}
-            </Button>
+            {scoreResult && (
+              <Button
+                type="button"
+                disabled={createContact.isPending}
+                onClick={() => createContact.mutate(getValues(), { onSuccess: handleClose })}
+              >
+                {createContact.isPending ? "Ajout…" : scoreResult.compatible ? "Ajouter" : "Ajouter quand même"}
+              </Button>
+            )}
+            {((!scoreContact.isPending && !scoreResult) || scoreError) && (
+              <Button type="submit" disabled={createContact.isPending}>
+                {createContact.isPending ? "Création…" : "Créer"}
+              </Button>
+            )}
           </DialogFooter>
         </form>
       </DialogContent>
     </Dialog>
-  )
+  );
 }
 
-CreateContactModal.displayName = 'CreateContactModal'
+CreateContactModal.displayName = "CreateContactModal";

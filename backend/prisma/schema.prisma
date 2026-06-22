@@ -77,11 +77,25 @@ model JobOffer {
   contacts Contact[]
 }
 
+model Company {
+  id          String    @id @default(cuid())
+  name        String
+  description String?
+  sector      String?
+  size        String?
+  linkedinUrl String?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  contacts Contact[]
+}
+
 model Contact {
   id          String        @id @default(cuid())
   name        String
   company     String?
   linkedinUrl String?
+  jobTitle    String?
   status      ContactStatus @default(to_contact)
   notes       String?
   createdAt   DateTime      @default(now())
@@ -92,4 +106,18 @@ model Contact {
 
   jobOfferId String?
   jobOffer   JobOffer? @relation(fields: [jobOfferId], references: [id], onDelete: SetNull)
+
+  companyId String?
+  companyRef Company? @relation(fields: [companyId], references: [id], onDelete: SetNull)
+
+  messages Message[]
+}
+
+model Message {
+  id        String   @id @default(cuid())
+  content   String
+  createdAt DateTime @default(now())
+
+  contactId String
+  contact   Contact @relation(fields: [contactId], references: [id], onDelete: Cascade)
 }

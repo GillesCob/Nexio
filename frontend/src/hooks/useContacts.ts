@@ -41,3 +41,77 @@ export function useDeleteContact() {
     },
   })
 }
+
+export function useExtractContact() {
+  return useMutation({
+    mutationFn: (rawText: string) => contactService.extractContact(rawText),
+  })
+}
+
+export function useExtractCompany() {
+  return useMutation({
+    mutationFn: (rawText: string) => contactService.extractCompany(rawText),
+  })
+}
+
+export function useSuggestTemplate() {
+  return useMutation({
+    mutationFn: (contactId: string) => contactService.suggestTemplate(contactId),
+  })
+}
+
+export function useScoreContact() {
+  return useMutation({
+    mutationFn: (data: { name: string; jobTitle?: string; company?: string; location?: string }) =>
+      contactService.scoreContact(data),
+  })
+}
+
+export const RELANCES_QUERY_KEY = ['contacts', 'relances'] as const
+
+export function useGetRelances() {
+  return useQuery({
+    queryKey: RELANCES_QUERY_KEY,
+    queryFn: contactService.getRelances,
+  })
+}
+
+export const messagesQueryKey = (contactId: string) =>
+  ['contacts', contactId, 'messages'] as const
+
+export function useCreateMessage() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: ({ contactId, content }: { contactId: string; content: string }) =>
+      contactService.createMessage(contactId, content),
+    onSuccess: (_data, { contactId }) => {
+      queryClient.invalidateQueries({ queryKey: CONTACTS_QUERY_KEY })
+      queryClient.invalidateQueries({ queryKey: messagesQueryKey(contactId) })
+    },
+  })
+}
+
+export function useGetMessages(contactId: string) {
+  return useQuery({
+    queryKey: messagesQueryKey(contactId),
+    queryFn: () => contactService.getMessages(contactId),
+    enabled: !!contactId,
+  })
+}
+
+export function useSuggestRelance() {
+  return useMutation({
+    mutationFn: (contactId: string) => contactService.suggestRelance(contactId),
+  })
+}
+
+export function useTouchContact() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: (id: string) => contactService.touchContact(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: RELANCES_QUERY_KEY })
+      queryClient.invalidateQueries({ queryKey: CONTACTS_QUERY_KEY })
+    },
+  })
+}

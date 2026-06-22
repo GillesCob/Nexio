@@ -6,18 +6,22 @@ interface ICreateContactData {
   name: string
   company?: string
   linkedinUrl?: string
+  jobTitle?: string
   status?: ContactStatus
   notes?: string
   jobOfferId?: string
+  companyId?: string
 }
 
 interface IUpdateContactData {
   name?: string
   company?: string
   linkedinUrl?: string
+  jobTitle?: string
   status?: ContactStatus
   notes?: string
   jobOfferId?: string
+  companyId?: string
 }
 
 async function assertOwnership(userId: string, contactId: string) {
@@ -36,11 +40,19 @@ export async function getContacts(userId: string) {
   return prisma.contact.findMany({
     where: { userId },
     orderBy: { createdAt: 'desc' },
+    include: { companyRef: true },
   })
 }
 
 export async function getContactById(userId: string, contactId: string) {
-  return assertOwnership(userId, contactId)
+  const contact = await prisma.contact.findUnique({
+    where: { id: contactId },
+    include: { companyRef: true },
+  })
+  if (!contact || contact.userId !== userId) {
+    throw new AppError(404, 'Contact not found')
+  }
+  return contact
 }
 
 export async function updateContact(userId: string, contactId: string, data: IUpdateContactData) {
@@ -51,4 +63,12 @@ export async function updateContact(userId: string, contactId: string, data: IUp
 export async function deleteContact(userId: string, contactId: string) {
   await assertOwnership(userId, contactId)
   await prisma.contact.delete({ where: { id: contactId } })
+}
+
+export async function touchContact(userId: string, contactId: string) {
+  await assertOwnership(userId, contactId)
+  return prisma.contact.update({
+    where: { id: contactId },
+    data: { updatedAt: new Date() },
+  })
 }

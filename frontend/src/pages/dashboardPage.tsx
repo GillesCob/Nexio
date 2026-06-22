@@ -3,6 +3,7 @@ import type { IContact } from '@/types/contact'
 import { KanbanBoard } from '@/components/contacts/kanbanBoard'
 import { ContactModal } from '@/components/contacts/contactModal'
 import { CreateContactModal } from '@/components/contacts/createContactModal'
+import { RelanceBanner } from '@/components/contacts/relanceBanner'
 import { Button } from '@/components/ui/button'
 
 export function DashboardPage() {
@@ -16,6 +17,7 @@ export function DashboardPage() {
         <Button onClick={() => setIsCreateOpen(true)}>+ Ajouter un contact</Button>
       </div>
 
+      <RelanceBanner onOpenContact={setSelectedContact} />
       <KanbanBoard onOpenContact={setSelectedContact} />
 
       <ContactModal

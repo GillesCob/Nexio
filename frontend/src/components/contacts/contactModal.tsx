@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import type { IContact, ContactStatus, IUpdateContactPayload } from '@/types/contact'
-import { useUpdateContact, useDeleteContact } from '@/hooks/useContacts'
+import { useUpdateContact, useDeleteContact, useExtractCompany, useSuggestTemplate, useCreateMessage, useGetMessages, useGetRelances, useSuggestRelance, useTouchContact } from '@/hooks/useContacts'
 import {
   Dialog,
   DialogContent,
@@ -12,13 +12,14 @@ import {
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import { StatusActions } from '@/components/contacts/statusActions'
 
 const STATUS_LABELS: Record<ContactStatus, string> = {
   to_contact: 'À contacter',
   contacted: 'Contacté',
-  replied: 'A répondu',
+  replied: 'Echange en cours',
   meeting_scheduled: 'RDV planifié',
-  follow_up: 'Relance',
+  follow_up: 'A relancer',
   closed: 'Fermé',
 }
 
@@ -38,8 +39,25 @@ interface IContactModalProps {
 
 export function ContactModal({ contact, onClose }: IContactModalProps) {
   const [isEditing, setIsEditing] = useState(false)
+  const [rawCompanyText, setRawCompanyText] = useState('')
+  const [suggestedMessage, setSuggestedMessage] = useState<string | null>(null)
+  const [suggestedRelance, setSuggestedRelance] = useState<string | null>(null)
+  const [extractionStatus, setExtractionStatus] = useState<'idle' | 'success' | 'error'>('idle')
+  const [copied, setCopied] = useState(false)
+  const [copiedRelance, setCopiedRelance] = useState(false)
+  const [localStatus, setLocalStatus] = useState<ContactStatus>(contact?.status ?? 'to_contact')
+
   const updateContact = useUpdateContact()
   const deleteContact = useDeleteContact()
+  const extractCompany = useExtractCompany()
+  const suggestTemplate = useSuggestTemplate()
+  const suggestRelance = useSuggestRelance()
+  const createMessage = useCreateMessage()
+  const touchContact = useTouchContact()
+  const { data: messages = [] } = useGetMessages(contact?.id ?? '')
+  const { data: relanceResult } = useGetRelances()
+  const relanceInfo = contact ? relanceResult?.toFollowUp.find((r) => r.id === contact.id) : undefined
+  const repliedRelanceInfo = contact ? relanceResult?.toCheckReplied.find((r) => r.id === contact.id) : undefined
 
   const { register, handleSubmit, reset } = useForm<IUpdateContactPayload>()
 
@@ -49,14 +67,27 @@ export function ContactModal({ contact, onClose }: IContactModalProps) {
         name: contact.name,
         company: contact.company ?? '',
         linkedinUrl: contact.linkedinUrl ?? '',
+        jobTitle: contact.jobTitle ?? '',
         status: contact.status,
         notes: contact.notes ?? '',
       })
       setIsEditing(false)
+      setRawCompanyText('')
+      setSuggestedMessage(null)
+      setSuggestedRelance(null)
+      setExtractionStatus('idle')
+      setLocalStatus(contact.status)
     }
   }, [contact, reset])
 
   if (!contact) return null
+
+  const handleStatusChange = (status: ContactStatus) => {
+    updateContact.mutate(
+      { id: contact.id, data: { status } },
+      { onSuccess: () => setLocalStatus(status) }
+    )
+  }
 
   const handleSave = handleSubmit((data) => {
     updateContact.mutate(
@@ -69,12 +100,72 @@ export function ContactModal({ contact, onClose }: IContactModalProps) {
     deleteContact.mutate(contact.id, { onSuccess: onClose })
   }
 
+  const handleExtractCompany = () => {
+    setExtractionStatus('idle')
+    extractCompany.mutate(rawCompanyText, {
+      onSuccess: (company) => {
+        updateContact.mutate({ id: contact.id, data: { companyId: company.id } })
+        setExtractionStatus('success')
+        setTimeout(() => setExtractionStatus('idle'), 3000)
+      },
+      onError: () => {
+        setExtractionStatus('error')
+        setTimeout(() => setExtractionStatus('idle'), 3000)
+      },
+    })
+  }
+
+  const handleSuggestTemplate = () => {
+    suggestTemplate.mutate(contact.id, {
+      onSuccess: (data) => {
+        setSuggestedMessage(data.message)
+      },
+    })
+  }
+
+  const handleCopyMessage = () => {
+    if (!suggestedMessage) return
+    navigator.clipboard.writeText(suggestedMessage)
+    setCopied(true)
+    setTimeout(() => setCopied(false), 2000)
+    createMessage.mutate({ contactId: contact.id, content: suggestedMessage })
+  }
+
+  const handleSuggestRelance = () => {
+    suggestRelance.mutate(contact.id, {
+      onSuccess: (data) => {
+        setSuggestedRelance(data.message)
+      },
+    })
+  }
+
+  const handleCopyRelance = () => {
+    if (!suggestedRelance) return
+    navigator.clipboard.writeText(suggestedRelance)
+    setCopiedRelance(true)
+    setTimeout(() => setCopiedRelance(false), 3000)
+    createMessage.mutate({ contactId: contact.id, content: suggestedRelance })
+    handleStatusChange('contacted')
+  }
+
   return (
     <Dialog open={!!contact} onOpenChange={(open) => { if (!open) onClose() }}>
-      <DialogContent>
+      <DialogContent className="max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>{isEditing ? 'Modifier le contact' : contact.name}</DialogTitle>
         </DialogHeader>
+
+        {relanceInfo && (
+          <div className="rounded-md border border-amber-300 bg-amber-50 px-3 py-2 text-sm text-amber-800">
+            Relance recommandée — {relanceInfo.daysSinceUpdate} jour{relanceInfo.daysSinceUpdate > 1 ? 's' : ''} sans nouvelles
+          </div>
+        )}
+
+        {repliedRelanceInfo && (
+          <div className="rounded-md border border-indigo-300 bg-indigo-50 px-3 py-2 text-sm text-indigo-800">
+            Echange toujours en cours ? — {repliedRelanceInfo.daysSinceUpdate} jour{repliedRelanceInfo.daysSinceUpdate > 1 ? 's' : ''} sans nouvelles
+          </div>
+        )}
 
         {isEditing ? (
           <form onSubmit={handleSave} className="flex flex-col gap-4 mt-2">
@@ -82,15 +173,20 @@ export function ContactModal({ contact, onClose }: IContactModalProps) {
               <Label htmlFor="name">Nom *</Label>
               <Input
                 id="name"
-                className="bg-slate-800 text-slate-100 border-slate-600 placeholder:text-slate-400"
                 {...register('name', { required: true })}
+              />
+            </div>
+            <div className="flex flex-col gap-1.5">
+              <Label htmlFor="jobTitle">Poste</Label>
+              <Input
+                id="jobTitle"
+                {...register('jobTitle')}
               />
             </div>
             <div className="flex flex-col gap-1.5">
               <Label htmlFor="company">Entreprise</Label>
               <Input
                 id="company"
-                className="bg-slate-800 text-slate-100 border-slate-600 placeholder:text-slate-400"
                 {...register('company')}
               />
             </div>
@@ -99,7 +195,6 @@ export function ContactModal({ contact, onClose }: IContactModalProps) {
               <Input
                 id="linkedinUrl"
                 type="url"
-                className="bg-slate-800 text-slate-100 border-slate-600 placeholder:text-slate-400"
                 {...register('linkedinUrl')}
               />
             </div>
@@ -108,7 +203,7 @@ export function ContactModal({ contact, onClose }: IContactModalProps) {
               <select
                 id="status"
                 {...register('status')}
-                className="flex h-9 w-full rounded-md border border-slate-600 bg-slate-800 text-slate-100 px-3 py-1 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+                className="flex h-9 w-full rounded-md border border-input bg-background text-foreground px-3 py-1 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
               >
                 {STATUS_OPTIONS.map((s) => (
                   <option key={s} value={s}>{STATUS_LABELS[s]}</option>
@@ -121,7 +216,7 @@ export function ContactModal({ contact, onClose }: IContactModalProps) {
                 id="notes"
                 {...register('notes')}
                 rows={3}
-                className="flex w-full rounded-md border border-slate-600 bg-slate-800 text-slate-100 placeholder:text-slate-400 px-3 py-2 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring resize-none"
+                className="flex w-full rounded-md border border-input bg-background text-foreground px-3 py-2 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring resize-none"
               />
             </div>
             <DialogFooter className="mt-2">
@@ -134,25 +229,37 @@ export function ContactModal({ contact, onClose }: IContactModalProps) {
             </DialogFooter>
           </form>
         ) : (
-          <div className="mt-2 space-y-3 text-sm">
+          <div className="mt-2 space-y-4 text-sm">
+            {contact.jobTitle && (
+              <div>
+                <span className="text-gray-500">Poste</span>
+                <p className="font-medium">{contact.jobTitle}</p>
+              </div>
+            )}
             {contact.company && (
               <div>
-                <span className="text-slate-400">Entreprise</span>
-                <p className="font-medium text-slate-100">{contact.company}</p>
+                <span className="text-gray-500">Entreprise</span>
+                <p className="font-medium">{contact.company}</p>
               </div>
             )}
             <div>
-              <span className="text-slate-400">Statut</span>
-              <p className="font-medium text-slate-100">{STATUS_LABELS[contact.status]}</p>
+              <span className="text-gray-500">Statut</span>
+              <p className="font-medium mb-2">{STATUS_LABELS[localStatus]}</p>
+              <StatusActions
+                contact={{ ...contact, status: localStatus }}
+                onStatusChange={handleStatusChange}
+                isRepliedAlert={!!repliedRelanceInfo}
+                onTouch={() => touchContact.mutate(contact.id)}
+              />
             </div>
             {contact.linkedinUrl && (
               <div>
-                <span className="text-slate-400">LinkedIn</span>
+                <span className="text-gray-500">LinkedIn</span>
                 <a
                   href={contact.linkedinUrl}
                   target="_blank"
                   rel="noreferrer"
-                  className="block font-medium text-blue-400 hover:underline truncate"
+                  className="block font-medium text-blue-600 hover:underline truncate"
                 >
                   {contact.linkedinUrl}
                 </a>
@@ -160,11 +267,132 @@ export function ContactModal({ contact, onClose }: IContactModalProps) {
             )}
             {contact.notes && (
               <div>
-                <span className="text-slate-400">Notes</span>
-                <p className="whitespace-pre-wrap text-slate-100">{contact.notes}</p>
+                <span className="text-gray-500">Notes</span>
+                <p className="whitespace-pre-wrap">{contact.notes}</p>
               </div>
             )}
-            <DialogFooter className="mt-4">
+
+            <div className="border-t border-gray-200 pt-4 flex flex-col gap-2">
+              <span className="text-gray-500 font-medium">Entreprise LinkedIn</span>
+              {contact.companyRef ? (
+                <div className="rounded-md bg-gray-100 px-3 py-2">
+                  <p className="font-medium">{contact.companyRef.name}</p>
+                  {contact.companyRef.sector && (
+                    <p className="text-xs text-gray-500">{contact.companyRef.sector}{contact.companyRef.size ? ` · ${contact.companyRef.size}` : ''}</p>
+                  )}
+                </div>
+              ) : (
+                <div className="flex flex-col gap-1.5">
+                  <textarea
+                    value={rawCompanyText}
+                    onChange={(e) => setRawCompanyText(e.target.value)}
+                    rows={3}
+                    placeholder="Colle ici le texte de la page LinkedIn entreprise…"
+                    className="flex w-full rounded-md border border-input bg-background text-foreground px-3 py-2 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring resize-none"
+                  />
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={handleExtractCompany}
+                    disabled={!rawCompanyText.trim() || extractCompany.isPending}
+                    className="self-end"
+                  >
+                    {extractCompany.isPending ? 'Extraction…' : 'Extraire l\'entreprise'}
+                  </Button>
+                  {extractionStatus === 'success' && (
+                    <p className="text-xs text-gray-700">Entreprise extraite avec succès.</p>
+                  )}
+                  {extractionStatus === 'error' && (
+                    <p className="text-xs text-gray-700">Échec de l'extraction. Vérifie le texte saisi.</p>
+                  )}
+                </div>
+              )}
+            </div>
+
+            <div className="border-t border-gray-200 pt-4 flex flex-col gap-2">
+              <span className="text-gray-500 font-medium">Message LinkedIn</span>
+              {suggestedMessage ? (
+                <div className="flex flex-col gap-2">
+                  <textarea
+                    readOnly
+                    value={suggestedMessage}
+                    rows={8}
+                    className="flex w-full rounded-md border border-input bg-background text-foreground px-3 py-2 text-sm shadow-sm resize-none"
+                  />
+                  <Button type="button" variant="outline" onClick={handleCopyMessage} className="self-end">
+                    {copied ? 'Copié ✓' : 'Copier'}
+                  </Button>
+                </div>
+              ) : (
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={handleSuggestTemplate}
+                  disabled={suggestTemplate.isPending}
+                  className="self-start"
+                >
+                  {suggestTemplate.isPending ? 'Génération…' : 'Générer le message'}
+                </Button>
+              )}
+            </div>
+
+            {localStatus === 'follow_up' && (
+              <div className="border-t border-gray-200 pt-4 flex flex-col gap-2">
+                <span className="text-gray-500 font-medium">Relance</span>
+                {suggestedRelance ? (
+                  <div className="flex flex-col gap-2">
+                    <textarea
+                      readOnly
+                      value={suggestedRelance}
+                      rows={8}
+                      className="flex w-full rounded-md border border-input bg-background text-foreground px-3 py-2 text-sm shadow-sm resize-none"
+                    />
+                    <Button type="button" variant="outline" onClick={handleCopyRelance} className="self-end">
+                      {copiedRelance ? 'Copié ✓' : 'Copier'}
+                    </Button>
+                    {copiedRelance && (
+                      <p className="text-sm text-gray-500">Message copié — contact repassé en Contacté</p>
+                    )}
+                  </div>
+                ) : (
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={handleSuggestRelance}
+                    disabled={suggestRelance.isPending}
+                    className="self-start"
+                  >
+                    {suggestRelance.isPending ? 'Génération…' : 'Générer une relance'}
+                  </Button>
+                )}
+              </div>
+            )}
+
+            <div className="border-t border-gray-200 pt-4 flex flex-col gap-2">
+              <span className="text-gray-500 font-medium">Historique des messages</span>
+              {messages.length === 0 ? (
+                <p className="text-sm text-gray-400">Aucun message envoyé pour l'instant.</p>
+              ) : (
+                <ul className="flex flex-col gap-2">
+                  {messages.map((msg) => (
+                    <li key={msg.id} className="rounded-md bg-gray-100 px-3 py-2 text-sm">
+                      <p className="text-xs text-gray-400 mb-1">
+                        {new Date(msg.createdAt).toLocaleDateString('fr-FR', {
+                          day: '2-digit',
+                          month: '2-digit',
+                          year: 'numeric',
+                          hour: '2-digit',
+                          minute: '2-digit',
+                        })}
+                      </p>
+                      <p className="whitespace-pre-wrap text-gray-700">{msg.content}</p>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
+
+            <DialogFooter className="mt-2">
               <Button
                 variant="destructive"
                 onClick={handleDelete}

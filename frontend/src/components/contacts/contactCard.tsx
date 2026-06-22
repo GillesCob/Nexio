@@ -1,5 +1,6 @@
 import { Draggable } from '@hello-pangea/dnd'
 import type { IContact } from '@/types/contact'
+import { getProfileBadge } from '@/lib/profileBadge'
 
 interface IContactCardProps {
   contact: IContact
@@ -25,6 +26,11 @@ export function ContactCard({ contact, index, onOpen }: IContactCardProps) {
           <p className="text-sm font-medium text-slate-900 truncate">{contact.name}</p>
           {contact.company && (
             <p className="text-xs text-slate-500 mt-0.5 truncate">{contact.company}</p>
+          )}
+          {contact.jobTitle && (
+            <span className="inline-block mt-1.5 text-xs border border-black rounded px-1.5 py-0.5 text-black">
+              {getProfileBadge(contact.jobTitle)}
+            </span>
           )}
         </div>
       )}

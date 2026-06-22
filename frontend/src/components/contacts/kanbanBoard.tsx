@@ -8,9 +8,9 @@ import { KanbanColumn } from './kanbanColumn'
 const COLUMNS: { status: ContactStatus; label: string }[] = [
   { status: 'to_contact', label: 'À contacter' },
   { status: 'contacted', label: 'Contacté' },
-  { status: 'replied', label: 'A répondu' },
+  { status: 'replied', label: 'Echange en cours' },
   { status: 'meeting_scheduled', label: 'RDV planifié' },
-  { status: 'follow_up', label: 'Relance' },
+  { status: 'follow_up', label: 'A relancer' },
   { status: 'closed', label: 'Fermé' },
 ]
 
