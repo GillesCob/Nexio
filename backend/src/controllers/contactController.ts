@@ -21,6 +21,7 @@ const createContactSchema = z.object({
   notes: z.string().optional(),
   jobOfferId: z.string().optional(),
   companyId: z.string().optional(),
+  contactedAt: z.string().optional(),
 })
 
 const updateContactSchema = createContactSchema.partial()

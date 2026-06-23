@@ -4,6 +4,8 @@ import { KanbanBoard } from '@/components/contacts/kanbanBoard'
 import { ContactModal } from '@/components/contacts/contactModal'
 import { CreateContactModal } from '@/components/contacts/createContactModal'
 import { RelanceBanner } from '@/components/contacts/relanceBanner'
+import { LinkedInReminderBanner } from '@/components/stats/linkedinReminderBanner'
+import { Navbar } from '@/components/layout/navbar'
 import { Button } from '@/components/ui/button'
 
 export function DashboardPage() {
@@ -12,11 +14,12 @@ export function DashboardPage() {
 
   return (
     <main className="p-8">
-      <div className="flex items-center justify-between mb-6">
-        <h1 className="text-2xl font-semibold text-slate-900">Tableau de bord</h1>
+      <Navbar />
+      <div className="flex justify-end mb-6">
         <Button onClick={() => setIsCreateOpen(true)}>+ Ajouter un contact</Button>
       </div>
 
+      <LinkedInReminderBanner />
       <RelanceBanner onOpenContact={setSelectedContact} />
       <KanbanBoard onOpenContact={setSelectedContact} />
 

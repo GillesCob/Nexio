@@ -32,6 +32,10 @@ const STATUS_OPTIONS: ContactStatus[] = [
   'closed',
 ]
 
+type ITimelineEvent =
+  | { id: string; type: 'contact_added' | 'last_update'; date: Date; label: string }
+  | { id: string; type: 'message'; date: Date; label: string; content: string }
+
 interface IContactModalProps {
   contact: IContact | null
   onClose: () => void
@@ -46,6 +50,7 @@ export function ContactModal({ contact, onClose }: IContactModalProps) {
   const [copied, setCopied] = useState(false)
   const [copiedRelance, setCopiedRelance] = useState(false)
   const [localStatus, setLocalStatus] = useState<ContactStatus>(contact?.status ?? 'to_contact')
+  const [openEventId, setOpenEventId] = useState<string | null>(null)
 
   const updateContact = useUpdateContact()
   const deleteContact = useDeleteContact()
@@ -77,10 +82,28 @@ export function ContactModal({ contact, onClose }: IContactModalProps) {
       setSuggestedRelance(null)
       setExtractionStatus('idle')
       setLocalStatus(contact.status)
+      setOpenEventId(null)
     }
   }, [contact, reset])
 
   if (!contact) return null
+
+  const formatDate = (date: Date) =>
+    date.toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' })
+
+  const timelineEvents: ITimelineEvent[] = [
+    { id: 'contact_added', type: 'contact_added', date: new Date(contact.createdAt), label: 'Contact ajouté' },
+    ...messages.map((msg) => ({
+      id: msg.id,
+      type: 'message' as const,
+      date: new Date(msg.createdAt),
+      label: 'Message envoyé',
+      content: msg.content,
+    })),
+    ...(contact.updatedAt > contact.createdAt
+      ? [{ id: 'last_update', type: 'last_update' as const, date: new Date(contact.updatedAt), label: 'Dernière mise à jour' }]
+      : []),
+  ].sort((a, b) => b.date.getTime() - a.date.getTime())
 
   const handleStatusChange = (status: ContactStatus) => {
     updateContact.mutate(
@@ -156,13 +179,13 @@ export function ContactModal({ contact, onClose }: IContactModalProps) {
         </DialogHeader>
 
         {relanceInfo && (
-          <div className="rounded-md border border-amber-300 bg-amber-50 px-3 py-2 text-sm text-amber-800">
+          <div className="rounded-md border border-amber-300 bg-amber-50 text-amber-800 px-3 py-2 text-sm">
             Relance recommandée — {relanceInfo.daysSinceUpdate} jour{relanceInfo.daysSinceUpdate > 1 ? 's' : ''} sans nouvelles
           </div>
         )}
 
         {repliedRelanceInfo && (
-          <div className="rounded-md border border-indigo-300 bg-indigo-50 px-3 py-2 text-sm text-indigo-800">
+          <div className="rounded-md border border-indigo-300 bg-indigo-50 text-indigo-800 px-3 py-2 text-sm">
             Echange toujours en cours ? — {repliedRelanceInfo.daysSinceUpdate} jour{repliedRelanceInfo.daysSinceUpdate > 1 ? 's' : ''} sans nouvelles
           </div>
         )}
@@ -232,18 +255,18 @@ export function ContactModal({ contact, onClose }: IContactModalProps) {
           <div className="mt-2 space-y-4 text-sm">
             {contact.jobTitle && (
               <div>
-                <span className="text-gray-500">Poste</span>
+                <span className="text-muted-foreground">Poste</span>
                 <p className="font-medium">{contact.jobTitle}</p>
               </div>
             )}
             {contact.company && (
               <div>
-                <span className="text-gray-500">Entreprise</span>
+                <span className="text-muted-foreground">Entreprise</span>
                 <p className="font-medium">{contact.company}</p>
               </div>
             )}
             <div>
-              <span className="text-gray-500">Statut</span>
+              <span className="text-muted-foreground">Statut</span>
               <p className="font-medium mb-2">{STATUS_LABELS[localStatus]}</p>
               <StatusActions
                 contact={{ ...contact, status: localStatus }}
@@ -254,12 +277,12 @@ export function ContactModal({ contact, onClose }: IContactModalProps) {
             </div>
             {contact.linkedinUrl && (
               <div>
-                <span className="text-gray-500">LinkedIn</span>
+                <span className="text-muted-foreground">LinkedIn</span>
                 <a
                   href={contact.linkedinUrl}
                   target="_blank"
                   rel="noreferrer"
-                  className="block font-medium text-blue-600 hover:underline truncate"
+                  className="block font-medium text-primary hover:underline truncate"
                 >
                   {contact.linkedinUrl}
                 </a>
@@ -267,18 +290,18 @@ export function ContactModal({ contact, onClose }: IContactModalProps) {
             )}
             {contact.notes && (
               <div>
-                <span className="text-gray-500">Notes</span>
+                <span className="text-muted-foreground">Notes</span>
                 <p className="whitespace-pre-wrap">{contact.notes}</p>
               </div>
             )}
 
-            <div className="border-t border-gray-200 pt-4 flex flex-col gap-2">
-              <span className="text-gray-500 font-medium">Entreprise LinkedIn</span>
+            <div className="border-t border-border pt-4 flex flex-col gap-2">
+              <span className="text-muted-foreground font-medium">Entreprise LinkedIn</span>
               {contact.companyRef ? (
-                <div className="rounded-md bg-gray-100 px-3 py-2">
+                <div className="rounded-md bg-muted px-3 py-2">
                   <p className="font-medium">{contact.companyRef.name}</p>
                   {contact.companyRef.sector && (
-                    <p className="text-xs text-gray-500">{contact.companyRef.sector}{contact.companyRef.size ? ` · ${contact.companyRef.size}` : ''}</p>
+                    <p className="text-xs text-muted-foreground">{contact.companyRef.sector}{contact.companyRef.size ? ` · ${contact.companyRef.size}` : ''}</p>
                   )}
                 </div>
               ) : (
@@ -300,17 +323,17 @@ export function ContactModal({ contact, onClose }: IContactModalProps) {
                     {extractCompany.isPending ? 'Extraction…' : 'Extraire l\'entreprise'}
                   </Button>
                   {extractionStatus === 'success' && (
-                    <p className="text-xs text-gray-700">Entreprise extraite avec succès.</p>
+                    <p className="text-xs text-foreground">Entreprise extraite avec succès.</p>
                   )}
                   {extractionStatus === 'error' && (
-                    <p className="text-xs text-gray-700">Échec de l'extraction. Vérifie le texte saisi.</p>
+                    <p className="text-xs text-foreground">Échec de l'extraction. Vérifie le texte saisi.</p>
                   )}
                 </div>
               )}
             </div>
 
-            <div className="border-t border-gray-200 pt-4 flex flex-col gap-2">
-              <span className="text-gray-500 font-medium">Message LinkedIn</span>
+            <div className="border-t border-border pt-4 flex flex-col gap-2">
+              <span className="text-muted-foreground font-medium">Message LinkedIn</span>
               {suggestedMessage ? (
                 <div className="flex flex-col gap-2">
                   <textarea
@@ -337,8 +360,8 @@ export function ContactModal({ contact, onClose }: IContactModalProps) {
             </div>
 
             {localStatus === 'follow_up' && (
-              <div className="border-t border-gray-200 pt-4 flex flex-col gap-2">
-                <span className="text-gray-500 font-medium">Relance</span>
+              <div className="border-t border-border pt-4 flex flex-col gap-2">
+                <span className="text-muted-foreground font-medium">Relance</span>
                 {suggestedRelance ? (
                   <div className="flex flex-col gap-2">
                     <textarea
@@ -351,7 +374,7 @@ export function ContactModal({ contact, onClose }: IContactModalProps) {
                       {copiedRelance ? 'Copié ✓' : 'Copier'}
                     </Button>
                     {copiedRelance && (
-                      <p className="text-sm text-gray-500">Message copié — contact repassé en Contacté</p>
+                      <p className="text-sm text-muted-foreground">Message copié — contact repassé en Contacté</p>
                     )}
                   </div>
                 ) : (
@@ -368,28 +391,32 @@ export function ContactModal({ contact, onClose }: IContactModalProps) {
               </div>
             )}
 
-            <div className="border-t border-gray-200 pt-4 flex flex-col gap-2">
-              <span className="text-gray-500 font-medium">Historique des messages</span>
-              {messages.length === 0 ? (
-                <p className="text-sm text-gray-400">Aucun message envoyé pour l'instant.</p>
-              ) : (
-                <ul className="flex flex-col gap-2">
-                  {messages.map((msg) => (
-                    <li key={msg.id} className="rounded-md bg-gray-100 px-3 py-2 text-sm">
-                      <p className="text-xs text-gray-400 mb-1">
-                        {new Date(msg.createdAt).toLocaleDateString('fr-FR', {
-                          day: '2-digit',
-                          month: '2-digit',
-                          year: 'numeric',
-                          hour: '2-digit',
-                          minute: '2-digit',
-                        })}
+            <div className="border-t border-border pt-4 flex flex-col gap-2">
+              <span className="text-muted-foreground font-medium">Timeline</span>
+              <ul className="flex flex-col">
+                {timelineEvents.map((event) => (
+                  <li key={event.id} className="border-b border-border last:border-b-0">
+                    <div
+                      className={`flex items-center gap-3 py-2 px-1 text-sm${event.type === 'message' ? ' cursor-pointer hover:bg-muted rounded-md' : ''}`}
+                      onClick={() => {
+                        if (event.type !== 'message') return
+                        setOpenEventId(openEventId === event.id ? null : event.id)
+                      }}
+                    >
+                      <span className="text-xs text-muted-foreground shrink-0">{formatDate(event.date)}</span>
+                      <span className="font-medium flex-1">{event.label}</span>
+                      {event.type === 'message' && (
+                        <span className="text-muted-foreground text-xs">{openEventId === event.id ? '▲' : '▼'}</span>
+                      )}
+                    </div>
+                    {event.type === 'message' && openEventId === event.id && (
+                      <p className="whitespace-pre-wrap text-sm text-foreground bg-muted rounded-md px-3 py-2 mb-2">
+                        {event.content}
                       </p>
-                      <p className="whitespace-pre-wrap text-gray-700">{msg.content}</p>
-                    </li>
-                  ))}
-                </ul>
-              )}
+                    )}
+                  </li>
+                ))}
+              </ul>
             </div>
 
             <DialogFooter className="mt-2">

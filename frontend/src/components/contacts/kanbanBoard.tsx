@@ -55,8 +55,8 @@ export function KanbanBoard({ onOpenContact }: IKanbanBoardProps) {
       <div className="flex gap-4 overflow-x-auto pb-4">
         {COLUMNS.map(({ status }) => (
           <div key={status} className="flex flex-col w-64 shrink-0">
-            <div className="h-6 w-32 bg-slate-200 rounded animate-pulse mb-3" />
-            <div className="rounded-lg bg-slate-50 min-h-[200px] p-2" />
+            <div className="h-6 w-32 bg-muted rounded animate-pulse mb-3" />
+            <div className="rounded-lg bg-muted/40 min-h-[200px] p-2" />
           </div>
         ))}
       </div>

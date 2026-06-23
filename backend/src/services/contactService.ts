@@ -11,6 +11,7 @@ interface ICreateContactData {
   notes?: string
   jobOfferId?: string
   companyId?: string
+  contactedAt?: string
 }
 
 interface IUpdateContactData {
@@ -33,7 +34,21 @@ async function assertOwnership(userId: string, contactId: string) {
 }
 
 export async function createContact(userId: string, data: ICreateContactData) {
-  return prisma.contact.create({ data: { ...data, userId } })
+  const { contactedAt, ...rest } = data
+  const createData = contactedAt
+    ? { ...rest, userId, status: 'contacted' as ContactStatus }
+    : { ...rest, userId }
+
+  const contact = await prisma.contact.create({ data: createData })
+
+  if (contactedAt) {
+    return prisma.contact.update({
+      where: { id: contact.id },
+      data: { updatedAt: new Date(contactedAt) },
+    })
+  }
+
+  return contact
 }
 
 export async function getContacts(userId: string) {

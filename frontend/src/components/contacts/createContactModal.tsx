@@ -37,6 +37,7 @@ export function CreateContactModal({ open, onClose }: ICreateContactModalProps) 
   const [rawText, setRawText] = useState("");
   const [scoreResult, setScoreResult] = useState<IScoreResult | null>(null);
   const [scoreError, setScoreError] = useState(false);
+  const [alreadyContacted, setAlreadyContacted] = useState(false);
 
   const { register, handleSubmit, reset, setValue, getValues } = useForm<ICreateContactPayload>({
     defaultValues: { status: "to_contact" },
@@ -47,7 +48,19 @@ export function CreateContactModal({ open, onClose }: ICreateContactModalProps) 
     setRawText("");
     setScoreResult(null);
     setScoreError(false);
+    setAlreadyContacted(false);
     onClose();
+  };
+
+  const handleAlreadyContactedToggle = () => {
+    const next = !alreadyContacted;
+    setAlreadyContacted(next);
+    if (next) {
+      setValue("status", "contacted");
+    } else {
+      setValue("status", "to_contact");
+      setValue("contactedAt", "");
+    }
   };
 
   const handleExtract = () => {
@@ -120,19 +133,19 @@ export function CreateContactModal({ open, onClose }: ICreateContactModalProps) 
         </div>
 
         {scoreContact.isPending && (
-          <div className="animate-pulse rounded-md bg-gray-100 px-3 py-2 text-sm text-gray-700">
+          <div className="animate-pulse rounded-md bg-muted px-3 py-2 text-sm text-muted-foreground">
             Analyse du profil en cours…
           </div>
         )}
 
         {scoreError && (
-          <div className="rounded-md bg-gray-100 px-3 py-2 text-sm text-gray-700">
+          <div className="rounded-md bg-muted px-3 py-2 text-sm text-muted-foreground">
             Analyse indisponible. Tu peux ajouter le contact manuellement.
           </div>
         )}
 
         {scoreResult?.compatible && (
-          <div className="rounded-md border border-gray-300 bg-gray-50 px-3 py-2 text-sm text-black">
+          <div className="rounded-md border border-border bg-muted px-3 py-2 text-sm text-foreground">
             <p className="font-semibold">Profil compatible</p>
             <ul className="mt-1 list-disc list-inside">
               {scoreResult.reasons.map((r, i) => (
@@ -143,7 +156,7 @@ export function CreateContactModal({ open, onClose }: ICreateContactModalProps) 
         )}
 
         {scoreResult && !scoreResult.compatible && (
-          <div className="rounded-md border border-gray-300 bg-gray-50 px-3 py-2 text-sm text-black">
+          <div className="rounded-md border border-border bg-muted px-3 py-2 text-sm text-foreground">
             <p className="font-semibold">Profil non compatible</p>
             <ul className="mt-1 list-disc list-inside">
               {scoreResult.reasons.map((r, i) => (
@@ -185,17 +198,23 @@ export function CreateContactModal({ open, onClose }: ICreateContactModalProps) 
           </div>
           <div className="flex flex-col gap-1.5">
             <Label htmlFor="create-status">Statut</Label>
-            <select
-              id="create-status"
-              {...register("status")}
-              className="flex h-9 w-full rounded-md border border-input bg-background text-foreground px-3 py-1 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
-            >
-              {STATUS_OPTIONS.map((s) => (
-                <option key={s} value={s}>
-                  {STATUS_LABELS[s]}
-                </option>
-              ))}
-            </select>
+            {alreadyContacted ? (
+              <div className="flex h-9 items-center rounded-md border border-input bg-muted px-3 text-sm text-muted-foreground">
+                Contacté
+              </div>
+            ) : (
+              <select
+                id="create-status"
+                {...register("status")}
+                className="flex h-9 w-full rounded-md border border-input bg-background text-foreground px-3 py-1 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+              >
+                {STATUS_OPTIONS.map((s) => (
+                  <option key={s} value={s}>
+                    {STATUS_LABELS[s]}
+                  </option>
+                ))}
+              </select>
+            )}
           </div>
           <div className="flex flex-col gap-1.5">
             <Label htmlFor="create-notes">Notes</Label>
@@ -205,6 +224,28 @@ export function CreateContactModal({ open, onClose }: ICreateContactModalProps) 
               rows={3}
               className="flex w-full rounded-md border border-input bg-background text-foreground px-3 py-2 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring resize-none"
             />
+          </div>
+          <div className="flex flex-col gap-2">
+            <label className="flex items-center gap-2 cursor-pointer">
+              <input
+                type="checkbox"
+                checked={alreadyContacted}
+                onChange={handleAlreadyContactedToggle}
+                className="h-4 w-4 rounded border-input accent-primary"
+              />
+              <span className="text-sm">J'ai déjà contacté cette personne</span>
+            </label>
+            {alreadyContacted && (
+              <div className="flex flex-col gap-1.5">
+                <Label htmlFor="create-contactedAt">Date d'envoi</Label>
+                <Input
+                  id="create-contactedAt"
+                  type="date"
+                  {...register("contactedAt", { required: alreadyContacted })}
+                  max={new Date().toISOString().split("T")[0]}
+                />
+              </div>
+            )}
           </div>
           <DialogFooter className="mt-2">
             <Button type="button" variant="outline" onClick={handleClose}>

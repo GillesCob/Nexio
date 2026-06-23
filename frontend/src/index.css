@@ -3,6 +3,10 @@
 @tailwind utilities;
 
 @layer base {
+  body {
+    @apply bg-background text-foreground;
+  }
+
   :root {
     --background: 0 0% 100%;
     --foreground: 222.2 84% 4.9%;
@@ -26,26 +30,5 @@
     --radius: 0.5rem;
   }
 
-  .dark {
-    --background: 215 28% 7%;
-    --foreground: 210 34% 93%;
-    --card: 214 30% 11%;
-    --card-foreground: 210 34% 93%;
-    --popover: 214 30% 11%;
-    --popover-foreground: 210 34% 93%;
-    --primary: 213 100% 67%;
-    --primary-foreground: 215 28% 7%;
-    --secondary: 213 16% 15%;
-    --secondary-foreground: 210 34% 93%;
-    --muted: 213 16% 15%;
-    --muted-foreground: 212 10% 52%;
-    --accent: 213 16% 18%;
-    --accent-foreground: 210 34% 93%;
-    --destructive: 0 72% 51%;
-    --destructive-foreground: 0 0% 98%;
-    --border: 214 12% 21%;
-    --input: 213 16% 15%;
-    --ring: 213 100% 67%;
-    --radius: 0.5rem;
-  }
+
 }

@@ -3,6 +3,8 @@ import { LoginPage } from '@/pages/loginPage'
 import { RegisterPage } from '@/pages/registerPage'
 import { ForgotPasswordPage } from '@/pages/forgotPasswordPage'
 import { DashboardPage } from '@/pages/dashboardPage'
+import { StatsPage } from '@/pages/statsPage'
+import { JobOffersPage } from '@/pages/jobOffersPage'
 import { ProtectedRoute } from '@/components/protectedRoute'
 import AuthInitializer from '@/components/authInitializer'
 
@@ -18,6 +20,22 @@ export function App() {
           element={
             <ProtectedRoute>
               <DashboardPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/stats"
+          element={
+            <ProtectedRoute>
+              <StatsPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/job-offers"
+          element={
+            <ProtectedRoute>
+              <JobOffersPage />
             </ProtectedRoute>
           }
         />

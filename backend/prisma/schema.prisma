@@ -46,6 +46,7 @@ model User {
   jobOffers           JobOffer[]
   contacts            Contact[]
   passwordResetTokens PasswordResetToken[]
+  linkedInSnapshots   LinkedInSnapshot[]
 }
 
 model PasswordResetToken {
@@ -70,6 +71,11 @@ model JobOffer {
   status      JobOfferStatus @default(wishlist)
   createdAt   DateTime       @default(now())
   updatedAt   DateTime       @updatedAt
+
+  score        Int?
+  scoreMatches String[]
+  scoreGaps    String[]
+  scoreComment String?
 
   userId String
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
@@ -120,4 +126,23 @@ model Message {
 
   contactId String
   contact   Contact @relation(fields: [contactId], references: [id], onDelete: Cascade)
+}
+
+model LinkedInSnapshot {
+  id                         String   @id @default(cuid())
+  weekLabel                  String
+  impressions                Int
+  impressionsVariation       Int
+  followers                  Int
+  followersVariation         Int
+  profileViews               Int
+  profileViewsVariation      Int
+  searchAppearances          Int
+  searchAppearancesVariation Int
+  postsCount                 Int
+  commentsCount              Int
+  createdAt                  DateTime @default(now())
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 }

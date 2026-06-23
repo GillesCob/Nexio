@@ -47,7 +47,7 @@ export function StatusActions({ contact, onStatusChange, onTouch, isRepliedAlert
   const showTouchButton = contact.status === 'replied' && isRepliedAlert && onTouch
 
   if (transitions.length === 0 && !showTouchButton) {
-    return <p className="text-sm text-gray-400">Statut final</p>
+    return <p className="text-sm text-muted-foreground">Statut final</p>
   }
 
   const handleClick = (t: { label: string; targetStatus: ContactStatus }) => {
@@ -90,7 +90,7 @@ export function StatusActions({ contact, onStatusChange, onTouch, isRepliedAlert
           </Button>
         ))}
       </div>
-      {feedback && <p className="text-sm text-gray-500">{feedback}</p>}
+      {feedback && <p className="text-sm text-muted-foreground">{feedback}</p>}
     </div>
   )
 }

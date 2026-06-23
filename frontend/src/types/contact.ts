@@ -40,6 +40,7 @@ export interface ICreateContactPayload {
   status?: ContactStatus
   notes?: string
   jobOfferId?: string
+  contactedAt?: string
 }
 
 export interface IUpdateContactPayload {
@@ -77,4 +78,5 @@ export interface IRelanceContact extends IContact {
 export interface IRelanceResult {
   toFollowUp: IRelanceContact[]
   toCheckReplied: IRelanceContact[]
+  toRelanceContacted: IRelanceContact[]
 }
