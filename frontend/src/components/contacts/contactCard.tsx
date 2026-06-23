@@ -2,6 +2,13 @@ import { Draggable } from '@hello-pangea/dnd'
 import type { IContact } from '@/types/contact'
 import { getProfileBadge } from '@/lib/profileBadge'
 
+const formatDate = (iso: string) =>
+  new Date(iso).toLocaleDateString('fr-FR', {
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric',
+  })
+
 interface IContactCardProps {
   contact: IContact
   index: number
@@ -9,6 +16,11 @@ interface IContactCardProps {
 }
 
 export function ContactCard({ contact, index, onOpen }: IContactCardProps) {
+  const isUnchanged = contact.updatedAt === contact.createdAt
+  const dateLabel = isUnchanged
+    ? `Ajouté le ${formatDate(contact.createdAt)}`
+    : `Dernier contact le ${formatDate(contact.updatedAt)}`
+
   return (
     <Draggable draggableId={contact.id} index={index}>
       {(provided, snapshot) => (
@@ -32,6 +44,7 @@ export function ContactCard({ contact, index, onOpen }: IContactCardProps) {
               {getProfileBadge(contact.jobTitle)}
             </span>
           )}
+          <p className="text-xs text-muted-foreground mt-2">{dateLabel}</p>
         </div>
       )}
     </Draggable>
