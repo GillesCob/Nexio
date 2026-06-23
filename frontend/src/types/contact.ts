@@ -78,5 +78,4 @@ export interface IRelanceContact extends IContact {
 export interface IRelanceResult {
   toFollowUp: IRelanceContact[]
   toCheckReplied: IRelanceContact[]
-  toRelanceContacted: IRelanceContact[]
 }

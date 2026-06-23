@@ -10,3 +10,13 @@ export async function getRelances(req: Request, res: Response, next: NextFunctio
     next(err)
   }
 }
+
+export async function autoPromoteToFollowUp(req: Request, res: Response, next: NextFunction): Promise<void> {
+  try {
+    const userId = req.user!.userId
+    const promoted = await relanceService.autoPromoteToFollowUp(userId)
+    res.json({ promoted })
+  } catch (err) {
+    next(err)
+  }
+}

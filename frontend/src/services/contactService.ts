@@ -74,3 +74,8 @@ export async function suggestRelance(contactId: string): Promise<{ message: stri
   const response = await apiClient.get<{ message: string }>(`/contacts/${contactId}/suggest-relance`)
   return response.data
 }
+
+export async function autoPromote(): Promise<{ promoted: number }> {
+  const response = await apiClient.post<{ promoted: number }>('/contacts/auto-promote')
+  return response.data
+}

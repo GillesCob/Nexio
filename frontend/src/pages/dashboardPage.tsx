@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import type { IContact } from '@/types/contact'
 import { KanbanBoard } from '@/components/contacts/kanbanBoard'
 import { ContactModal } from '@/components/contacts/contactModal'
@@ -7,10 +7,15 @@ import { RelanceBanner } from '@/components/contacts/relanceBanner'
 import { LinkedInReminderBanner } from '@/components/stats/linkedinReminderBanner'
 import { Navbar } from '@/components/layout/navbar'
 import { Button } from '@/components/ui/button'
+import { useAutoPromote } from '@/hooks/useContacts'
 
 export function DashboardPage() {
   const [selectedContact, setSelectedContact] = useState<IContact | null>(null)
   const [isCreateOpen, setIsCreateOpen] = useState(false)
+  const autoPromote = useAutoPromote()
+
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  useEffect(() => { autoPromote.mutate() }, [])
 
   return (
     <main className="p-8">

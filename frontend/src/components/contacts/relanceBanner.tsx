@@ -10,9 +10,8 @@ export function RelanceBanner({ onOpenContact }: IRelanceBannerProps) {
 
   const toFollowUp = relanceResult?.toFollowUp ?? []
   const toCheckReplied = relanceResult?.toCheckReplied ?? []
-  const toRelanceContacted = relanceResult?.toRelanceContacted ?? []
 
-  if (toFollowUp.length === 0 && toCheckReplied.length === 0 && toRelanceContacted.length === 0) return null
+  if (toFollowUp.length === 0 && toCheckReplied.length === 0) return null
 
   return (
     <div className="flex flex-col gap-2 mb-6">
@@ -54,24 +53,6 @@ export function RelanceBanner({ onOpenContact }: IRelanceBannerProps) {
         </div>
       )}
 
-      {toRelanceContacted.length > 0 && (
-        <div className="rounded-md border border-emerald-300 bg-emerald-50 text-emerald-800 px-4 py-3 text-sm">
-          <span className="font-semibold">
-            {toRelanceContacted.length} contact{toRelanceContacted.length > 1 ? 's' : ''} sans nouvelles depuis plus de 7 jours :
-          </span>{' '}
-          {toRelanceContacted.map((r, i) => (
-            <span key={r.id}>
-              <button
-                onClick={() => onOpenContact(r)}
-                className="underline hover:text-emerald-900 cursor-pointer"
-              >
-                {r.name}
-              </button>
-              {i < toRelanceContacted.length - 1 ? ', ' : ''}
-            </span>
-          ))}
-        </div>
-      )}
     </div>
   )
 }

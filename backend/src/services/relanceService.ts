@@ -20,7 +20,6 @@ interface IRelanceContact {
 export interface IRelanceResult {
   toFollowUp: IRelanceContact[]
   toCheckReplied: IRelanceContact[]
-  toRelanceContacted: IRelanceContact[]
 }
 
 function mapWithDays(contacts: Omit<IRelanceContact, 'daysSinceUpdate'>[]): IRelanceContact[] {
@@ -39,11 +38,8 @@ export async function getRelances(userId: string): Promise<IRelanceResult> {
   const repliedCutoff = new Date(
     Date.now() - RELANCE_CONFIG.repliedDelayDays * 24 * 60 * 60 * 1000
   )
-  const contactedCutoff = new Date(
-    Date.now() - RELANCE_CONFIG.contactedDelayDays * 24 * 60 * 60 * 1000
-  )
 
-  const [followUpContacts, repliedContacts, contactedContacts] = await Promise.all([
+  const [followUpContacts, repliedContacts] = await Promise.all([
     prisma.contact.findMany({
       where: { userId, status: 'follow_up', updatedAt: { lt: followUpCutoff } },
       orderBy: { updatedAt: 'asc' },
@@ -52,15 +48,21 @@ export async function getRelances(userId: string): Promise<IRelanceResult> {
       where: { userId, status: 'replied', updatedAt: { lt: repliedCutoff } },
       orderBy: { updatedAt: 'asc' },
     }),
-    prisma.contact.findMany({
-      where: { userId, status: 'contacted', updatedAt: { lt: contactedCutoff } },
-      orderBy: { updatedAt: 'asc' },
-    }),
   ])
 
   return {
     toFollowUp: mapWithDays(followUpContacts),
     toCheckReplied: mapWithDays(repliedContacts),
-    toRelanceContacted: mapWithDays(contactedContacts),
   }
+}
+
+export async function autoPromoteToFollowUp(userId: string): Promise<number> {
+  const contactedCutoff = new Date(
+    Date.now() - RELANCE_CONFIG.contactedDelayDays * 24 * 60 * 60 * 1000
+  )
+  const result = await prisma.contact.updateMany({
+    where: { userId, status: 'contacted', updatedAt: { lt: contactedCutoff } },
+    data: { status: 'follow_up' },
+  })
+  return result.count
 }

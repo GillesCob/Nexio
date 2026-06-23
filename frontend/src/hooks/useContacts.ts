@@ -105,6 +105,16 @@ export function useSuggestRelance() {
   })
 }
 
+export function useAutoPromote() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: contactService.autoPromote,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: CONTACTS_QUERY_KEY })
+    },
+  })
+}
+
 export function useTouchContact() {
   const queryClient = useQueryClient()
   return useMutation({
