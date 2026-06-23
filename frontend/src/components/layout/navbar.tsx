@@ -1,5 +1,7 @@
 import { Link, useLocation } from 'react-router-dom'
 import { cn } from '@/lib/utils'
+import { Button } from '@/components/ui/button'
+import { useLogout } from '@/hooks/useAuth'
 
 interface INavLink {
   label: string
@@ -14,6 +16,7 @@ const NAV_LINKS: INavLink[] = [
 
 export function Navbar() {
   const location = useLocation()
+  const logout = useLogout()
 
   return (
     <nav className="flex items-center gap-8 py-3 border-b border-border mb-6">
@@ -36,7 +39,16 @@ export function Navbar() {
           </Link>
         ))}
       </div>
-
+      <div className="ml-auto">
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={() => logout.mutate()}
+          disabled={logout.isPending}
+        >
+          Se déconnecter
+        </Button>
+      </div>
     </nav>
   )
 }

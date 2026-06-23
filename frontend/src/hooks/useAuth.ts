@@ -43,3 +43,16 @@ export function useForgotPassword() {
       apiClient.post('/auth/forgot-password', payload).then((r) => r.data),
   })
 }
+
+export function useLogout() {
+  const navigate = useNavigate()
+  const clearAuth = useAuthStore((s) => s.clearAuth)
+
+  return useMutation({
+    mutationFn: () => apiClient.post('/auth/logout').then((r) => r.data),
+    onSettled: () => {
+      clearAuth()
+      navigate('/login', { replace: true })
+    },
+  })
+}
