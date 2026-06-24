@@ -1,36 +1,19 @@
 import { useState } from "react";
 import { useForm } from "react-hook-form";
-import type { ICreateContactPayload, ContactStatus, IScoreResult } from "@/types/contact";
+import type { ICreateContactPayload, IScoreResult, IContact } from "@/types/contact";
 import { useCreateContact, useExtractContact, useScoreContact } from "@/hooks/useContacts";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
-const STATUS_LABELS: Record<ContactStatus, string> = {
-  to_contact: "À contacter",
-  contacted: "Contacté",
-  replied: "A répondu",
-  meeting_scheduled: "RDV planifié",
-  follow_up: "Relance",
-  closed: "Fermé",
-};
-
-const STATUS_OPTIONS: ContactStatus[] = [
-  "to_contact",
-  "contacted",
-  "replied",
-  "meeting_scheduled",
-  "follow_up",
-  "closed",
-];
-
 interface ICreateContactModalProps {
   open: boolean;
   onClose: () => void;
+  onCreated: (contact: IContact) => void;
 }
 
-export function CreateContactModal({ open, onClose }: ICreateContactModalProps) {
+export function CreateContactModal({ open, onClose, onCreated }: ICreateContactModalProps) {
   const createContact = useCreateContact();
   const extractContact = useExtractContact();
   const scoreContact = useScoreContact();
@@ -39,9 +22,7 @@ export function CreateContactModal({ open, onClose }: ICreateContactModalProps) 
   const [scoreError, setScoreError] = useState(false);
   const [alreadyContacted, setAlreadyContacted] = useState(false);
 
-  const { register, handleSubmit, reset, setValue, getValues } = useForm<ICreateContactPayload>({
-    defaultValues: { status: "to_contact" },
-  });
+  const { register, handleSubmit, reset, setValue, getValues } = useForm<ICreateContactPayload>();
 
   const handleClose = () => {
     reset();
@@ -96,7 +77,7 @@ export function CreateContactModal({ open, onClose }: ICreateContactModalProps) 
   };
 
   const onSubmit = handleSubmit((data) => {
-    createContact.mutate(data, { onSuccess: handleClose });
+    createContact.mutate(data, { onSuccess: (contact) => { onCreated(contact); handleClose(); } });
   });
 
   return (
@@ -171,7 +152,7 @@ export function CreateContactModal({ open, onClose }: ICreateContactModalProps) 
                 type="button"
                 size="sm"
                 disabled={createContact.isPending}
-                onClick={() => createContact.mutate(getValues(), { onSuccess: handleClose })}
+                onClick={() => createContact.mutate(getValues(), { onSuccess: (contact) => { onCreated(contact); handleClose(); } })}
               >
                 {createContact.isPending ? "Ajout…" : "Ajouter quand même"}
               </Button>
@@ -195,26 +176,6 @@ export function CreateContactModal({ open, onClose }: ICreateContactModalProps) 
           <div className="flex flex-col gap-1.5">
             <Label htmlFor="create-linkedinUrl">URL LinkedIn</Label>
             <Input id="create-linkedinUrl" type="url" {...register("linkedinUrl")} />
-          </div>
-          <div className="flex flex-col gap-1.5">
-            <Label htmlFor="create-status">Statut</Label>
-            {alreadyContacted ? (
-              <div className="flex h-9 items-center rounded-md border border-input bg-muted px-3 text-sm text-muted-foreground">
-                Contacté
-              </div>
-            ) : (
-              <select
-                id="create-status"
-                {...register("status")}
-                className="flex h-9 w-full rounded-md border border-input bg-background text-foreground px-3 py-1 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
-              >
-                {STATUS_OPTIONS.map((s) => (
-                  <option key={s} value={s}>
-                    {STATUS_LABELS[s]}
-                  </option>
-                ))}
-              </select>
-            )}
           </div>
           <div className="flex flex-col gap-1.5">
             <Label htmlFor="create-notes">Notes</Label>
@@ -255,7 +216,7 @@ export function CreateContactModal({ open, onClose }: ICreateContactModalProps) 
               <Button
                 type="button"
                 disabled={createContact.isPending}
-                onClick={() => createContact.mutate(getValues(), { onSuccess: handleClose })}
+                onClick={() => createContact.mutate(getValues(), { onSuccess: (contact) => { onCreated(contact); handleClose(); } })}
               >
                 {createContact.isPending ? "Ajout…" : scoreResult.compatible ? "Ajouter" : "Ajouter quand même"}
               </Button>

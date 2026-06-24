@@ -1,7 +1,9 @@
 import { Link, useLocation } from 'react-router-dom'
+import { Moon, Sun } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
 import { useLogout } from '@/hooks/useAuth'
+import { useDarkMode } from '@/hooks/useDarkMode'
 
 interface INavLink {
   label: string
@@ -17,6 +19,7 @@ const NAV_LINKS: INavLink[] = [
 export function Navbar() {
   const location = useLocation()
   const logout = useLogout()
+  const { theme, toggle } = useDarkMode()
 
   return (
     <nav className="flex items-center gap-8 py-3 border-b border-border mb-6">
@@ -39,7 +42,10 @@ export function Navbar() {
           </Link>
         ))}
       </div>
-      <div className="ml-auto">
+      <div className="ml-auto flex items-center gap-2">
+        <Button variant="ghost" size="sm" onClick={toggle} aria-label="Basculer le thème">
+          {theme === 'dark' ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+        </Button>
         <Button
           variant="ghost"
           size="sm"
