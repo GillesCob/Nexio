@@ -13,6 +13,36 @@ export const relanceTemplates: IRelanceTemplate[] = [
     body: `Bonjour {{firstName}},\n\nJe me permets de revenir vers vous suite à mon message précédent. Je suis toujours en recherche active d'une opportunité en développement web full-stack (React / Node.js / TypeScript), et {{companyName}} reste une entreprise qui m'intéresse particulièrement.\n\nAvez-vous eu l'occasion d'y réfléchir ? Je reste disponible pour un échange rapide si vous le souhaitez.\n\nCordialement,\nGilles`,
   },
   {
+    id: '1a_relance_after_17_07',
+    label: 'Flux 1a — Relance après 17/07',
+    targetProfile: 'recruiter_esn',
+    body: `Bonjour [Prénom],
+
+Je me permets de revenir vers vous suite à mon message du [DATE].
+
+Cerithe vient de passer en production. C'est le projet dont je vous parlais et il est maintenant en ligne. Depuis gillescobigo.com vous pouvez d'ailleurs accéder aux démos de mes différents projets et vous faire une idée concrète de ce que je construis.
+
+Je reste à la recherche d'un poste fullstack dans la région de [VILLE] et [NOM ESN] m'intéresse toujours.
+
+À votre disposition pour échanger.
+Gilles`,
+  },
+  {
+    id: '1a_relance_final',
+    label: 'Flux 1a — Relance finale',
+    targetProfile: 'recruiter_esn',
+    body: `Bonjour [Prénom],
+
+Dernier message de ma part pour ne pas encombrer votre boîte.
+
+Mon profil a évolué depuis nos derniers échanges, gillescobigo.com est à jour si vous souhaitez y jeter un oeil.
+
+Si une opportunité se présente au sein de [NOM ESN], je reste preneur.
+
+Bonne continuation.
+Gilles`,
+  },
+  {
     id: '1b_relance',
     label: 'Relance recruteuse freelance',
     targetProfile: 'recruiter_freelance',
