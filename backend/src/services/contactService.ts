@@ -56,22 +56,26 @@ export async function createContact(userId: string, data: ICreateContactData) {
     companySector = company?.sector ?? null;
   }
 
-  try {
-    const classification = await classifyContactFlux({
-      jobTitle: data.jobTitle ?? null,
-      companyName: data.company ?? null,
-      companyDescription,
-      companySector,
-    });
+  const companyIsEnriched = companyDescription !== null && companySector !== null;
 
-    if (classification.flux !== 'unknown') {
-      return prisma.contact.update({
-        where: { id: contact.id },
-        data: { flux: classification.flux, fluxConfidence: classification.confidence },
+  if (companyIsEnriched) {
+    try {
+      const classification = await classifyContactFlux({
+        jobTitle: data.jobTitle ?? null,
+        companyName: data.company ?? null,
+        companyDescription,
+        companySector,
       });
+
+      if (classification.flux !== 'unknown') {
+        return prisma.contact.update({
+          where: { id: contact.id },
+          data: { flux: classification.flux, fluxConfidence: classification.confidence },
+        });
+      }
+    } catch (err) {
+      console.error('[contactService] classifyContactFlux failed, contact saved without flux:', err);
     }
-  } catch (err) {
-    console.error('[contactService] classifyContactFlux failed, contact saved without flux:', err);
   }
 
   return contactAfterDateUpdate;
