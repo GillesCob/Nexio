@@ -90,6 +90,7 @@ model Company {
   sector      String?
   size        String?
   linkedinUrl String?
+  companyType String?
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
 
@@ -97,15 +98,20 @@ model Company {
 }
 
 model Contact {
-  id          String        @id @default(cuid())
-  name        String
-  company     String?
-  linkedinUrl String?
-  jobTitle    String?
-  status      ContactStatus @default(to_contact)
-  notes       String?
-  createdAt   DateTime      @default(now())
-  updatedAt   DateTime      @updatedAt
+  id             String        @id @default(cuid())
+  name           String
+  company        String?
+  linkedinUrl    String?
+  jobTitle       String?
+  status         ContactStatus @default(to_contact)
+  notes          String?
+  contactedAt    DateTime?
+  relanceCount   Int           @default(0)
+  flux           String?
+  fluxConfidence Float?
+  location       String?
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
 
   userId String
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
