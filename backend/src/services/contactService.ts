@@ -1,6 +1,7 @@
 import { ContactStatus } from "@prisma/client";
 import { AppError } from "../middlewares/errorMiddleware";
 import { prisma } from "../lib/prisma";
+import { classifyContactFlux } from "./fluxClassifier";
 
 interface ICreateContactData {
   name: string;
@@ -39,14 +40,41 @@ export async function createContact(userId: string, data: ICreateContactData) {
 
   const contact = await prisma.contact.create({ data: createData });
 
+  let contactAfterDateUpdate = contact;
   if (contactedAt) {
-    return prisma.contact.update({
+    contactAfterDateUpdate = await prisma.contact.update({
       where: { id: contact.id },
       data: { updatedAt: new Date(contactedAt) },
     });
   }
 
-  return contact;
+  let companyDescription: string | null = null;
+  let companySector: string | null = null;
+  if (data.companyId) {
+    const company = await prisma.company.findUnique({ where: { id: data.companyId } });
+    companyDescription = company?.description ?? null;
+    companySector = company?.sector ?? null;
+  }
+
+  try {
+    const classification = await classifyContactFlux({
+      jobTitle: data.jobTitle ?? null,
+      companyName: data.company ?? null,
+      companyDescription,
+      companySector,
+    });
+
+    if (classification.flux !== 'unknown') {
+      return prisma.contact.update({
+        where: { id: contact.id },
+        data: { flux: classification.flux, fluxConfidence: classification.confidence },
+      });
+    }
+  } catch (err) {
+    console.error('[contactService] classifyContactFlux failed, contact saved without flux:', err);
+  }
+
+  return contactAfterDateUpdate;
 }
 
 export async function getContacts(userId: string) {
