@@ -28,6 +28,24 @@ export const SCORING_CRITERIA = {
     "responsable technique",
     "engineering manager",
     "VP engineering",
+    "chief technology",
+    // Management / Direction
+    "directeur de projets",
+    "directeur des systèmes",
+    "DSI",
+    "directeur informatique",
+    "responsable informatique",
+    "project manager",
+    "responsable projets",
+    "manager technique",
+    "directeur agence",
+    "responsable agence",
+    // ESN / Consulting
+    "business manager",
+    "manager ESN",
+    "delivery manager",
+    "account manager",
+    "responsable commercial",
   ],
   excludedProfiles: [
     "industrie lourde",
@@ -39,6 +57,5 @@ export const SCORING_CRITERIA = {
     "manutention",
     "BTP ouvrier",
   ],
-  // Si remote mentionné dans le profil → ignorer la contrainte géo
   remoteKeywords: ["remote", "full remote", "télétravail", "distanciel"],
 } as const;
