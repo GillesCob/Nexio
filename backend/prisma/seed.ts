@@ -35,7 +35,7 @@ async function main() {
   await prisma.linkedInSnapshot.deleteMany({ where: { userId: guestUser.id } });
 
   // Companies — findFirst + create car name n'est pas @unique dans le schema
-  const findOrCreateCompany = async (name: string, data: { sector?: string; size?: string; description?: string }) => {
+  const findOrCreateCompany = async (name: string, data: { sector?: string; size?: string; description?: string; companyType?: string }) => {
     const existing = await prisma.company.findFirst({ where: { name } });
     if (existing) return existing;
     return prisma.company.create({ data: { name, ...data } });
@@ -45,24 +45,28 @@ async function main() {
     sector: "ESN",
     size: "50 000+ salariés",
     description: "Groupe européen de services numériques et de conseil.",
+    companyType: "ESN",
   });
 
   const capgeminiCompany = await findOrCreateCompany("Capgemini", {
     sector: "ESN",
     size: "300 000+ salariés",
     description: "Leader mondial du conseil, des services informatiques et de la transformation numérique.",
+    companyType: "ESN",
   });
 
   const axiansCompany = await findOrCreateCompany("Axians", {
     sector: "ESN / Infra",
     size: "10 000+ salariés",
     description: "Marque ICT de VINCI Energies, spécialisée dans les infrastructures digitales.",
+    companyType: "ESN",
   });
 
   const zenikaCompany = await findOrCreateCompany("Zenika", {
     sector: "Conseil tech",
     size: "800+ salariés",
     description: "Cabinet de conseil et de formation en technologies innovantes.",
+    companyType: "ESN",
   });
 
   // Contacts avec messages imbriqués
@@ -73,6 +77,11 @@ async function main() {
       company: "Sopra Steria",
       status: ContactStatus.to_contact,
       notes: "Recruteuse Sopra Steria Bordeaux — spécialisée profils frontend.",
+      contactedAt: null,
+      relanceCount: 0,
+      flux: "1a",
+      fluxConfidence: 0.95,
+      location: "Bordeaux",
       updatedAt: daysAgo(5),
       userId: guestUser.id,
       companyId: sopraSteriaCompany.id,
@@ -86,6 +95,11 @@ async function main() {
       company: "Capgemini",
       status: ContactStatus.to_contact,
       notes: "Lead dev JS/TS chez Capgemini Bordeaux. Suit les sujets React.",
+      contactedAt: null,
+      relanceCount: 0,
+      flux: "1b",
+      fluxConfidence: 0.92,
+      location: "Bordeaux",
       updatedAt: daysAgo(3),
       userId: guestUser.id,
       companyId: capgeminiCompany.id,
@@ -99,6 +113,11 @@ async function main() {
       company: "TechGironde",
       status: ContactStatus.to_contact,
       notes: "Startup locale en croissance — stack React/Node. Pas encore de poste ouvert visible.",
+      contactedAt: null,
+      relanceCount: 0,
+      flux: "2",
+      fluxConfidence: 0.95,
+      location: "Bordeaux",
       updatedAt: daysAgo(1),
       userId: guestUser.id,
     },
@@ -110,6 +129,11 @@ async function main() {
       jobTitle: "Recruteur Tech",
       company: "Axians",
       status: ContactStatus.contacted,
+      contactedAt: daysAgo(8),
+      relanceCount: 0,
+      flux: "1a",
+      fluxConfidence: 0.95,
+      location: "Bayonne",
       updatedAt: daysAgo(8),
       userId: guestUser.id,
       companyId: axiansCompany.id,
@@ -131,6 +155,11 @@ async function main() {
       jobTitle: "Lead Developer React",
       company: "Zenika",
       status: ContactStatus.contacted,
+      contactedAt: daysAgo(6),
+      relanceCount: 0,
+      flux: "1b",
+      fluxConfidence: 0.90,
+      location: "Bordeaux",
       updatedAt: daysAgo(6),
       userId: guestUser.id,
       companyId: zenikaCompany.id,
@@ -152,6 +181,11 @@ async function main() {
       jobTitle: "CTO",
       company: "DataSud",
       status: ContactStatus.replied,
+      contactedAt: daysAgo(9),
+      relanceCount: 0,
+      flux: "2",
+      fluxConfidence: 0.95,
+      location: "Bordeaux",
       updatedAt: daysAgo(2),
       userId: guestUser.id,
       messages: {
@@ -177,6 +211,11 @@ async function main() {
       jobTitle: "Recruteuse IT",
       company: "Accenture",
       status: ContactStatus.replied,
+      contactedAt: daysAgo(10),
+      relanceCount: 0,
+      flux: "1a",
+      fluxConfidence: 0.95,
+      location: "Bordeaux",
       updatedAt: daysAgo(4),
       userId: guestUser.id,
       messages: {
@@ -198,6 +237,11 @@ async function main() {
       company: "Sopra Steria",
       status: ContactStatus.meeting_scheduled,
       notes: "Entretien prévu jeudi matin. Préparer les questions sur le contexte projet.",
+      contactedAt: daysAgo(7),
+      relanceCount: 0,
+      flux: "1b",
+      fluxConfidence: 0.88,
+      location: "Bordeaux",
       updatedAt: daysAgo(1),
       userId: guestUser.id,
       companyId: sopraSteriaCompany.id,
@@ -220,6 +264,11 @@ async function main() {
       company: "Capgemini",
       status: ContactStatus.follow_up,
       notes: "Pas de réponse depuis 2 semaines. Relancer avec une nouvelle accroche.",
+      contactedAt: daysAgo(14),
+      relanceCount: 1,
+      flux: "1a",
+      fluxConfidence: 0.95,
+      location: "Bordeaux",
       updatedAt: daysAgo(14),
       userId: guestUser.id,
       companyId: capgeminiCompany.id,
@@ -233,6 +282,11 @@ async function main() {
       company: "WebAgency64",
       status: ContactStatus.follow_up,
       notes: "Agence locale Pau/Bayonne. Premier message sans réponse.",
+      contactedAt: daysAgo(12),
+      relanceCount: 1,
+      flux: "3",
+      fluxConfidence: 0.82,
+      location: "Pau",
       updatedAt: daysAgo(12),
       userId: guestUser.id,
     },
@@ -245,6 +299,11 @@ async function main() {
       company: "InfoSud",
       status: ContactStatus.closed,
       notes: "Poste pourvu. A recontacter dans 6 mois si la boîte est en croissance.",
+      contactedAt: daysAgo(30),
+      relanceCount: 1,
+      flux: "2",
+      fluxConfidence: 0.95,
+      location: "Bordeaux",
       updatedAt: daysAgo(30),
       userId: guestUser.id,
     },
@@ -257,6 +316,11 @@ async function main() {
       company: "Axians",
       status: ContactStatus.closed,
       notes: "Pas de budget ouverture de poste avant Q1 prochain.",
+      contactedAt: daysAgo(25),
+      relanceCount: 1,
+      flux: "1b",
+      fluxConfidence: 0.90,
+      location: "Bayonne",
       updatedAt: daysAgo(25),
       userId: guestUser.id,
       companyId: axiansCompany.id,
