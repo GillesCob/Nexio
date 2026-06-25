@@ -30,8 +30,8 @@ export async function extractContact(rawText: string): Promise<IExtractedContact
   return response.data
 }
 
-export async function extractCompany(rawText: string): Promise<ICompany> {
-  const response = await apiClient.post<ICompany>('/companies/extract', { rawText })
+export async function extractCompany(rawText: string, contactId?: string): Promise<ICompany> {
+  const response = await apiClient.post<ICompany>('/companies/extract', { rawText, contactId })
   return response.data
 }
 

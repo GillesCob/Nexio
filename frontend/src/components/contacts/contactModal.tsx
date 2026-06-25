@@ -130,9 +130,8 @@ export function ContactModal({ contact, onClose }: IContactModalProps) {
 
   const handleExtractCompany = () => {
     setExtractionStatus('idle')
-    extractCompany.mutate(rawCompanyText, {
+    extractCompany.mutate({ rawText: rawCompanyText, contactId: contact.id }, {
       onSuccess: (company) => {
-        updateContact.mutate({ id: contact.id, data: { companyId: company.id, company: company.name } })
         setLocalCompany(company)
         setExtractionStatus('success')
         setTimeout(() => setExtractionStatus('idle'), 3000)

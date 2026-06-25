@@ -5,15 +5,18 @@ import { extractCompanyFromText } from '../services/extractCompanyService'
 import * as companyService from '../services/companyService'
 import { prisma } from '../lib/prisma'
 
-const extractSchema = z.object({ rawText: z.string().min(1) })
+const extractSchema = z.object({ rawText: z.string().min(1), contactId: z.string().optional() })
 const enrichParamsSchema = z.object({ id: z.string() })
 const enrichBodySchema = z.object({ rawText: z.string().min(1) })
 
 export async function extractCompany(req: Request, res: Response, next: NextFunction): Promise<void> {
   try {
-    const { rawText } = extractSchema.parse(req.body)
+    const { rawText, contactId } = extractSchema.parse(req.body)
     const extracted = await extractCompanyFromText(rawText)
     const company = await prisma.company.create({ data: extracted })
+    if (contactId) {
+      await companyService.linkAndClassifyContact(company, contactId)
+    }
     res.status(201).json(company)
   } catch (err) {
     if (err instanceof z.ZodError) {

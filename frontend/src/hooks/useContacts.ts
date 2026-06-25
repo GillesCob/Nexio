@@ -49,8 +49,13 @@ export function useExtractContact() {
 }
 
 export function useExtractCompany() {
+  const queryClient = useQueryClient()
   return useMutation({
-    mutationFn: (rawText: string) => contactService.extractCompany(rawText),
+    mutationFn: ({ rawText, contactId }: { rawText: string; contactId?: string }) =>
+      contactService.extractCompany(rawText, contactId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: CONTACTS_QUERY_KEY })
+    },
   })
 }
 

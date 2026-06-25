@@ -1,4 +1,4 @@
-import { Prisma } from '@prisma/client'
+import { Prisma, Company } from '@prisma/client'
 import { AppError } from '../middlewares/errorMiddleware'
 import { prisma } from '../lib/prisma'
 import { extractCompanyFromText } from './extractCompanyService'
@@ -57,4 +57,30 @@ export async function enrichCompany(companyId: string, rawText: string) {
   )
 
   return company
+}
+
+export async function linkAndClassifyContact(company: Company, contactId: string) {
+  const contact = await prisma.contact.update({
+    where: { id: contactId },
+    data: { companyId: company.id, company: company.name },
+  })
+
+  if (!company.description || !company.sector) return
+
+  try {
+    const classification = await classifyContactFlux({
+      jobTitle: contact.jobTitle ?? null,
+      companyName: company.name,
+      companyDescription: company.description,
+      companySector: company.sector,
+    })
+    if (classification.flux !== 'unknown') {
+      await prisma.contact.update({
+        where: { id: contactId },
+        data: { flux: classification.flux, fluxConfidence: classification.confidence },
+      })
+    }
+  } catch (err) {
+    console.error(`[companyService] classifyContactFlux failed for contact ${contactId}:`, err)
+  }
 }
