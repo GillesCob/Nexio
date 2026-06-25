@@ -24,4 +24,55 @@ export const templates: ITemplate[] = [
     targetProfile: "cto",
     body: `Bonjour {{firstName}},\n\nJe vous contacte car votre stack et votre approche technique chez {{companyName}} correspondent exactement à ce que je construis depuis plusieurs mois.\n\nVenu du BIM (gestion de données complexes, coordination multi-acteurs), je me reconvertis sur React/Node/TypeScript et je cherche un environnement exigeant pour progresser vite.\n\nUn échange de 15 min vous serait-il possible ?\n\nCordialement,\nGilles`,
   },
+  {
+    id: "2_first_contact",
+    label: "Flux 2 — CTO / Directeur technique",
+    targetProfile: "cto_directeur_technique",
+    body: `Bonjour [Prénom],
+
+Je construis actuellement Cerithe, un carnet de santé numérique du bâtiment. Stack Node.js, TypeScript, React, Postgres, déployé sur un VPS que j'ai monté from scratch. Je documente chaque décision technique dans un article quotidien.
+
+Mon parcours est atypique : 10 ans dans le bâtiment, dont BIM Manager sur Mareterra à Monaco. J'ai appris à coder pour construire mes propres outils, et c'est devenu mon métier.
+
+Tout est sur gillescobigo.com : les projets en démo, le code sur GitHub, les articles, et un visuel interactif qui détaille mes compétences. Je vous ai également fait une courte vidéo de présentation si vous préférez : [LIEN VIDEO]
+
+Je cherche un poste fullstack dans la région de [VILLE] et [NOM BOITE] m'intéresse.
+
+À votre disposition pour échanger.
+Gilles`,
+  },
+  {
+    id: "3_first_contact",
+    label: "Flux 3 — Lead Dev / Tech Lead",
+    targetProfile: "lead_dev_tech_lead",
+    body: `Bonjour [Prénom],
+
+Je construis actuellement Cerithe, un carnet de santé numérique du bâtiment. Stack Node.js, TypeScript, React, Postgres, déployé sur un VPS que j'ai monté from scratch. Je documente chaque décision technique dans un article quotidien, autant pour ancrer ce que j'apprends que pour partager une démarche.
+
+Mon parcours est atypique : 10 ans dans le bâtiment, dont BIM Manager sur Mareterra à Monaco. J'ai appris à coder pour construire mes propres outils, et c'est devenu mon métier.
+
+Tout est sur gillescobigo.com : les projets en démo, le code sur GitHub, les articles, et un visuel interactif qui détaille mes compétences. Je vous ai également fait une courte vidéo de présentation si vous préférez : [LIEN VIDEO]
+
+Je cherche un poste fullstack dans la région de [VILLE] et [NOM BOITE] m'intéresse.
+
+À votre disposition pour échanger.
+Gilles`,
+  },
+  {
+    id: "4_first_contact",
+    label: "Flux 4 — Business Manager / Directeur de projets ESN",
+    targetProfile: "business_manager_esn",
+    body: `Bonjour [Prénom],
+
+Développeur fullstack, stack Node.js, TypeScript, React, Postgres. Dispo immédiatement, mobile sur Bordeaux, Pau, Bayonne et Mont-de-Marsan.
+
+Profil hybride : 10 ans dans le bâtiment, dont BIM Manager sur Mareterra à Monaco (projet à 2 milliards). Habitué à dialoguer avec des MOA, à tenir des engagements client et à porter un projet de bout en bout. J'ai appris à coder pour construire mes propres outils et c'est devenu mon métier.
+
+Mes projets, mon code et une présentation détaillée sont sur gillescobigo.com. Je vous ai également fait une courte vidéo de présentation : [LIEN VIDEO]
+
+Si un de vos clients cherche un profil fullstack dans la région, je serais ravi d'échanger.
+
+À votre disposition.
+Gilles`,
+  },
 ];
