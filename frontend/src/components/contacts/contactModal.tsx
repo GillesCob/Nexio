@@ -178,9 +178,9 @@ export function ContactModal({ contact, onClose }: IContactModalProps) {
 
   return (
     <Dialog open={!!contact} onOpenChange={(open) => { if (!open) onClose() }}>
-      <DialogContent className="max-h-[90vh] overflow-y-auto [&>button:last-child]:hidden">
+      <DialogContent className="max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <div className="flex items-center justify-between">
+          <div className="flex items-center justify-between pr-10">
             <DialogTitle>{isEditing ? 'Modifier le contact' : contact.name}</DialogTitle>
             <Button
               variant={isEditing ? 'secondary' : 'ghost'}
