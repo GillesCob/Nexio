@@ -1,5 +1,5 @@
 import { apiClient } from '@/lib/axiosClient'
-import type { ICompany, IContact, ICreateContactPayload, IExtractedContact, IMessage, IRelanceContact, IRelanceResult, IScoreResult, IUpdateContactPayload } from '@/types/contact'
+import type { ICompany, IContact, ICreateContactPayload, IExtractedContact, IMessage, IRelanceResult, IScoreResult, IUpdateContactPayload } from '@/types/contact'
 
 export async function createContact(data: ICreateContactPayload): Promise<IContact> {
   const response = await apiClient.post<IContact>('/contacts', data)

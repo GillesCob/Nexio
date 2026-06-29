@@ -1,3 +1,4 @@
+import type { CSSProperties } from 'react'
 import { Draggable } from '@hello-pangea/dnd'
 import type { IJobOffer } from '@/types/jobOffer'
 
@@ -16,10 +17,13 @@ function getScoreBadgeClass(score: number): string {
 export function JobOfferCard({ jobOffer, index, onOpen }: IJobOfferCardProps) {
   return (
     <Draggable draggableId={jobOffer.id} index={index}>
-      {(provided, snapshot) => (
+      {(provided, snapshot) => {
+        const { style: draggableStyle, ...draggablePropsRest } = provided.draggableProps
+        return (
         <div
           ref={provided.innerRef}
-          {...provided.draggableProps}
+          {...draggablePropsRest}
+          style={draggableStyle as CSSProperties}
           {...provided.dragHandleProps}
           onClick={() => onOpen(jobOffer)}
           className={`
@@ -69,7 +73,8 @@ export function JobOfferCard({ jobOffer, index, onOpen }: IJobOfferCardProps) {
             </div>
           )}
         </div>
-      )}
+        )
+      }}
     </Draggable>
   )
 }

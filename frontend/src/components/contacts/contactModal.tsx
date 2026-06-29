@@ -97,7 +97,7 @@ export function ContactModal({ contact, onClose }: IContactModalProps) {
     date.toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' })
 
   const timelineEvents: ITimelineEvent[] = [
-    { id: 'contact_added', type: 'contact_added', date: new Date(contact.createdAt), label: 'Contact ajouté' },
+    { id: 'contact_added', type: 'contact_added' as const, date: new Date(contact.createdAt), label: 'Contact ajouté' },
     ...messages.map((msg) => ({
       id: msg.id,
       type: 'message' as const,

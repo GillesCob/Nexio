@@ -1,3 +1,4 @@
+import type { CSSProperties } from 'react'
 import { Draggable } from '@hello-pangea/dnd'
 import type { IContact } from '@/types/contact'
 import { getProfileBadge } from '@/lib/profileBadge'
@@ -23,10 +24,13 @@ export function ContactCard({ contact, index, onOpen }: IContactCardProps) {
 
   return (
     <Draggable draggableId={contact.id} index={index}>
-      {(provided, snapshot) => (
+      {(provided, snapshot) => {
+        const { style: draggableStyle, ...draggablePropsRest } = provided.draggableProps
+        return (
         <div
           ref={provided.innerRef}
-          {...provided.draggableProps}
+          {...draggablePropsRest}
+          style={draggableStyle as CSSProperties}
           {...provided.dragHandleProps}
           onClick={() => onOpen(contact)}
           className={`
@@ -46,7 +50,8 @@ export function ContactCard({ contact, index, onOpen }: IContactCardProps) {
           )}
           <p className="text-xs text-muted-foreground mt-2">{dateLabel}</p>
         </div>
-      )}
+        )
+      }}
     </Draggable>
   )
 }
