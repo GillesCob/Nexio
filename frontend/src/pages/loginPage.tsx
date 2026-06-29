@@ -14,7 +14,7 @@ export function LoginPage() {
   const handleDemoLogin = () => {
     setValue("email", "guest@nexio.dev");
     setValue("password", "guest1234");
-    login({ email: "guest@nexio.dev", password: "guest123" });
+    login({ email: "guest@nexio.dev", password: "guest1234" });
   };
 
   useEffect(() => {
