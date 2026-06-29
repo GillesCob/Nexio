@@ -30,19 +30,12 @@ const resetPasswordSchema = z.object({
   newPassword: z.string().min(8),
 })
 
-export async function register(req: Request, res: Response, next: NextFunction): Promise<void> {
-  try {
-    const { email, password } = registerSchema.parse(req.body)
-    const { accessToken, refreshToken, user } = await authService.register(email, password)
-    res.cookie('refreshToken', refreshToken, COOKIE_OPTIONS)
-    res.status(201).json({ accessToken, user })
-  } catch (err) {
-    if (err instanceof z.ZodError) {
-      next(new AppError(400, err.errors[0].message))
-    } else {
-      next(err)
-    }
-  }
+export async function register(_req: Request, res: Response, _next: NextFunction): Promise<void> {
+  // TODO: re-enable when multi-tenant is ready
+  res.status(403).json({
+    error: 'Registration is disabled',
+    message: 'Public registration is currently disabled. Demo account is available via the login page.',
+  })
 }
 
 export async function login(req: Request, res: Response, next: NextFunction): Promise<void> {
