@@ -57,15 +57,15 @@ export function TutorialModal({ open, onClose }: ITutorialModalProps) {
 
   return (
     <Dialog open={open} onOpenChange={(o) => { if (!o) onClose(); }}>
-      <DialogContent className="max-h-[90vh] overflow-y-auto [&>button:last-child]:hidden">
-        <DialogHeader>
+      <DialogContent className="max-h-[100dvh] flex flex-col p-0 [&>button:last-child]:hidden">
+        <DialogHeader className="flex-shrink-0 px-6 pt-6 pb-4 border-b">
           <p className="text-xs text-muted-foreground">Étape {currentStep} / {total}</p>
           <DialogTitle>{step.title}</DialogTitle>
         </DialogHeader>
 
-        <div className="flex flex-col gap-3">{renderBody()}</div>
+        <div className="flex-1 overflow-y-auto flex flex-col gap-3 px-6 py-4">{renderBody()}</div>
 
-        <div className="flex items-center justify-between pt-2">
+        <div className="flex-shrink-0 flex items-center justify-between px-6 pb-6 pt-4 border-t">
           <div>
             {currentStep > 1 && (
               <Button
