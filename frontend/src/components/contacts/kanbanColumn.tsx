@@ -13,8 +13,8 @@ export function KanbanColumn({ status, label, contacts, onOpenContact }: IKanban
   return (
     <div className="flex flex-col w-64 shrink-0">
       <div className="flex items-center justify-between mb-3 px-1">
-        <h3 className="text-sm font-semibold text-slate-700">{label}</h3>
-        <span className="text-xs font-medium bg-slate-200 text-slate-600 rounded-full px-2 py-0.5">
+        <h3 className="text-sm font-semibold text-foreground">{label}</h3>
+        <span className="text-xs font-medium bg-muted text-muted-foreground rounded-full px-2 py-0.5">
           {contacts.length}
         </span>
       </div>
@@ -25,7 +25,7 @@ export function KanbanColumn({ status, label, contacts, onOpenContact }: IKanban
             {...provided.droppableProps}
             className={`
               flex flex-col gap-2 rounded-lg p-2 min-h-[200px] transition-colors
-              ${snapshot.isDraggingOver ? 'bg-slate-100' : 'bg-slate-50'}
+              ${snapshot.isDraggingOver ? 'bg-accent' : 'bg-muted/40'}
             `}
           >
             {contacts.map((contact, index) => (

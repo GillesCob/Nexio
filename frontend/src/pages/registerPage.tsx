@@ -37,7 +37,7 @@ export function RegisterPage() {
           </div>
 
           {error && (
-            <p className="text-sm text-red-500">
+            <p className="text-sm text-destructive">
               {(error as { response?: { data?: { message?: string } } }).response?.data?.message ??
                 'Une erreur est survenue'}
             </p>
