@@ -1,10 +1,13 @@
+import { useState } from 'react'
 import { Link, useLocation } from 'react-router-dom'
-import { Moon, Sun, LayoutDashboard, Briefcase, BarChart3, LogOut } from 'lucide-react'
+import { Moon, Sun, LayoutDashboard, Briefcase, BarChart3, LogOut, HelpCircle } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
 import { Logo } from '@/components/ui/logo'
 import { useLogout } from '@/hooks/useAuth'
 import { useDarkMode } from '@/hooks/useDarkMode'
+import { useAuthStore } from '@/store/authStore'
+import { TutorialModal } from '@/components/tutorial/tutorialModal'
 import type { LucideIcon } from 'lucide-react'
 
 interface INavLink {
@@ -23,8 +26,11 @@ export function Navbar() {
   const location = useLocation()
   const logout = useLogout()
   const { theme, toggle } = useDarkMode()
+  const user = useAuthStore((s) => s.user)
+  const [tutorialOpen, setTutorialOpen] = useState(false)
 
   return (
+    <>
     <nav className="flex items-center gap-2 sm:gap-8 py-3 border-b border-border mb-6">
       <Link to="/dashboard">
         <Logo className="h-8 w-auto" />
@@ -48,6 +54,18 @@ export function Navbar() {
         ))}
       </div>
       <div className="ml-auto flex items-center gap-2">
+        {user?.role === 'guest' && (
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => setTutorialOpen(true)}
+            aria-label="Tutoriel"
+            className="flex items-center gap-1.5"
+          >
+            <HelpCircle className="h-4 w-4 shrink-0" />
+            <span className="hidden sm:inline">Tutoriel</span>
+          </Button>
+        )}
         <Button variant="ghost" size="sm" onClick={toggle} aria-label="Basculer le thème">
           {theme === 'dark' ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
         </Button>
@@ -64,6 +82,8 @@ export function Navbar() {
         </Button>
       </div>
     </nav>
+    <TutorialModal open={tutorialOpen} onClose={() => setTutorialOpen(false)} />
+    </>
   )
 }
 
