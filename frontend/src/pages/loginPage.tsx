@@ -70,18 +70,10 @@ export function LoginPage() {
           Voir la démo
         </Button>
 
-        <div className="text-center text-sm space-y-1">
-          <p>
-            Pas de compte ?{" "}
-            <Link to="/register" className="underline">
-              S&apos;inscrire
-            </Link>
-          </p>
-          <p>
-            <Link to="/forgot-password" className="underline text-muted-foreground">
-              Mot de passe oublié ?
-            </Link>
-          </p>
+        <div className="text-center text-sm">
+          <Link to="/forgot-password" className="underline text-muted-foreground">
+            Mot de passe oublié ?
+          </Link>
         </div>
       </div>
     </main>
