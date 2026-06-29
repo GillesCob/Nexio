@@ -2,6 +2,7 @@ import { Link, useLocation } from 'react-router-dom'
 import { Moon, Sun } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
+import { Logo } from '@/components/ui/logo'
 import { useLogout } from '@/hooks/useAuth'
 import { useDarkMode } from '@/hooks/useDarkMode'
 
@@ -24,7 +25,7 @@ export function Navbar() {
   return (
     <nav className="flex items-center gap-8 py-3 border-b border-border mb-6">
       <Link to="/dashboard">
-        <img src="/logo.png" alt="Nexio" className="h-8 w-auto" />
+        <Logo className="h-8 w-auto" />
       </Link>
       <div className="flex items-center gap-6">
         {NAV_LINKS.map((link) => (
