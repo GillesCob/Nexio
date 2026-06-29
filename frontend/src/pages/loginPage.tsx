@@ -1,28 +1,28 @@
-import { useEffect } from 'react'
-import { Link } from 'react-router-dom'
-import { useForm } from 'react-hook-form'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import { useLogin } from '@/hooks/useAuth'
-import type { ILoginPayload } from '@/types/auth'
+import { useEffect } from "react";
+import { Link } from "react-router-dom";
+import { useForm } from "react-hook-form";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { useLogin } from "@/hooks/useAuth";
+import type { ILoginPayload } from "@/types/auth";
 
 export function LoginPage() {
-  const { register, handleSubmit, setValue } = useForm<ILoginPayload>()
-  const { mutate: login, isPending, error } = useLogin()
+  const { register, handleSubmit, setValue } = useForm<ILoginPayload>();
+  const { mutate: login, isPending, error } = useLogin();
 
   const handleDemoLogin = () => {
-    setValue('email', 'guest@nexio.dev')
-    setValue('password', 'guest123')
-    login({ email: 'guest@nexio.dev', password: 'guest123' })
-  }
+    setValue("email", "guest@nexio.dev");
+    setValue("password", "guest1234");
+    login({ email: "guest@nexio.dev", password: "guest123" });
+  };
 
   useEffect(() => {
-    const params = new URLSearchParams(window.location.search)
-    if (params.get('demo') === '1') {
-      handleDemoLogin()
+    const params = new URLSearchParams(window.location.search);
+    if (params.get("demo") === "1") {
+      handleDemoLogin();
     }
-  }, []) // eslint-disable-line react-hooks/exhaustive-deps
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
     <main className="flex min-h-screen items-center justify-center px-4">
@@ -32,12 +32,7 @@ export function LoginPage() {
         <form onSubmit={handleSubmit((data) => login(data))} className="space-y-4">
           <div className="space-y-2">
             <Label htmlFor="email">Email</Label>
-            <Input
-              id="email"
-              type="email"
-              autoComplete="email"
-              {...register('email', { required: true })}
-            />
+            <Input id="email" type="email" autoComplete="email" {...register("email", { required: true })} />
           </div>
 
           <div className="space-y-2">
@@ -46,19 +41,19 @@ export function LoginPage() {
               id="password"
               type="password"
               autoComplete="current-password"
-              {...register('password', { required: true })}
+              {...register("password", { required: true })}
             />
           </div>
 
           {error && (
             <p className="text-sm text-destructive">
               {(error as { response?: { data?: { message?: string } } }).response?.data?.message ??
-                'Une erreur est survenue'}
+                "Une erreur est survenue"}
             </p>
           )}
 
           <Button type="submit" className="w-full" disabled={isPending}>
-            {isPending ? 'Connexion…' : 'Se connecter'}
+            {isPending ? "Connexion…" : "Se connecter"}
           </Button>
         </form>
 
@@ -71,19 +66,13 @@ export function LoginPage() {
           </div>
         </div>
 
-        <Button
-          type="button"
-          variant="outline"
-          className="w-full"
-          disabled={isPending}
-          onClick={handleDemoLogin}
-        >
+        <Button type="button" variant="outline" className="w-full" disabled={isPending} onClick={handleDemoLogin}>
           Voir la démo
         </Button>
 
         <div className="text-center text-sm space-y-1">
           <p>
-            Pas de compte ?{' '}
+            Pas de compte ?{" "}
             <Link to="/register" className="underline">
               S&apos;inscrire
             </Link>
@@ -96,5 +85,5 @@ export function LoginPage() {
         </div>
       </div>
     </main>
-  )
+  );
 }
