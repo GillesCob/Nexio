@@ -1,3 +1,4 @@
+import { useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { useForm } from 'react-hook-form'
 import { Button } from '@/components/ui/button'
@@ -15,6 +16,13 @@ export function LoginPage() {
     setValue('password', 'guest123')
     login({ email: 'guest@nexio.dev', password: 'guest123' })
   }
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search)
+    if (params.get('demo') === '1') {
+      handleDemoLogin()
+    }
+  }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
     <main className="flex min-h-screen items-center justify-center px-4">
