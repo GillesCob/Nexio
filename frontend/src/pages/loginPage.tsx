@@ -1,3 +1,4 @@
+import { useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { useForm } from 'react-hook-form'
 import { Button } from '@/components/ui/button'
@@ -7,8 +8,21 @@ import { useLogin } from '@/hooks/useAuth'
 import type { ILoginPayload } from '@/types/auth'
 
 export function LoginPage() {
-  const { register, handleSubmit } = useForm<ILoginPayload>()
+  const { register, handleSubmit, setValue } = useForm<ILoginPayload>()
   const { mutate: login, isPending, error } = useLogin()
+
+  const handleDemoLogin = () => {
+    setValue('email', 'guest@nexio.dev')
+    setValue('password', 'guest123')
+    login({ email: 'guest@nexio.dev', password: 'guest123' })
+  }
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search)
+    if (params.get('demo') === '1') {
+      handleDemoLogin()
+    }
+  }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
     <main className="flex min-h-screen items-center justify-center px-4">
@@ -37,7 +51,7 @@ export function LoginPage() {
           </div>
 
           {error && (
-            <p className="text-sm text-red-500">
+            <p className="text-sm text-destructive">
               {(error as { response?: { data?: { message?: string } } }).response?.data?.message ??
                 'Une erreur est survenue'}
             </p>
@@ -47,6 +61,25 @@ export function LoginPage() {
             {isPending ? 'Connexion…' : 'Se connecter'}
           </Button>
         </form>
+
+        <div className="relative">
+          <div className="absolute inset-0 flex items-center">
+            <span className="w-full border-t" />
+          </div>
+          <div className="relative flex justify-center text-xs uppercase">
+            <span className="bg-background px-2 text-muted-foreground">ou</span>
+          </div>
+        </div>
+
+        <Button
+          type="button"
+          variant="outline"
+          className="w-full"
+          disabled={isPending}
+          onClick={handleDemoLogin}
+        >
+          Voir la démo
+        </Button>
 
         <div className="text-center text-sm space-y-1">
           <p>

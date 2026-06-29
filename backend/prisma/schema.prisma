@@ -46,6 +46,7 @@ model User {
   jobOffers           JobOffer[]
   contacts            Contact[]
   passwordResetTokens PasswordResetToken[]
+  linkedInSnapshots   LinkedInSnapshot[]
 }
 
 model PasswordResetToken {
@@ -71,25 +72,83 @@ model JobOffer {
   createdAt   DateTime       @default(now())
   updatedAt   DateTime       @updatedAt
 
+  score        Int?
+  scoreMatches String[]
+  scoreGaps    String[]
+  scoreComment String?
+
   userId String
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   contacts Contact[]
 }
 
-model Contact {
-  id          String        @id @default(cuid())
+model Company {
+  id          String    @id @default(cuid())
   name        String
-  company     String?
+  description String?
+  sector      String?
+  size        String?
   linkedinUrl String?
-  status      ContactStatus @default(to_contact)
-  notes       String?
-  createdAt   DateTime      @default(now())
-  updatedAt   DateTime      @updatedAt
+  companyType String?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  contacts Contact[]
+}
+
+model Contact {
+  id             String        @id @default(cuid())
+  name           String
+  company        String?
+  linkedinUrl    String?
+  jobTitle       String?
+  status         ContactStatus @default(to_contact)
+  notes          String?
+  contactedAt    DateTime?
+  relanceCount   Int           @default(0)
+  flux           String?
+  fluxConfidence Float?
+  location       String?
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
 
   userId String
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   jobOfferId String?
   jobOffer   JobOffer? @relation(fields: [jobOfferId], references: [id], onDelete: SetNull)
+
+  companyId String?
+  companyRef Company? @relation(fields: [companyId], references: [id], onDelete: SetNull)
+
+  messages Message[]
+}
+
+model Message {
+  id        String   @id @default(cuid())
+  content   String
+  createdAt DateTime @default(now())
+
+  contactId String
+  contact   Contact @relation(fields: [contactId], references: [id], onDelete: Cascade)
+}
+
+model LinkedInSnapshot {
+  id                         String   @id @default(cuid())
+  weekLabel                  String
+  impressions                Int
+  impressionsVariation       Int
+  followers                  Int
+  followersVariation         Int
+  profileViews               Int
+  profileViewsVariation      Int
+  searchAppearances          Int
+  searchAppearancesVariation Int
+  postsCount                 Int
+  commentsCount              Int
+  createdAt                  DateTime @default(now())
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 }

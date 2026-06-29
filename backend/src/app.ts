@@ -4,6 +4,9 @@ import cookieParser from 'cookie-parser'
 import { healthRouter } from './routes/healthRoutes'
 import { authRouter } from './routes/authRoutes'
 import { contactRouter } from './routes/contactRoutes'
+import { companyRouter } from './routes/companyRoutes'
+import { statsRouter } from './routes/statsRoutes'
+import { jobOfferRouter } from './routes/jobOfferRoutes'
 import { errorMiddleware } from './middlewares/errorMiddleware'
 
 export const app = express()
@@ -20,5 +23,8 @@ app.use(cookieParser())
 app.use('/health', healthRouter)
 app.use('/auth', authRouter)
 app.use('/contacts', contactRouter)
+app.use('/companies', companyRouter)
+app.use('/stats', statsRouter)
+app.use('/job-offers', jobOfferRouter)
 
 app.use(errorMiddleware)

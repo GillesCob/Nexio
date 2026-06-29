@@ -19,6 +19,10 @@ export interface IJobOffer {
   status: JobOfferStatus
   createdAt: string
   updatedAt: string
+  score?: number
+  scoreMatches?: string[]
+  scoreGaps?: string[]
+  scoreComment?: string
 }
 
 export interface ICreateJobOfferPayload {
