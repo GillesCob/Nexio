@@ -30,7 +30,7 @@ Mon parcours est atypique : 10 ans dans le bâtiment, dont BIM Manager sur Maret
 
 Tout est sur gillescobigo.com : les projets en démo, le code sur GitHub, les articles, et un visuel interactif qui détaille mes compétences. Je vous ai également fait une courte vidéo de présentation si vous préférez : {{videoLink}}
 
-Je cherche un poste fullstack dans la région de {{location}} et {{companyName}} m'intéresse.
+Je cherche un poste fullstack dans la région {{locationWithDe}} et {{companyName}} m'intéresse.
 
 À votre disposition pour échanger.
 Gilles`,
@@ -47,7 +47,7 @@ Mon parcours est atypique : 10 ans dans le bâtiment, dont BIM Manager sur Maret
 
 Tout est sur gillescobigo.com : les projets en démo, le code sur GitHub, les articles, et un visuel interactif qui détaille mes compétences. Je vous ai également fait une courte vidéo de présentation si vous préférez : {{videoLink}}
 
-Je cherche un poste fullstack dans la région de {{location}} et {{companyName}} m'intéresse.
+Je cherche un poste fullstack dans la région {{locationWithDe}} et {{companyName}} m'intéresse.
 
 À votre disposition pour échanger.
 Gilles`,
@@ -64,7 +64,7 @@ Profil hybride : 10 ans dans le bâtiment, dont BIM Manager sur Mareterra à Mon
 
 Mes projets, mon code et une présentation détaillée sont sur gillescobigo.com. Je vous ai également fait une courte vidéo de présentation : {{videoLink}}
 
-Si un de vos clients cherche un profil fullstack dans la région de {{location}}, je serais ravi d'échanger.
+Si un de vos clients cherche un profil fullstack dans la région {{locationWithDe}}, je serais ravi d'échanger.
 
 À votre disposition.
 Gilles`,

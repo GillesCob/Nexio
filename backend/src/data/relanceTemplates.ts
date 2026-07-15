@@ -22,7 +22,7 @@ Je me permets de revenir vers vous suite à mon message du {{lastContactDate}}.
 
 Cerithe vient de passer en production. C'est le projet dont je vous parlais et il est maintenant en ligne. Depuis gillescobigo.com vous pouvez d'ailleurs accéder aux démos de mes différents projets et vous faire une idée concrète de ce que je construis.
 
-Je reste à la recherche d'un poste fullstack dans la région de {{location}} et {{companyName}} m'intéresse toujours.
+Je reste à la recherche d'un poste fullstack dans la région {{locationWithDe}} et {{companyName}} m'intéresse toujours.
 
 À votre disposition pour échanger.
 Gilles`,
@@ -37,7 +37,7 @@ Dernier message de ma part pour ne pas encombrer votre boîte.
 
 Mon profil a évolué depuis nos derniers échanges, gillescobigo.com est à jour si vous souhaitez y jeter un oeil.
 
-Si une opportunité se présente au sein de {{companyName}}, je reste preneur.
+Si une opportunité se présente au sein {{companyNameWithDe}}, je reste preneur.
 
 Bonne continuation.
 Gilles`,
@@ -49,6 +49,12 @@ Gilles`,
     body: `Bonjour {{firstName}},\n\nJe me permets de relancer mon message précédent, au cas où il serait passé sous les radars.\n\nJe suis en reconversion active vers le développement web (React, Node.js, TypeScript) avec un background BIM assez atypique. Si vous avez des mandats en cours pour lesquels mon profil pourrait correspondre, je serais ravi d'en discuter.\n\nBonne continuation,\nGilles`,
   },
   {
+    id: '1b_relance_final',
+    label: 'Flux 1b : Relance finale',
+    targetProfile: 'recruiter_freelance',
+    body: `Bonjour {{firstName}},\n\nDernier message de ma part pour ne pas encombrer votre boîte.\n\nMon profil a évolué depuis nos derniers échanges, gillescobigo.com est à jour si vous souhaitez y jeter un œil.\n\nSi un mandat correspondant à mon profil se présente, je reste preneur.\n\nBonne continuation,\nGilles`,
+  },
+  {
     id: '2_relance_before_17_07',
     label: 'Flux 2 : Relance avant 17/07',
     targetProfile: 'cto_directeur_technique',
@@ -58,7 +64,7 @@ Je me permets de revenir vers vous suite à mon message du {{lastContactDate}}.
 
 Depuis, j'ai mis en ligne deux projets : Cerithe, un carnet de santé numérique du bâtiment, et Nexio, un CRM de suivi de recherche d'emploi avec extraction IA des profils LinkedIn et scoring automatique des annonces. Démos accessibles directement sur gillescobigo.com, code sur GitHub, et un article par jour qui documente chaque décision technique.
 
-Je reste à la recherche d'un poste fullstack dans la région de {{location}} et {{companyName}} m'intéresse toujours.
+Je reste à la recherche d'un poste fullstack dans la région {{locationWithDe}} et {{companyName}} m'intéresse toujours.
 
 À votre disposition pour échanger.
 Gilles`,
@@ -73,7 +79,7 @@ Je me permets de revenir vers vous suite à mon message du {{lastContactDate}}.
 
 Depuis, j'ai mis en ligne Nexio, un CRM de suivi de recherche d'emploi avec extraction IA des profils LinkedIn et scoring automatique des annonces. Démo accessible directement sur gillescobigo.com, et le code est sur GitHub.
 
-Je reste à la recherche d'un poste fullstack dans la région de {{location}} et {{companyName}} m'intéresse toujours.
+Je reste à la recherche d'un poste fullstack dans la région {{locationWithDe}} et {{companyName}} m'intéresse toujours.
 
 À votre disposition pour échanger.
 Gilles`,
@@ -88,7 +94,7 @@ Dernier message de ma part pour ne pas encombrer votre boîte.
 
 Mon profil a évolué depuis nos derniers échanges, gillescobigo.com est à jour si vous souhaitez y jeter un œil.
 
-Si une opportunité se présente au sein de {{companyName}}, je reste preneur.
+Si une opportunité se présente au sein {{companyNameWithDe}}, je reste preneur.
 
 Bonne continuation.
 Gilles`,
@@ -103,7 +109,7 @@ Je me permets de revenir vers vous suite à mon message du {{lastContactDate}}.
 
 Depuis, j'ai mis en ligne deux projets : Cerithe, un carnet de santé numérique du bâtiment, et Nexio, un CRM de suivi de recherche d'emploi avec extraction IA des profils LinkedIn et scoring automatique des annonces. Démos accessibles directement sur gillescobigo.com, code sur GitHub, et un article par jour qui documente chaque décision technique, autant pour ancrer ce que j'apprends que pour partager une démarche.
 
-Je reste à la recherche d'un poste fullstack dans la région de {{location}} et {{companyName}} m'intéresse toujours.
+Je reste à la recherche d'un poste fullstack dans la région {{locationWithDe}} et {{companyName}} m'intéresse toujours.
 
 À votre disposition pour échanger.
 Gilles`,
@@ -118,7 +124,7 @@ Je me permets de revenir vers vous suite à mon message du {{lastContactDate}}.
 
 Depuis, Cerithe est passé en production. C'est le projet dont je vous parlais et il est maintenant en ligne, accessible en démo sur gillescobigo.com. J'ai également mis en ligne Nexio, un CRM de suivi de recherche d'emploi avec extraction IA des profils LinkedIn et scoring automatique des annonces.
 
-Je reste à la recherche d'un poste fullstack dans la région de {{location}} et {{companyName}} m'intéresse toujours.
+Je reste à la recherche d'un poste fullstack dans la région {{locationWithDe}} et {{companyName}} m'intéresse toujours.
 
 À votre disposition pour échanger.
 Gilles`,
@@ -133,7 +139,7 @@ Dernier message de ma part pour ne pas encombrer votre boîte.
 
 Mon profil a évolué depuis nos derniers échanges, gillescobigo.com est à jour si vous souhaitez y jeter un œil.
 
-Si une opportunité se présente au sein de {{companyName}}, je reste preneur.
+Si une opportunité se présente au sein {{companyNameWithDe}}, je reste preneur.
 
 Bonne continuation.
 Gilles`,
