@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import { Pencil, ChevronDown, ChevronUp } from 'lucide-react'
 import { useForm } from 'react-hook-form'
 import type { IContact, ICompany, ContactStatus, IUpdateContactPayload } from '@/types/contact'
-import { useUpdateContact, useDeleteContact, useExtractCompany, useSuggestTemplate, useCreateMessage, useGetMessages, useGetRelances, useSuggestRelance, useTouchContact } from '@/hooks/useContacts'
+import { useUpdateContact, useDeleteContact, useExtractContact, useExtractCompany, useSuggestTemplate, useCreateMessage, useGetMessages, useGetRelances, useSuggestRelance, useTouchContact } from '@/hooks/useContacts'
 import {
   Dialog,
   DialogContent,
@@ -45,18 +45,22 @@ interface IContactModalProps {
 export function ContactModal({ contact, onClose }: IContactModalProps) {
   const [isEditing, setIsEditing] = useState(false)
   const [rawCompanyText, setRawCompanyText] = useState('')
+  const [rawContactText, setRawContactText] = useState('')
   const [suggestedMessage, setSuggestedMessage] = useState<string | null>(null)
   const [suggestedRelance, setSuggestedRelance] = useState<string | null>(null)
   const [extractionStatus, setExtractionStatus] = useState<'idle' | 'success' | 'error'>('idle')
+  const [contactExtractionStatus, setContactExtractionStatus] = useState<'idle' | 'success' | 'error'>('idle')
   const [copied, setCopied] = useState(false)
   const [copiedRelance, setCopiedRelance] = useState(false)
   const [localStatus, setLocalStatus] = useState<ContactStatus>(contact?.status ?? 'to_contact')
   const [localCompany, setLocalCompany] = useState<ICompany | undefined>(contact?.companyRef)
+  const [localJobTitle, setLocalJobTitle] = useState(contact?.jobTitle ?? null)
   const [openEventId, setOpenEventId] = useState<string | null>(null)
   const [isTimelineOpen, setIsTimelineOpen] = useState(false)
 
   const updateContact = useUpdateContact()
   const deleteContact = useDeleteContact()
+  const extractContact = useExtractContact()
   const extractCompany = useExtractCompany()
   const suggestTemplate = useSuggestTemplate()
   const suggestRelance = useSuggestRelance()
@@ -81,11 +85,14 @@ export function ContactModal({ contact, onClose }: IContactModalProps) {
       })
       setIsEditing(false)
       setRawCompanyText('')
+      setRawContactText('')
       setSuggestedMessage(null)
       setSuggestedRelance(null)
       setExtractionStatus('idle')
+      setContactExtractionStatus('idle')
       setLocalStatus(contact.status)
       setLocalCompany(contact.companyRef)
+      setLocalJobTitle(contact.jobTitle ?? null)
       setOpenEventId(null)
       setIsTimelineOpen(false)
     }
@@ -139,6 +146,41 @@ export function ContactModal({ contact, onClose }: IContactModalProps) {
       onError: () => {
         setExtractionStatus('error')
         setTimeout(() => setExtractionStatus('idle'), 3000)
+      },
+    })
+  }
+
+  const handleExtractContactInfo = () => {
+    setContactExtractionStatus('idle')
+    extractContact.mutate(rawContactText, {
+      onSuccess: (data) => {
+        updateContact.mutate(
+          {
+            id: contact.id,
+            data: {
+              ...(data.name ? { name: data.name } : {}),
+              ...(data.company ? { company: data.company } : {}),
+              ...(data.linkedinUrl ? { linkedinUrl: data.linkedinUrl } : {}),
+              ...(data.jobTitle ? { jobTitle: data.jobTitle } : {}),
+            },
+          },
+          {
+            onSuccess: () => {
+              if (data.jobTitle) setLocalJobTitle(data.jobTitle)
+              setRawContactText('')
+              setContactExtractionStatus('success')
+              setTimeout(() => setContactExtractionStatus('idle'), 3000)
+            },
+            onError: () => {
+              setContactExtractionStatus('error')
+              setTimeout(() => setContactExtractionStatus('idle'), 3000)
+            },
+          }
+        )
+      },
+      onError: () => {
+        setContactExtractionStatus('error')
+        setTimeout(() => setContactExtractionStatus('idle'), 3000)
       },
     })
   }
@@ -265,10 +307,10 @@ export function ContactModal({ contact, onClose }: IContactModalProps) {
           </form>
         ) : (
           <div className="mt-2 space-y-4 text-sm">
-            {contact.jobTitle && (
+            {localJobTitle && (
               <div>
                 <span className="text-muted-foreground">Poste</span>
-                <p className="font-medium">{contact.jobTitle}</p>
+                <p className="font-medium">{localJobTitle}</p>
               </div>
             )}
             {contact.company && (
@@ -341,6 +383,38 @@ export function ContactModal({ contact, onClose }: IContactModalProps) {
                     <p className="text-xs text-foreground">Échec de l'extraction. Vérifie le texte saisi.</p>
                   )}
                 </div>
+              )}
+            </div>
+
+            <div className="border-t border-border pt-4 flex flex-col gap-2">
+              <span className="text-muted-foreground font-medium">
+                {localJobTitle ? 'Mettre à jour les infos LinkedIn' : 'Poste manquant — colle le profil LinkedIn pour le déduire'}
+              </span>
+              <textarea
+                value={rawContactText}
+                onChange={(e) => setRawContactText(e.target.value)}
+                rows={3}
+                placeholder="Colle ici le texte du profil LinkedIn du contact…"
+                className="flex w-full rounded-md border border-input bg-background text-foreground px-3 py-2 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring resize-none"
+              />
+              <Button
+                type="button"
+                variant="outline"
+                onClick={handleExtractContactInfo}
+                disabled={!rawContactText.trim() || extractContact.isPending || updateContact.isPending}
+                className="self-end"
+              >
+                {extractContact.isPending || updateContact.isPending
+                  ? 'Extraction…'
+                  : localJobTitle
+                    ? 'Mettre à jour les infos LinkedIn'
+                    : 'Extraire les infos'}
+              </Button>
+              {contactExtractionStatus === 'success' && (
+                <p className="text-xs text-foreground">Infos mises à jour.</p>
+              )}
+              {contactExtractionStatus === 'error' && (
+                <p className="text-xs text-foreground">Échec de l'extraction. Vérifie le texte saisi.</p>
               )}
             </div>
 
