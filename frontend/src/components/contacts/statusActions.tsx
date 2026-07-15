@@ -27,7 +27,7 @@ const ACTION_FEEDBACK: Record<string, string> = {
   follow_up: 'Contact passé en "A relancer"',
   replied: 'Contact passé en "Echange en cours"',
   closed: "Contact clôturé",
-  contacted: 'Relance envoyée — contact repassé en "Contacté"',
+  contacted: 'Relance envoyée, contact repassé en "Contacté"',
   meeting_scheduled: "RDV planifié",
 };
 
@@ -59,7 +59,7 @@ export function StatusActions({ contact, onStatusChange, onTouch, isRepliedAlert
 
   const handleTouch = () => {
     onTouch?.();
-    setFeedback("Echange repoussé — alerte réinitialisée");
+    setFeedback("Echange repoussé, alerte réinitialisée");
     setTimeout(() => setFeedback(null), 3000);
   };
 

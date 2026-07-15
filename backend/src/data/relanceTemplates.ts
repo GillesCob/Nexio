@@ -14,7 +14,7 @@ export const relanceTemplates: IRelanceTemplate[] = [
   },
   {
     id: '1a_relance_after_17_07',
-    label: 'Flux 1a — Relance après 17/07',
+    label: 'Flux 1a : Relance après 17/07',
     targetProfile: 'recruiter_esn',
     body: `Bonjour [Prénom],
 
@@ -29,7 +29,7 @@ Gilles`,
   },
   {
     id: '1a_relance_final',
-    label: 'Flux 1a — Relance finale',
+    label: 'Flux 1a : Relance finale',
     targetProfile: 'recruiter_esn',
     body: `Bonjour [Prénom],
 
@@ -50,7 +50,7 @@ Gilles`,
   },
   {
     id: '2_relance_before_17_07',
-    label: 'Flux 2 — Relance avant 17/07',
+    label: 'Flux 2 : Relance avant 17/07',
     targetProfile: 'cto_directeur_technique',
     body: `Bonjour [Prénom],
 
@@ -65,7 +65,7 @@ Gilles`,
   },
   {
     id: '2_relance_after_17_07',
-    label: 'Flux 2 — Relance après 17/07',
+    label: 'Flux 2 : Relance après 17/07',
     targetProfile: 'cto_directeur_technique',
     body: `Bonjour [Prénom],
 
@@ -80,7 +80,7 @@ Gilles`,
   },
   {
     id: '2_relance_final',
-    label: 'Flux 2 — Relance finale',
+    label: 'Flux 2 : Relance finale',
     targetProfile: 'cto_directeur_technique',
     body: `Bonjour [Prénom],
 
@@ -95,7 +95,7 @@ Gilles`,
   },
   {
     id: '3_relance_before_17_07',
-    label: 'Flux 3 — Relance avant 17/07',
+    label: 'Flux 3 : Relance avant 17/07',
     targetProfile: 'lead_dev_tech_lead',
     body: `Bonjour [Prénom],
 
@@ -110,7 +110,7 @@ Gilles`,
   },
   {
     id: '3_relance_after_17_07',
-    label: 'Flux 3 — Relance après 17/07',
+    label: 'Flux 3 : Relance après 17/07',
     targetProfile: 'lead_dev_tech_lead',
     body: `Bonjour [Prénom],
 
@@ -125,7 +125,7 @@ Gilles`,
   },
   {
     id: '3_relance_final',
-    label: 'Flux 3 — Relance finale',
+    label: 'Flux 3 : Relance finale',
     targetProfile: 'lead_dev_tech_lead',
     body: `Bonjour [Prénom],
 
@@ -140,7 +140,7 @@ Gilles`,
   },
   {
     id: '4_relance_before_17_07',
-    label: 'Flux 4 — Relance avant 17/07',
+    label: 'Flux 4 : Relance avant 17/07',
     targetProfile: 'business_manager_esn',
     body: `Bonjour [Prénom],
 
@@ -157,7 +157,7 @@ Gilles`,
   },
   {
     id: '4_relance_after_17_07',
-    label: 'Flux 4 — Relance après 17/07',
+    label: 'Flux 4 : Relance après 17/07',
     targetProfile: 'business_manager_esn',
     body: `Bonjour [Prénom],
 
@@ -172,7 +172,7 @@ Gilles`,
   },
   {
     id: '4_relance_final',
-    label: 'Flux 4 — Relance finale',
+    label: 'Flux 4 : Relance finale',
     targetProfile: 'business_manager_esn',
     body: `Bonjour [Prénom],
 

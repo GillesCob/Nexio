@@ -237,13 +237,13 @@ export function ContactModal({ contact, onClose }: IContactModalProps) {
 
         {relanceInfo && (
           <div className="rounded-md border border-amber-300 bg-amber-50 text-amber-800 px-3 py-2 text-sm">
-            Relance recommandée — {relanceInfo.daysSinceUpdate} jour{relanceInfo.daysSinceUpdate > 1 ? 's' : ''} sans nouvelles
+            Relance recommandée : {relanceInfo.daysSinceUpdate} jour{relanceInfo.daysSinceUpdate > 1 ? 's' : ''} sans nouvelles
           </div>
         )}
 
         {repliedRelanceInfo && (
           <div className="rounded-md border border-indigo-300 bg-indigo-50 text-indigo-800 px-3 py-2 text-sm">
-            Echange toujours en cours ? — {repliedRelanceInfo.daysSinceUpdate} jour{repliedRelanceInfo.daysSinceUpdate > 1 ? 's' : ''} sans nouvelles
+            Echange toujours en cours ? {repliedRelanceInfo.daysSinceUpdate} jour{repliedRelanceInfo.daysSinceUpdate > 1 ? 's' : ''} sans nouvelles
           </div>
         )}
 
@@ -306,7 +306,7 @@ export function ContactModal({ contact, onClose }: IContactModalProps) {
             </DialogFooter>
           </form>
         ) : (
-          <div className="mt-2 space-y-4 text-sm">
+          <div className="mt-2 min-w-0 space-y-4 text-sm">
             {localJobTitle && (
               <div>
                 <span className="text-muted-foreground">Poste</span>
@@ -388,7 +388,7 @@ export function ContactModal({ contact, onClose }: IContactModalProps) {
 
             <div className="border-t border-border pt-4 flex flex-col gap-2">
               <span className="text-muted-foreground font-medium">
-                {localJobTitle ? 'Mettre à jour les infos LinkedIn' : 'Poste manquant — colle le profil LinkedIn pour le déduire'}
+                {localJobTitle ? 'Mettre à jour les infos LinkedIn' : 'Poste manquant : colle le profil LinkedIn pour le déduire'}
               </span>
               <textarea
                 value={rawContactText}
@@ -423,7 +423,7 @@ export function ContactModal({ contact, onClose }: IContactModalProps) {
                 <span className="text-muted-foreground font-medium">Message 1er contact</span>
                 {suggestedMessage ? (
                   copied ? (
-                    <p className="text-sm text-muted-foreground">Message copié — visible dans la timeline</p>
+                    <p className="text-sm text-muted-foreground">Message copié, visible dans la timeline</p>
                   ) : (
                     <div className="flex flex-col gap-2">
                       <textarea
@@ -466,7 +466,7 @@ export function ContactModal({ contact, onClose }: IContactModalProps) {
                       {copiedRelance ? 'Copié ✓' : 'Copier'}
                     </Button>
                     {copiedRelance && (
-                      <p className="text-sm text-muted-foreground">Message copié — contact repassé en Contacté</p>
+                      <p className="text-sm text-muted-foreground">Message copié, contact repassé en Contacté</p>
                     )}
                   </div>
                 ) : (
