@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import { Pencil, ChevronDown, ChevronUp } from 'lucide-react'
 import { useForm } from 'react-hook-form'
 import type { IContact, ICompany, ContactStatus, IUpdateContactPayload } from '@/types/contact'
-import { useUpdateContact, useDeleteContact, useExtractContact, useExtractCompany, useSuggestTemplate, useCreateMessage, useGetMessages, useGetRelances, useSuggestRelance, useTouchContact } from '@/hooks/useContacts'
+import { useUpdateContact, useDeleteContact, useExtractContact, useExtractCompany, useEnrichCompany, useSuggestTemplate, useCreateMessage, useGetMessages, useGetRelances, useSuggestRelance, useTouchContact } from '@/hooks/useContacts'
 import {
   Dialog,
   DialogContent,
@@ -62,6 +62,7 @@ export function ContactModal({ contact, onClose }: IContactModalProps) {
   const deleteContact = useDeleteContact()
   const extractContact = useExtractContact()
   const extractCompany = useExtractCompany()
+  const enrichCompany = useEnrichCompany()
   const suggestTemplate = useSuggestTemplate()
   const suggestRelance = useSuggestRelance()
   const createMessage = useCreateMessage()
@@ -148,6 +149,26 @@ export function ContactModal({ contact, onClose }: IContactModalProps) {
         setTimeout(() => setExtractionStatus('idle'), 3000)
       },
     })
+  }
+
+  const handleEnrichCompany = () => {
+    if (!localCompany) return
+    setExtractionStatus('idle')
+    enrichCompany.mutate(
+      { companyId: localCompany.id, rawText: rawCompanyText },
+      {
+        onSuccess: (company) => {
+          setLocalCompany(company)
+          setRawCompanyText('')
+          setExtractionStatus('success')
+          setTimeout(() => setExtractionStatus('idle'), 3000)
+        },
+        onError: () => {
+          setExtractionStatus('error')
+          setTimeout(() => setExtractionStatus('idle'), 3000)
+        },
+      }
+    )
   }
 
   const handleExtractContactInfo = () => {
@@ -351,39 +372,42 @@ export function ContactModal({ contact, onClose }: IContactModalProps) {
 
             <div className="border-t border-border pt-4 flex flex-col gap-2">
               <span className="text-muted-foreground font-medium">Entreprise LinkedIn</span>
-              {localCompany ? (
+              {localCompany && (
                 <div className="rounded-md bg-muted px-3 py-2">
                   <p className="font-medium">{localCompany.name}</p>
                   {localCompany.sector && (
                     <p className="text-xs text-muted-foreground">{localCompany.sector}{localCompany.size ? ` · ${localCompany.size}` : ''}</p>
                   )}
                 </div>
-              ) : (
-                <div className="flex flex-col gap-1.5">
-                  <textarea
-                    value={rawCompanyText}
-                    onChange={(e) => setRawCompanyText(e.target.value)}
-                    rows={3}
-                    placeholder="Colle ici le texte de la page LinkedIn entreprise…"
-                    className="flex w-full rounded-md border border-input bg-background text-foreground px-3 py-2 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring resize-none"
-                  />
-                  <Button
-                    type="button"
-                    variant="outline"
-                    onClick={handleExtractCompany}
-                    disabled={!rawCompanyText.trim() || extractCompany.isPending}
-                    className="self-end"
-                  >
-                    {extractCompany.isPending ? 'Extraction…' : 'Extraire l\'entreprise'}
-                  </Button>
-                  {extractionStatus === 'success' && (
-                    <p className="text-xs text-foreground">Entreprise extraite avec succès.</p>
-                  )}
-                  {extractionStatus === 'error' && (
-                    <p className="text-xs text-foreground">Échec de l'extraction. Vérifie le texte saisi.</p>
-                  )}
-                </div>
               )}
+              <div className="flex flex-col gap-1.5">
+                <textarea
+                  value={rawCompanyText}
+                  onChange={(e) => setRawCompanyText(e.target.value)}
+                  rows={3}
+                  placeholder={localCompany ? 'Colle ici le texte à jour de la page LinkedIn entreprise…' : 'Colle ici le texte de la page LinkedIn entreprise…'}
+                  className="flex w-full rounded-md border border-input bg-background text-foreground px-3 py-2 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring resize-none"
+                />
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={localCompany ? handleEnrichCompany : handleExtractCompany}
+                  disabled={!rawCompanyText.trim() || extractCompany.isPending || enrichCompany.isPending}
+                  className="self-end"
+                >
+                  {extractCompany.isPending || enrichCompany.isPending
+                    ? 'Extraction…'
+                    : localCompany
+                      ? 'Mettre à jour les infos entreprise'
+                      : "Extraire l'entreprise"}
+                </Button>
+                {extractionStatus === 'success' && (
+                  <p className="text-xs text-foreground">Entreprise mise à jour.</p>
+                )}
+                {extractionStatus === 'error' && (
+                  <p className="text-xs text-foreground">Échec de l'extraction. Vérifie le texte saisi.</p>
+                )}
+              </div>
             </div>
 
             <div className="border-t border-border pt-4 flex flex-col gap-2">

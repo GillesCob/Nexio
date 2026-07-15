@@ -59,6 +59,17 @@ export function useExtractCompany() {
   })
 }
 
+export function useEnrichCompany() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: ({ companyId, rawText }: { companyId: string; rawText: string }) =>
+      contactService.enrichCompany(companyId, rawText),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: CONTACTS_QUERY_KEY })
+    },
+  })
+}
+
 export function useSuggestTemplate() {
   return useMutation({
     mutationFn: (contactId: string) => contactService.suggestTemplate(contactId),
