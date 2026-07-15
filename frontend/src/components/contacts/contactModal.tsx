@@ -47,6 +47,7 @@ export function ContactModal({ contact, onClose }: IContactModalProps) {
   const [rawCompanyText, setRawCompanyText] = useState('')
   const [rawContactText, setRawContactText] = useState('')
   const [suggestedMessage, setSuggestedMessage] = useState<string | null>(null)
+  const [templateError, setTemplateError] = useState<string | null>(null)
   const [suggestedRelance, setSuggestedRelance] = useState<string | null>(null)
   const [extractionStatus, setExtractionStatus] = useState<'idle' | 'success' | 'error'>('idle')
   const [contactExtractionStatus, setContactExtractionStatus] = useState<'idle' | 'success' | 'error'>('idle')
@@ -90,6 +91,7 @@ export function ContactModal({ contact, onClose }: IContactModalProps) {
       setRawCompanyText('')
       setRawContactText('')
       setSuggestedMessage(null)
+      setTemplateError(null)
       setSuggestedRelance(null)
       setExtractionStatus('idle')
       setContactExtractionStatus('idle')
@@ -214,9 +216,16 @@ export function ContactModal({ contact, onClose }: IContactModalProps) {
   }
 
   const handleSuggestTemplate = () => {
+    setTemplateError(null)
     suggestTemplate.mutate(contact.id, {
       onSuccess: (data) => {
         setSuggestedMessage(data.message)
+      },
+      onError: (err) => {
+        const message =
+          (err as { response?: { data?: { message?: string } } }).response?.data?.message ??
+          'Impossible de générer le message.'
+        setTemplateError(message)
       },
     })
   }
@@ -453,6 +462,9 @@ export function ContactModal({ contact, onClose }: IContactModalProps) {
                   >
                     {suggestTemplate.isPending ? 'Génération…' : 'Générer le message'}
                   </Button>
+                )}
+                {templateError && (
+                  <p className="text-xs text-foreground">{templateError}</p>
                 )}
               </div>
             )}
