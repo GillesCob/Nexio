@@ -1,7 +1,18 @@
-import Groq from 'groq-sdk'
 import { prisma } from '../lib/prisma'
 import { templates } from '../data/templates'
+import { relanceTemplates } from '../data/relanceTemplates'
+import { VIDEO_LINKS } from '../data/videoLinks'
+import { selectTemplate } from './templateSelector'
 import { AppError } from '../middlewares/errorMiddleware'
+
+function fillTemplate(body: string, vars: Record<string, string | null>): string {
+  let result = body
+  for (const [key, value] of Object.entries(vars)) {
+    if (value === null) continue
+    result = result.split(`{{${key}}}`).join(value)
+  }
+  return result
+}
 
 export async function suggestTemplate(userId: string, contactId: string): Promise<string> {
   const contact = await prisma.contact.findUnique({
@@ -11,31 +22,36 @@ export async function suggestTemplate(userId: string, contactId: string): Promis
 
   if (!contact || contact.userId !== userId) throw new AppError(404, 'Contact not found')
 
-  const firstName = contact.name.split(' ')[0]
-  const companyName = contact.companyRef?.name ?? 'votre entreprise'
-
-  const client = new Groq({ apiKey: process.env.GROQ_API_KEY })
-
-  const message = await client.chat.completions.create({
-    model: 'llama-3.3-70b-versatile',
-    max_tokens: 1024,
-    messages: [
-      {
-        role: 'user',
-        content: `Tu es un assistant de prospection LinkedIn. Voici le profil du contact :
-- Prénom : ${firstName}
-- Poste : ${contact.jobTitle ?? 'inconnu'}
-- Entreprise : ${contact.companyRef?.name ?? 'inconnue'}
-- Secteur entreprise : ${contact.companyRef?.sector ?? 'inconnu'}
-- Taille entreprise : ${contact.companyRef?.size ?? 'inconnue'}
-
-Voici les templates disponibles (au format JSON) :
-${JSON.stringify(templates)}
-
-Choisis le template le plus adapté au profil du contact. Retourne UNIQUEMENT le body du template choisi, avec {{firstName}} remplacé par "${firstName}" et {{companyName}} remplacé par "${companyName}". Aucune explication, aucun markdown.`,
-      },
-    ],
+  const templateId = selectTemplate({
+    flux: contact.flux,
+    contactedAt: contact.contactedAt,
+    relanceCount: contact.relanceCount,
   })
 
-  return message.choices[0].message.content ?? ''
+  if (!templateId) {
+    throw new AppError(
+      400,
+      "Ce contact n'a pas encore été classifié (flux manquant), impossible de choisir un template automatiquement. Mets à jour les infos entreprise pour déclencher la classification."
+    )
+  }
+
+  const template = [...templates, ...relanceTemplates].find((t) => t.id === templateId)
+  if (!template) {
+    throw new AppError(500, `Template "${templateId}" introuvable.`)
+  }
+
+  const firstName = contact.name.split(' ')[0]
+  const companyName = contact.companyRef?.name ?? contact.company ?? 'votre entreprise'
+  const lastContactDate = contact.contactedAt
+    ? contact.contactedAt.toLocaleDateString('fr-FR', { day: '2-digit', month: 'long' })
+    : null
+  const videoLink = contact.flux ? VIDEO_LINKS[contact.flux] ?? null : null
+
+  return fillTemplate(template.body, {
+    firstName,
+    companyName,
+    location: contact.location,
+    lastContactDate,
+    videoLink,
+  })
 }

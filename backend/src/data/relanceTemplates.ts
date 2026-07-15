@@ -16,13 +16,13 @@ export const relanceTemplates: IRelanceTemplate[] = [
     id: '1a_relance_after_17_07',
     label: 'Flux 1a : Relance après 17/07',
     targetProfile: 'recruiter_esn',
-    body: `Bonjour [Prénom],
+    body: `Bonjour {{firstName}},
 
-Je me permets de revenir vers vous suite à mon message du [DATE].
+Je me permets de revenir vers vous suite à mon message du {{lastContactDate}}.
 
 Cerithe vient de passer en production. C'est le projet dont je vous parlais et il est maintenant en ligne. Depuis gillescobigo.com vous pouvez d'ailleurs accéder aux démos de mes différents projets et vous faire une idée concrète de ce que je construis.
 
-Je reste à la recherche d'un poste fullstack dans la région de [VILLE] et [NOM ESN] m'intéresse toujours.
+Je reste à la recherche d'un poste fullstack dans la région de {{location}} et {{companyName}} m'intéresse toujours.
 
 À votre disposition pour échanger.
 Gilles`,
@@ -31,13 +31,13 @@ Gilles`,
     id: '1a_relance_final',
     label: 'Flux 1a : Relance finale',
     targetProfile: 'recruiter_esn',
-    body: `Bonjour [Prénom],
+    body: `Bonjour {{firstName}},
 
 Dernier message de ma part pour ne pas encombrer votre boîte.
 
 Mon profil a évolué depuis nos derniers échanges, gillescobigo.com est à jour si vous souhaitez y jeter un oeil.
 
-Si une opportunité se présente au sein de [NOM ESN], je reste preneur.
+Si une opportunité se présente au sein de {{companyName}}, je reste preneur.
 
 Bonne continuation.
 Gilles`,
@@ -52,13 +52,13 @@ Gilles`,
     id: '2_relance_before_17_07',
     label: 'Flux 2 : Relance avant 17/07',
     targetProfile: 'cto_directeur_technique',
-    body: `Bonjour [Prénom],
+    body: `Bonjour {{firstName}},
 
-Je me permets de revenir vers vous suite à mon message du [DATE].
+Je me permets de revenir vers vous suite à mon message du {{lastContactDate}}.
 
 Depuis, j'ai mis en ligne deux projets : Cerithe, un carnet de santé numérique du bâtiment, et Nexio, un CRM de suivi de recherche d'emploi avec extraction IA des profils LinkedIn et scoring automatique des annonces. Démos accessibles directement sur gillescobigo.com, code sur GitHub, et un article par jour qui documente chaque décision technique.
 
-Je reste à la recherche d'un poste fullstack dans la région de [VILLE] et [NOM BOITE] m'intéresse toujours.
+Je reste à la recherche d'un poste fullstack dans la région de {{location}} et {{companyName}} m'intéresse toujours.
 
 À votre disposition pour échanger.
 Gilles`,
@@ -67,13 +67,13 @@ Gilles`,
     id: '2_relance_after_17_07',
     label: 'Flux 2 : Relance après 17/07',
     targetProfile: 'cto_directeur_technique',
-    body: `Bonjour [Prénom],
+    body: `Bonjour {{firstName}},
 
-Je me permets de revenir vers vous suite à mon message du [DATE].
+Je me permets de revenir vers vous suite à mon message du {{lastContactDate}}.
 
 Depuis, j'ai mis en ligne Nexio, un CRM de suivi de recherche d'emploi avec extraction IA des profils LinkedIn et scoring automatique des annonces. Démo accessible directement sur gillescobigo.com, et le code est sur GitHub.
 
-Je reste à la recherche d'un poste fullstack dans la région de [VILLE] et [NOM BOITE] m'intéresse toujours.
+Je reste à la recherche d'un poste fullstack dans la région de {{location}} et {{companyName}} m'intéresse toujours.
 
 À votre disposition pour échanger.
 Gilles`,
@@ -82,13 +82,13 @@ Gilles`,
     id: '2_relance_final',
     label: 'Flux 2 : Relance finale',
     targetProfile: 'cto_directeur_technique',
-    body: `Bonjour [Prénom],
+    body: `Bonjour {{firstName}},
 
 Dernier message de ma part pour ne pas encombrer votre boîte.
 
 Mon profil a évolué depuis nos derniers échanges, gillescobigo.com est à jour si vous souhaitez y jeter un œil.
 
-Si une opportunité se présente au sein de [NOM BOITE], je reste preneur.
+Si une opportunité se présente au sein de {{companyName}}, je reste preneur.
 
 Bonne continuation.
 Gilles`,
@@ -97,13 +97,13 @@ Gilles`,
     id: '3_relance_before_17_07',
     label: 'Flux 3 : Relance avant 17/07',
     targetProfile: 'lead_dev_tech_lead',
-    body: `Bonjour [Prénom],
+    body: `Bonjour {{firstName}},
 
-Je me permets de revenir vers vous suite à mon message du [DATE].
+Je me permets de revenir vers vous suite à mon message du {{lastContactDate}}.
 
 Depuis, j'ai mis en ligne deux projets : Cerithe, un carnet de santé numérique du bâtiment, et Nexio, un CRM de suivi de recherche d'emploi avec extraction IA des profils LinkedIn et scoring automatique des annonces. Démos accessibles directement sur gillescobigo.com, code sur GitHub, et un article par jour qui documente chaque décision technique, autant pour ancrer ce que j'apprends que pour partager une démarche.
 
-Je reste à la recherche d'un poste fullstack dans la région de [VILLE] et [NOM BOITE] m'intéresse toujours.
+Je reste à la recherche d'un poste fullstack dans la région de {{location}} et {{companyName}} m'intéresse toujours.
 
 À votre disposition pour échanger.
 Gilles`,
@@ -112,13 +112,13 @@ Gilles`,
     id: '3_relance_after_17_07',
     label: 'Flux 3 : Relance après 17/07',
     targetProfile: 'lead_dev_tech_lead',
-    body: `Bonjour [Prénom],
+    body: `Bonjour {{firstName}},
 
-Je me permets de revenir vers vous suite à mon message du [DATE].
+Je me permets de revenir vers vous suite à mon message du {{lastContactDate}}.
 
 Depuis, Cerithe est passé en production. C'est le projet dont je vous parlais et il est maintenant en ligne, accessible en démo sur gillescobigo.com. J'ai également mis en ligne Nexio, un CRM de suivi de recherche d'emploi avec extraction IA des profils LinkedIn et scoring automatique des annonces.
 
-Je reste à la recherche d'un poste fullstack dans la région de [VILLE] et [NOM BOITE] m'intéresse toujours.
+Je reste à la recherche d'un poste fullstack dans la région de {{location}} et {{companyName}} m'intéresse toujours.
 
 À votre disposition pour échanger.
 Gilles`,
@@ -127,13 +127,13 @@ Gilles`,
     id: '3_relance_final',
     label: 'Flux 3 : Relance finale',
     targetProfile: 'lead_dev_tech_lead',
-    body: `Bonjour [Prénom],
+    body: `Bonjour {{firstName}},
 
 Dernier message de ma part pour ne pas encombrer votre boîte.
 
 Mon profil a évolué depuis nos derniers échanges, gillescobigo.com est à jour si vous souhaitez y jeter un œil.
 
-Si une opportunité se présente au sein de [NOM BOITE], je reste preneur.
+Si une opportunité se présente au sein de {{companyName}}, je reste preneur.
 
 Bonne continuation.
 Gilles`,
@@ -142,9 +142,9 @@ Gilles`,
     id: '4_relance_before_17_07',
     label: 'Flux 4 : Relance avant 17/07',
     targetProfile: 'business_manager_esn',
-    body: `Bonjour [Prénom],
+    body: `Bonjour {{firstName}},
 
-Je me permets de revenir vers vous suite à mon message du [DATE].
+Je me permets de revenir vers vous suite à mon message du {{lastContactDate}}.
 
 Pour vous donner plus de visibilité sur mon profil : développeur fullstack, stack Node.js, TypeScript, React, Postgres. Dispo immédiatement, mobile sur Bordeaux, Pau, Bayonne et Mont-de-Marsan.
 
@@ -159,9 +159,9 @@ Gilles`,
     id: '4_relance_after_17_07',
     label: 'Flux 4 : Relance après 17/07',
     targetProfile: 'business_manager_esn',
-    body: `Bonjour [Prénom],
+    body: `Bonjour {{firstName}},
 
-Je me permets de revenir vers vous suite à mon message du [DATE].
+Je me permets de revenir vers vous suite à mon message du {{lastContactDate}}.
 
 Cerithe vient de passer en production dans les délais annoncés. Le projet est accessible en démo sur gillescobigo.com, aux côtés de Nexio, un CRM de suivi de recherche d'emploi que j'ai également mis en ligne depuis.
 
@@ -174,7 +174,7 @@ Gilles`,
     id: '4_relance_final',
     label: 'Flux 4 : Relance finale',
     targetProfile: 'business_manager_esn',
-    body: `Bonjour [Prénom],
+    body: `Bonjour {{firstName}},
 
 Dernier message de ma part pour ne pas encombrer votre boîte.
 
