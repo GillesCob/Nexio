@@ -35,6 +35,11 @@ export async function extractCompany(rawText: string, contactId?: string): Promi
   return response.data
 }
 
+export async function enrichCompany(companyId: string, rawText: string): Promise<ICompany> {
+  const response = await apiClient.patch<ICompany>(`/companies/${companyId}/enrich`, { rawText })
+  return response.data
+}
+
 export async function suggestTemplate(contactId: string): Promise<{ message: string }> {
   const response = await apiClient.get<{ message: string }>(`/contacts/${contactId}/suggest-template`)
   return response.data

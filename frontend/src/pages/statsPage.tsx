@@ -19,7 +19,7 @@ function VariationBadge({ value }: { value: number }) {
 function SnapshotRow({ snapshot }: { snapshot: ILinkedInSnapshot }) {
   return (
     <tr className="border-b border-border">
-      <td className="py-2 pr-4 text-sm font-medium">{snapshot.weekLabel || '—'}</td>
+      <td className="py-2 pr-4 text-sm font-medium">{snapshot.weekLabel || '-'}</td>
       <td className="py-2 pr-4 text-sm text-right">
         {snapshot.impressions} <VariationBadge value={snapshot.impressionsVariation} />
       </td>

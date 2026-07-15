@@ -20,7 +20,7 @@ export async function extractJobOfferFromText(rawText: string): Promise<IExtract
     messages: [
       {
         role: "user",
-        content: `Tu es un extracteur d'annonces d'emploi. Analyse ce texte et retourne UNIQUEMENT un objet JSON valide (sans markdown, sans explication) avec exactement ces clés : title (string, obligatoire), company (string, obligatoire — si absent du texte mettre "Entreprise non mentionnée"), description (string ou null), stack (tableau de strings, peut être vide), salary (string ou null), remote (boolean), location (string ou null), url (string ou null).
+        content: `Tu es un extracteur d'annonces d'emploi. Analyse ce texte et retourne UNIQUEMENT un objet JSON valide (sans markdown, sans explication) avec exactement ces clés : title (string, obligatoire), company (string, obligatoire, si absent du texte mettre "Entreprise non mentionnée"), description (string ou null), stack (tableau de strings, peut être vide), salary (string ou null), remote (boolean), location (string ou null), url (string ou null).
 
 Texte de l'annonce :
 ${rawText}`,

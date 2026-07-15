@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import { Pencil, ChevronDown, ChevronUp } from 'lucide-react'
 import { useForm } from 'react-hook-form'
 import type { IContact, ICompany, ContactStatus, IUpdateContactPayload } from '@/types/contact'
-import { useUpdateContact, useDeleteContact, useExtractCompany, useSuggestTemplate, useCreateMessage, useGetMessages, useGetRelances, useSuggestRelance, useTouchContact } from '@/hooks/useContacts'
+import { useUpdateContact, useDeleteContact, useExtractContact, useExtractCompany, useEnrichCompany, useSuggestTemplate, useCreateMessage, useGetMessages, useGetRelances, useSuggestRelance, useTouchContact } from '@/hooks/useContacts'
 import {
   Dialog,
   DialogContent,
@@ -45,19 +45,26 @@ interface IContactModalProps {
 export function ContactModal({ contact, onClose }: IContactModalProps) {
   const [isEditing, setIsEditing] = useState(false)
   const [rawCompanyText, setRawCompanyText] = useState('')
+  const [rawContactText, setRawContactText] = useState('')
   const [suggestedMessage, setSuggestedMessage] = useState<string | null>(null)
   const [suggestedRelance, setSuggestedRelance] = useState<string | null>(null)
   const [extractionStatus, setExtractionStatus] = useState<'idle' | 'success' | 'error'>('idle')
+  const [contactExtractionStatus, setContactExtractionStatus] = useState<'idle' | 'success' | 'error'>('idle')
   const [copied, setCopied] = useState(false)
   const [copiedRelance, setCopiedRelance] = useState(false)
   const [localStatus, setLocalStatus] = useState<ContactStatus>(contact?.status ?? 'to_contact')
   const [localCompany, setLocalCompany] = useState<ICompany | undefined>(contact?.companyRef)
+  const [localJobTitle, setLocalJobTitle] = useState(contact?.jobTitle ?? null)
   const [openEventId, setOpenEventId] = useState<string | null>(null)
   const [isTimelineOpen, setIsTimelineOpen] = useState(false)
+  const [isCompanyModalOpen, setIsCompanyModalOpen] = useState(false)
+  const [isContactInfoModalOpen, setIsContactInfoModalOpen] = useState(false)
 
   const updateContact = useUpdateContact()
   const deleteContact = useDeleteContact()
+  const extractContact = useExtractContact()
   const extractCompany = useExtractCompany()
+  const enrichCompany = useEnrichCompany()
   const suggestTemplate = useSuggestTemplate()
   const suggestRelance = useSuggestRelance()
   const createMessage = useCreateMessage()
@@ -81,11 +88,16 @@ export function ContactModal({ contact, onClose }: IContactModalProps) {
       })
       setIsEditing(false)
       setRawCompanyText('')
+      setRawContactText('')
       setSuggestedMessage(null)
       setSuggestedRelance(null)
       setExtractionStatus('idle')
+      setContactExtractionStatus('idle')
+      setIsCompanyModalOpen(false)
+      setIsContactInfoModalOpen(false)
       setLocalStatus(contact.status)
       setLocalCompany(contact.companyRef)
+      setLocalJobTitle(contact.jobTitle ?? null)
       setOpenEventId(null)
       setIsTimelineOpen(false)
     }
@@ -133,12 +145,70 @@ export function ContactModal({ contact, onClose }: IContactModalProps) {
     extractCompany.mutate({ rawText: rawCompanyText, contactId: contact.id }, {
       onSuccess: (company) => {
         setLocalCompany(company)
+        setIsCompanyModalOpen(false)
         setExtractionStatus('success')
         setTimeout(() => setExtractionStatus('idle'), 3000)
       },
       onError: () => {
         setExtractionStatus('error')
         setTimeout(() => setExtractionStatus('idle'), 3000)
+      },
+    })
+  }
+
+  const handleEnrichCompany = () => {
+    if (!localCompany) return
+    setExtractionStatus('idle')
+    enrichCompany.mutate(
+      { companyId: localCompany.id, rawText: rawCompanyText },
+      {
+        onSuccess: (company) => {
+          setLocalCompany(company)
+          setRawCompanyText('')
+          setIsCompanyModalOpen(false)
+          setExtractionStatus('success')
+          setTimeout(() => setExtractionStatus('idle'), 3000)
+        },
+        onError: () => {
+          setExtractionStatus('error')
+          setTimeout(() => setExtractionStatus('idle'), 3000)
+        },
+      }
+    )
+  }
+
+  const handleExtractContactInfo = () => {
+    setContactExtractionStatus('idle')
+    extractContact.mutate(rawContactText, {
+      onSuccess: (data) => {
+        updateContact.mutate(
+          {
+            id: contact.id,
+            data: {
+              ...(data.name ? { name: data.name } : {}),
+              ...(data.company ? { company: data.company } : {}),
+              ...(data.linkedinUrl ? { linkedinUrl: data.linkedinUrl } : {}),
+              ...(data.jobTitle ? { jobTitle: data.jobTitle } : {}),
+            },
+          },
+          {
+            onSuccess: () => {
+              if (data.jobTitle) setLocalJobTitle(data.jobTitle)
+              setRawContactText('')
+              setIsContactInfoModalOpen(false)
+              setContactExtractionStatus('success')
+              setTimeout(() => setContactExtractionStatus('idle'), 3000)
+            },
+            onError: () => {
+              setContactExtractionStatus('error')
+              setTimeout(() => setContactExtractionStatus('idle'), 3000)
+            },
+          }
+        )
+      },
+      onError: () => {
+        setContactExtractionStatus('error')
+        setTimeout(() => setContactExtractionStatus('idle'), 3000)
       },
     })
   }
@@ -177,6 +247,7 @@ export function ContactModal({ contact, onClose }: IContactModalProps) {
   }
 
   return (
+    <>
     <Dialog open={!!contact} onOpenChange={(open) => { if (!open) onClose() }}>
       <DialogContent className="max-h-[90vh] overflow-y-auto">
         <DialogHeader>
@@ -195,13 +266,13 @@ export function ContactModal({ contact, onClose }: IContactModalProps) {
 
         {relanceInfo && (
           <div className="rounded-md border border-amber-300 bg-amber-50 text-amber-800 px-3 py-2 text-sm">
-            Relance recommandée — {relanceInfo.daysSinceUpdate} jour{relanceInfo.daysSinceUpdate > 1 ? 's' : ''} sans nouvelles
+            Relance recommandée : {relanceInfo.daysSinceUpdate} jour{relanceInfo.daysSinceUpdate > 1 ? 's' : ''} sans nouvelles
           </div>
         )}
 
         {repliedRelanceInfo && (
           <div className="rounded-md border border-indigo-300 bg-indigo-50 text-indigo-800 px-3 py-2 text-sm">
-            Echange toujours en cours ? — {repliedRelanceInfo.daysSinceUpdate} jour{repliedRelanceInfo.daysSinceUpdate > 1 ? 's' : ''} sans nouvelles
+            Echange toujours en cours ? {repliedRelanceInfo.daysSinceUpdate} jour{repliedRelanceInfo.daysSinceUpdate > 1 ? 's' : ''} sans nouvelles
           </div>
         )}
 
@@ -264,11 +335,11 @@ export function ContactModal({ contact, onClose }: IContactModalProps) {
             </DialogFooter>
           </form>
         ) : (
-          <div className="mt-2 space-y-4 text-sm">
-            {contact.jobTitle && (
+          <div className="mt-2 min-w-0 space-y-4 text-sm">
+            {localJobTitle && (
               <div>
                 <span className="text-muted-foreground">Poste</span>
-                <p className="font-medium">{contact.jobTitle}</p>
+                <p className="font-medium">{localJobTitle}</p>
               </div>
             )}
             {contact.company && (
@@ -309,38 +380,47 @@ export function ContactModal({ contact, onClose }: IContactModalProps) {
 
             <div className="border-t border-border pt-4 flex flex-col gap-2">
               <span className="text-muted-foreground font-medium">Entreprise LinkedIn</span>
-              {localCompany ? (
+              {localCompany && (
                 <div className="rounded-md bg-muted px-3 py-2">
                   <p className="font-medium">{localCompany.name}</p>
                   {localCompany.sector && (
                     <p className="text-xs text-muted-foreground">{localCompany.sector}{localCompany.size ? ` · ${localCompany.size}` : ''}</p>
                   )}
                 </div>
-              ) : (
-                <div className="flex flex-col gap-1.5">
-                  <textarea
-                    value={rawCompanyText}
-                    onChange={(e) => setRawCompanyText(e.target.value)}
-                    rows={3}
-                    placeholder="Colle ici le texte de la page LinkedIn entreprise…"
-                    className="flex w-full rounded-md border border-input bg-background text-foreground px-3 py-2 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring resize-none"
-                  />
-                  <Button
-                    type="button"
-                    variant="outline"
-                    onClick={handleExtractCompany}
-                    disabled={!rawCompanyText.trim() || extractCompany.isPending}
-                    className="self-end"
-                  >
-                    {extractCompany.isPending ? 'Extraction…' : 'Extraire l\'entreprise'}
-                  </Button>
-                  {extractionStatus === 'success' && (
-                    <p className="text-xs text-foreground">Entreprise extraite avec succès.</p>
-                  )}
-                  {extractionStatus === 'error' && (
-                    <p className="text-xs text-foreground">Échec de l'extraction. Vérifie le texte saisi.</p>
-                  )}
-                </div>
+              )}
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => setIsCompanyModalOpen(true)}
+                className="self-start"
+              >
+                {localCompany ? 'Mettre à jour les infos entreprise' : "Extraire l'entreprise"}
+              </Button>
+              {extractionStatus === 'success' && (
+                <p className="text-xs text-foreground">Entreprise mise à jour.</p>
+              )}
+              {extractionStatus === 'error' && (
+                <p className="text-xs text-foreground">Échec de l'extraction. Vérifie le texte saisi.</p>
+              )}
+            </div>
+
+            <div className="border-t border-border pt-4 flex flex-col gap-2">
+              <span className="text-muted-foreground font-medium">
+                {localJobTitle ? 'Infos LinkedIn du contact' : 'Poste manquant'}
+              </span>
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => setIsContactInfoModalOpen(true)}
+                className="self-start"
+              >
+                {localJobTitle ? 'Mettre à jour les infos LinkedIn' : 'Extraire les infos'}
+              </Button>
+              {contactExtractionStatus === 'success' && (
+                <p className="text-xs text-foreground">Infos mises à jour.</p>
+              )}
+              {contactExtractionStatus === 'error' && (
+                <p className="text-xs text-foreground">Échec de l'extraction. Vérifie le texte saisi.</p>
               )}
             </div>
 
@@ -349,7 +429,7 @@ export function ContactModal({ contact, onClose }: IContactModalProps) {
                 <span className="text-muted-foreground font-medium">Message 1er contact</span>
                 {suggestedMessage ? (
                   copied ? (
-                    <p className="text-sm text-muted-foreground">Message copié — visible dans la timeline</p>
+                    <p className="text-sm text-muted-foreground">Message copié, visible dans la timeline</p>
                   ) : (
                     <div className="flex flex-col gap-2">
                       <textarea
@@ -392,7 +472,7 @@ export function ContactModal({ contact, onClose }: IContactModalProps) {
                       {copiedRelance ? 'Copié ✓' : 'Copier'}
                     </Button>
                     {copiedRelance && (
-                      <p className="text-sm text-muted-foreground">Message copié — contact repassé en Contacté</p>
+                      <p className="text-sm text-muted-foreground">Message copié, contact repassé en Contacté</p>
                     )}
                   </div>
                 ) : (
@@ -461,6 +541,63 @@ export function ContactModal({ contact, onClose }: IContactModalProps) {
         )}
       </DialogContent>
     </Dialog>
+
+    <Dialog open={isCompanyModalOpen} onOpenChange={(open) => { if (!open) setIsCompanyModalOpen(false) }}>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>{localCompany ? 'Mettre à jour les infos entreprise' : "Extraire l'entreprise"}</DialogTitle>
+        </DialogHeader>
+        <textarea
+          value={rawCompanyText}
+          onChange={(e) => setRawCompanyText(e.target.value)}
+          rows={6}
+          autoFocus
+          placeholder={localCompany ? 'Colle ici le texte à jour de la page LinkedIn entreprise…' : 'Colle ici le texte de la page LinkedIn entreprise…'}
+          className="flex w-full rounded-md border border-input bg-background text-foreground px-3 py-2 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring resize-none"
+        />
+        <DialogFooter>
+          <Button type="button" variant="outline" onClick={() => setIsCompanyModalOpen(false)}>
+            Annuler
+          </Button>
+          <Button
+            type="button"
+            onClick={localCompany ? handleEnrichCompany : handleExtractCompany}
+            disabled={!rawCompanyText.trim() || extractCompany.isPending || enrichCompany.isPending}
+          >
+            {extractCompany.isPending || enrichCompany.isPending ? 'Extraction…' : 'Extraire'}
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+
+    <Dialog open={isContactInfoModalOpen} onOpenChange={(open) => { if (!open) setIsContactInfoModalOpen(false) }}>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>{localJobTitle ? 'Mettre à jour les infos LinkedIn' : 'Extraire les infos'}</DialogTitle>
+        </DialogHeader>
+        <textarea
+          value={rawContactText}
+          onChange={(e) => setRawContactText(e.target.value)}
+          rows={6}
+          autoFocus
+          placeholder="Colle ici le texte du profil LinkedIn du contact…"
+          className="flex w-full rounded-md border border-input bg-background text-foreground px-3 py-2 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring resize-none"
+        />
+        <DialogFooter>
+          <Button type="button" variant="outline" onClick={() => setIsContactInfoModalOpen(false)}>
+            Annuler
+          </Button>
+          <Button
+            type="button"
+            onClick={handleExtractContactInfo}
+            disabled={!rawContactText.trim() || extractContact.isPending || updateContact.isPending}
+          >
+            {extractContact.isPending || updateContact.isPending ? 'Extraction…' : 'Extraire'}
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+    </>
   )
 }
 

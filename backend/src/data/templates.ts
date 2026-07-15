@@ -20,7 +20,7 @@ export const templates: ITemplate[] = [
   },
   {
     id: "2_first_contact",
-    label: "Flux 2 — CTO / Directeur technique",
+    label: "Flux 2 : CTO / Directeur technique",
     targetProfile: "cto_directeur_technique",
     body: `Bonjour [Prénom],
 
@@ -37,7 +37,7 @@ Gilles`,
   },
   {
     id: "3_first_contact",
-    label: "Flux 3 — Lead Dev / Tech Lead",
+    label: "Flux 3 : Lead Dev / Tech Lead",
     targetProfile: "lead_dev_tech_lead",
     body: `Bonjour [Prénom],
 
@@ -54,7 +54,7 @@ Gilles`,
   },
   {
     id: "4_first_contact",
-    label: "Flux 4 — Business Manager / Directeur de projets ESN",
+    label: "Flux 4 : Business Manager / Directeur de projets ESN",
     targetProfile: "business_manager_esn",
     body: `Bonjour [Prénom],
 
