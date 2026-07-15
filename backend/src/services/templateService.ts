@@ -14,6 +14,12 @@ function fillTemplate(body: string, vars: Record<string, string | null>): string
   return result
 }
 
+// Élision "de" -> "d'" devant un nom commençant par une voyelle (Axians -> d'Axians, Bordeaux -> de Bordeaux)
+function withDe(name: string | null): string | null {
+  if (!name) return null
+  return /^[aeiouyàâäéèêëïîôöùûüAEIOUYÀÂÄÉÈÊËÏÎÔÖÙÛÜ]/.test(name) ? `d'${name}` : `de ${name}`
+}
+
 export async function suggestTemplate(userId: string, contactId: string): Promise<string> {
   const contact = await prisma.contact.findUnique({
     where: { id: contactId },
@@ -51,6 +57,8 @@ export async function suggestTemplate(userId: string, contactId: string): Promis
     firstName,
     companyName,
     location: contact.location,
+    locationWithDe: withDe(contact.location),
+    companyNameWithDe: withDe(companyName),
     lastContactDate,
     videoLink,
   })

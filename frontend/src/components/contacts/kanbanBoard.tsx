@@ -6,7 +6,7 @@ import { useContacts, useUpdateContact, CONTACTS_QUERY_KEY } from '@/hooks/useCo
 import { KanbanColumn } from './kanbanColumn'
 
 const COLUMNS: { status: ContactStatus; label: string }[] = [
-  { status: 'to_contact', label: 'À contacter' },
+  { status: 'to_contact', label: 'Invitation envoyée' },
   { status: 'contacted', label: 'Contacté' },
   { status: 'replied', label: 'Echange en cours' },
   { status: 'meeting_scheduled', label: 'RDV planifié' },
