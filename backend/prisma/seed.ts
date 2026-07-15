@@ -6,14 +6,20 @@ const prisma = new PrismaClient();
 const daysAgo = (n: number) => new Date(Date.now() - n * 24 * 60 * 60 * 1000);
 
 async function main() {
-  const adminPassword = await argon2.hash("admin1234");
+  const adminEmail = process.env.ADMIN_EMAIL;
+  const adminPasswordRaw = process.env.ADMIN_PASSWORD;
+  if (!adminEmail || !adminPasswordRaw) {
+    throw new Error("ADMIN_EMAIL et ADMIN_PASSWORD doivent être définis dans .env avant de lancer le seed.");
+  }
+
+  const adminPassword = await argon2.hash(adminPasswordRaw);
   const guestPassword = await argon2.hash("guest123");
 
   await prisma.user.upsert({
-    where: { email: "admin@nexio.dev" },
-    update: {},
+    where: { email: adminEmail },
+    update: { password: adminPassword },
     create: {
-      email: "admin@nexio.dev",
+      email: adminEmail,
       password: adminPassword,
       role: Role.admin,
     },
