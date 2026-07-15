@@ -21,6 +21,7 @@ export function ContactCard({ contact, index, onOpen }: IContactCardProps) {
   const dateLabel = isUnchanged
     ? `Ajouté le ${formatDate(contact.createdAt)}`
     : `Dernier contact le ${formatDate(contact.updatedAt)}`
+  const isIncomplete = !contact.jobTitle || !contact.companyRef?.description
 
   return (
     <Draggable draggableId={contact.id} index={index}>
@@ -34,12 +35,18 @@ export function ContactCard({ contact, index, onOpen }: IContactCardProps) {
           {...provided.dragHandleProps}
           onClick={() => onOpen(contact)}
           className={`
-            cursor-pointer rounded-md border bg-card p-3 shadow-sm
+            relative cursor-pointer rounded-md border bg-card p-3 shadow-sm
             hover:shadow-md transition-shadow select-none
             ${snapshot.isDragging ? 'opacity-80 rotate-1 shadow-lg' : ''}
           `}
         >
-          <p className="text-sm font-medium text-card-foreground truncate">{contact.name}</p>
+          {isIncomplete && (
+            <span
+              title="Infos LinkedIn (poste et/ou entreprise) pas encore complétées"
+              className="absolute right-2 top-2 h-2 w-2 rounded-full bg-red-500"
+            />
+          )}
+          <p className="text-sm font-medium text-card-foreground truncate pr-3">{contact.name}</p>
           {contact.company && (
             <p className="text-xs text-muted-foreground mt-0.5 truncate">{contact.company}</p>
           )}
