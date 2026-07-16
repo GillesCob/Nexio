@@ -1,5 +1,6 @@
 import { NextFunction, Request, Response } from 'express'
 import { z } from 'zod'
+import { APIError } from 'groq-sdk'
 import { AppError } from '../middlewares/errorMiddleware'
 import { extractContactFromText } from '../services/extractContactService'
 
@@ -15,6 +16,13 @@ export async function extractContact(req: Request, res: Response, next: NextFunc
       next(new AppError(400, err.errors[0].message))
     } else if (err instanceof SyntaxError) {
       next(new AppError(422, 'Impossible de parser la réponse du modèle'))
+    } else if (err instanceof APIError) {
+      next(new AppError(
+        err.status === 429 ? 429 : 502,
+        err.status === 429
+          ? 'Quota Groq quotidien atteint, réessaie plus tard.'
+          : "Erreur du service d'extraction IA, réessaie."
+      ))
     } else {
       next(err)
     }

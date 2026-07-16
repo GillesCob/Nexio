@@ -14,9 +14,9 @@ export const templates: ITemplate[] = [
   },
   {
     id: "1b_first_contact",
-    label: "Recruteuse freelance",
-    targetProfile: "recruiter_freelance",
-    body: `Bonjour {{firstName}},\n\nJ'ai vu votre profil et votre activité de recrutement indépendant m'a immédiatement interpellé.\n\nJe suis en reconversion vers le développement web (React, Node.js, TypeScript) après une belle carrière dans la gestion de projet BIM. Mon profil atypique intéresse souvent les startups et scale-ups tech.\n\nTout est sur gillescobigo.com. Je vous ai également fait une courte vidéo de présentation si vous préférez : {{videoLink}}\n\nAvez-vous des mandats en cours pour lesquels je pourrais correspondre ?\n\nBonne journée,\nGilles`,
+    label: "Recruteur entreprise (interne)",
+    targetProfile: "recruiter_entreprise",
+    body: `Bonjour {{firstName}},\n\nJe me permets de vous contacter car je suis en pleine transition vers le développement web full-stack après 10 ans en tant que BIM Manager dans le bâtiment.\n\nSi un poste de développeur fullstack est ouvert au sein de vos équipes chez {{companyName}}, je serais ravi d'échanger.\n\nTout est sur gillescobigo.com. Je vous ai également fait une courte vidéo de présentation si vous préférez : {{videoLink}}\n\nSeriez-vous disponible pour un bref échange ?\n\nCordialement,\nGilles`,
   },
   {
     id: "2_first_contact",

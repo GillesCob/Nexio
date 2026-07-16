@@ -1,4 +1,4 @@
-import Groq from "groq-sdk";
+import { createChatCompletion } from "../lib/groqClient";
 
 interface IExtractedContact {
   name: string;
@@ -11,9 +11,7 @@ interface IExtractedContact {
 export async function extractContactFromText(rawText: string): Promise<IExtractedContact> {
   console.log("extractContactFromText appelé avec:", rawText?.slice(0, 100));
 
-  const client = new Groq({ apiKey: process.env.GROQ_API_KEY });
-
-  const message = await client.chat.completions.create({
+  const message = await createChatCompletion({
     model: "llama-3.3-70b-versatile",
     max_tokens: 512,
     messages: [
