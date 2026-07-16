@@ -49,6 +49,7 @@ export function ContactModal({ contact, onClose }: IContactModalProps) {
   const [suggestedMessage, setSuggestedMessage] = useState<string | null>(null)
   const [templateError, setTemplateError] = useState<string | null>(null)
   const [suggestedRelance, setSuggestedRelance] = useState<string | null>(null)
+  const [relanceError, setRelanceError] = useState<string | null>(null)
   const [extractionStatus, setExtractionStatus] = useState<'idle' | 'success' | 'error'>('idle')
   const [contactExtractionStatus, setContactExtractionStatus] = useState<'idle' | 'success' | 'error'>('idle')
   const [outOfScopeNotice, setOutOfScopeNotice] = useState<string | null>(null)
@@ -97,6 +98,7 @@ export function ContactModal({ contact, onClose }: IContactModalProps) {
       setSuggestedMessage(null)
       setTemplateError(null)
       setSuggestedRelance(null)
+      setRelanceError(null)
       setExtractionStatus('idle')
       setContactExtractionStatus('idle')
       setOutOfScopeNotice(null)
@@ -294,9 +296,16 @@ export function ContactModal({ contact, onClose }: IContactModalProps) {
   }
 
   const handleSuggestRelance = () => {
+    setRelanceError(null)
     suggestRelance.mutate(contact.id, {
       onSuccess: (data) => {
         setSuggestedRelance(data.message)
+      },
+      onError: (err) => {
+        const message =
+          (err as { response?: { data?: { message?: string } } }).response?.data?.message ??
+          'Impossible de générer la relance.'
+        setRelanceError(message)
       },
     })
   }
@@ -571,6 +580,9 @@ export function ContactModal({ contact, onClose }: IContactModalProps) {
                   >
                     {suggestRelance.isPending ? 'Génération…' : 'Générer une relance'}
                   </Button>
+                )}
+                {relanceError && (
+                  <p className="text-xs text-foreground">{relanceError}</p>
                 )}
               </div>
             )}
