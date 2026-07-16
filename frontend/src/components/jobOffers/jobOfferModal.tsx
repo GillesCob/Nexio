@@ -241,12 +241,12 @@ export function JobOfferModal({ jobOffer, onClose }: IJobOfferModalProps) {
                 </button>
               </div>
             ) : localUrl ? (
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2 min-w-0">
                 <a
                   href={localUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-xs text-primary hover:underline truncate"
+                  className="min-w-0 flex-1 text-xs text-primary hover:underline truncate"
                 >
                   {localUrl}
                 </a>
