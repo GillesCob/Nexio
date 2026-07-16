@@ -28,11 +28,15 @@ ${rawText}`,
   console.log("Réponse brute Groq:", message.choices[0].message.content);
 
   const raw = message.choices[0].message.content ?? "";
+  const cleaned = raw
+    .replace(/```[\w]*\n?/g, "")
+    .replace(/```/g, "")
+    .trim();
 
   try {
-    return JSON.parse(raw) as IExtractedContact;
+    return JSON.parse(cleaned) as IExtractedContact;
   } catch (e) {
     console.error("JSON.parse échoué. Réponse reçue:", raw);
-    throw new Error("Parsing JSON échoué");
+    throw new SyntaxError("Parsing JSON échoué");
   }
 }
