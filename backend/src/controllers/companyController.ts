@@ -23,11 +23,19 @@ export async function extractCompany(req: Request, res: Response, next: NextFunc
   try {
     const { rawText, contactId } = extractSchema.parse(req.body)
     const extracted = await extractCompanyFromText(rawText)
-    const company = await prisma.company.create({ data: extracted })
+
+    const existing = await prisma.company.findFirst({
+      where: { name: { equals: extracted.name, mode: 'insensitive' } },
+    })
+
+    const company = existing
+      ? await prisma.company.update({ where: { id: existing.id }, data: extracted })
+      : await prisma.company.create({ data: extracted })
+
     if (contactId) {
       await companyService.linkAndClassifyContact(company, contactId)
     }
-    res.status(201).json(company)
+    res.status(existing ? 200 : 201).json(company)
   } catch (err) {
     if (err instanceof z.ZodError) {
       next(new AppError(400, err.errors[0].message))
