@@ -83,7 +83,7 @@ export function JobOfferModal({ jobOffer, onClose }: IJobOfferModalProps) {
           <DialogTitle className="truncate">{jobOffer.title}</DialogTitle>
         </DialogHeader>
 
-        <div className="flex flex-col gap-4 text-sm">
+        <div className="flex flex-col gap-4 text-sm min-w-0">
           <div>
             <p className="text-xs text-muted-foreground uppercase tracking-wide mb-0.5">Entreprise</p>
             {editingField === 'company' ? (
