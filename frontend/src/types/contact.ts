@@ -23,6 +23,7 @@ export interface IContact {
   company?: string
   linkedinUrl?: string
   jobTitle?: string
+  location?: string
   status: ContactStatus
   notes?: string
   jobOfferId?: string
