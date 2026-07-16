@@ -20,11 +20,11 @@ export async function enrichCompany(companyId: string, rawText: string) {
     throw err
   }
 
-  if (!company.description || !company.sector) {
+  if (!company.sector) {
     return company
   }
 
-  const companyDescription = company.description
+  const companyDescription = company.description ?? null
   const companySector = company.sector
 
   const unclassifiedContacts = await prisma.contact.findMany({
@@ -65,13 +65,13 @@ export async function linkAndClassifyContact(company: Company, contactId: string
     data: { companyId: company.id, company: company.name },
   })
 
-  if (!company.description || !company.sector) return
+  if (!company.sector) return
 
   try {
     const classification = await classifyContactFlux({
       jobTitle: contact.jobTitle ?? null,
       companyName: company.name,
-      companyDescription: company.description,
+      companyDescription: company.description ?? null,
       companySector: company.sector,
     })
     if (classification.flux !== 'unknown') {
