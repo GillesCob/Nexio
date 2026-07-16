@@ -4,6 +4,7 @@ import { AppError } from '../middlewares/errorMiddleware'
 import { extractJobOfferFromText } from '../services/extractJobOfferService'
 import * as jobOfferService from '../services/jobOfferService'
 import { scoreJobOfferStack } from '../services/stackScoreService'
+import { searchAndImportJobOffers } from '../services/jobSearchService'
 
 const jobOfferStatusSchema = z.enum([
   'wishlist',
@@ -29,6 +30,8 @@ const updateSchema = z.object({
 })
 
 const paramsSchema = z.object({ id: z.string() })
+
+const searchSchema = z.object({ motsCles: z.string().min(1).optional() })
 
 function handleZod(err: unknown, next: NextFunction) {
   if (err instanceof z.ZodError) {
@@ -98,6 +101,21 @@ export async function deleteJobOffer(
     const { id } = paramsSchema.parse(req.params)
     await jobOfferService.deleteJobOffer(userId, id)
     res.status(204).send()
+  } catch (err) {
+    handleZod(err, next)
+  }
+}
+
+export async function searchJobOffers(
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> {
+  try {
+    const userId = req.user!.userId
+    const { motsCles } = searchSchema.parse(req.body ?? {})
+    const result = await searchAndImportJobOffers(userId, motsCles)
+    res.json(result)
   } catch (err) {
     handleZod(err, next)
   }

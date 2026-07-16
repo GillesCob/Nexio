@@ -37,6 +37,16 @@ export function useUpdateJobOffer() {
   })
 }
 
+export function useSearchJobOffers() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: (motsCles?: string) => jobOfferService.searchJobOffers(motsCles),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: JOB_OFFERS_QUERY_KEY })
+    },
+  })
+}
+
 export function useDeleteJobOffer() {
   const queryClient = useQueryClient()
   return useMutation({
