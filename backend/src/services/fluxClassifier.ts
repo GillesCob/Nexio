@@ -1,5 +1,5 @@
-import Groq from 'groq-sdk'
 import { z } from 'zod'
+import { createChatCompletion } from '../lib/groqClient'
 
 export interface IFluxClassifierInput {
   jobTitle: string | null
@@ -66,9 +66,7 @@ export async function classifyContactFlux(input: IFluxClassifierInput): Promise<
     .replace('{companyDescription}', input.companyDescription ?? 'non renseigné')
     .replace('{companySector}', input.companySector ?? 'non renseigné')
 
-  const client = new Groq({ apiKey: process.env.GROQ_API_KEY })
-
-  const message = await client.chat.completions.create({
+  const message = await createChatCompletion({
     model: 'llama-3.3-70b-versatile',
     max_tokens: 256,
     messages: [{ role: 'user', content: prompt }],

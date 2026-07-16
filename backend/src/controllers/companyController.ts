@@ -1,5 +1,6 @@
 import { NextFunction, Request, Response } from 'express'
 import { z } from 'zod'
+import { APIError } from 'groq-sdk'
 import { AppError } from '../middlewares/errorMiddleware'
 import { extractCompanyFromText } from '../services/extractCompanyService'
 import * as companyService from '../services/companyService'
@@ -8,6 +9,15 @@ import { prisma } from '../lib/prisma'
 const extractSchema = z.object({ rawText: z.string().min(1), contactId: z.string().optional() })
 const enrichParamsSchema = z.object({ id: z.string() })
 const enrichBodySchema = z.object({ rawText: z.string().min(1) })
+
+function toGroqAppError(err: APIError): AppError {
+  return new AppError(
+    err.status === 429 ? 429 : 502,
+    err.status === 429
+      ? 'Quota Groq quotidien atteint, réessaie plus tard.'
+      : "Erreur du service d'extraction IA, réessaie."
+  )
+}
 
 export async function extractCompany(req: Request, res: Response, next: NextFunction): Promise<void> {
   try {
@@ -23,6 +33,8 @@ export async function extractCompany(req: Request, res: Response, next: NextFunc
       next(new AppError(400, err.errors[0].message))
     } else if (err instanceof SyntaxError) {
       next(new AppError(422, 'Impossible de parser la réponse du modèle'))
+    } else if (err instanceof APIError) {
+      next(toGroqAppError(err))
     } else {
       next(err)
     }
@@ -38,6 +50,8 @@ export async function enrichCompany(req: Request, res: Response, next: NextFunct
   } catch (err) {
     if (err instanceof z.ZodError) {
       next(new AppError(400, err.errors[0].message))
+    } else if (err instanceof APIError) {
+      next(toGroqAppError(err))
     } else {
       next(err)
     }

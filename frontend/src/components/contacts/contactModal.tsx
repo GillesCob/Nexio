@@ -52,6 +52,8 @@ export function ContactModal({ contact, onClose }: IContactModalProps) {
   const [relanceError, setRelanceError] = useState<string | null>(null)
   const [extractionStatus, setExtractionStatus] = useState<'idle' | 'success' | 'error'>('idle')
   const [contactExtractionStatus, setContactExtractionStatus] = useState<'idle' | 'success' | 'error'>('idle')
+  const [companyExtractionError, setCompanyExtractionError] = useState<string | null>(null)
+  const [contactExtractionError, setContactExtractionError] = useState<string | null>(null)
   const [outOfScopeNotice, setOutOfScopeNotice] = useState<string | null>(null)
   const [copied, setCopied] = useState(false)
   const [copiedRelance, setCopiedRelance] = useState(false)
@@ -101,6 +103,8 @@ export function ContactModal({ contact, onClose }: IContactModalProps) {
       setRelanceError(null)
       setExtractionStatus('idle')
       setContactExtractionStatus('idle')
+      setCompanyExtractionError(null)
+      setContactExtractionError(null)
       setOutOfScopeNotice(null)
       setIsCompanyModalOpen(false)
       setIsContactInfoModalOpen(false)
@@ -165,6 +169,7 @@ export function ContactModal({ contact, onClose }: IContactModalProps) {
 
   const handleExtractCompany = () => {
     setExtractionStatus('idle')
+    setCompanyExtractionError(null)
     extractCompany.mutate({ rawText: rawCompanyText, contactId: contact.id }, {
       onSuccess: (company) => {
         setLocalCompany(company)
@@ -172,9 +177,11 @@ export function ContactModal({ contact, onClose }: IContactModalProps) {
         setExtractionStatus('success')
         setTimeout(() => setExtractionStatus('idle'), 3000)
       },
-      onError: () => {
-        setExtractionStatus('error')
-        setTimeout(() => setExtractionStatus('idle'), 3000)
+      onError: (err) => {
+        const message =
+          (err as { response?: { data?: { message?: string } } }).response?.data?.message ??
+          "Échec de l'extraction. Vérifie le texte saisi."
+        setCompanyExtractionError(message)
       },
     })
   }
@@ -182,6 +189,7 @@ export function ContactModal({ contact, onClose }: IContactModalProps) {
   const handleEnrichCompany = () => {
     if (!localCompany) return
     setExtractionStatus('idle')
+    setCompanyExtractionError(null)
     enrichCompany.mutate(
       { companyId: localCompany.id, rawText: rawCompanyText },
       {
@@ -192,9 +200,11 @@ export function ContactModal({ contact, onClose }: IContactModalProps) {
           setExtractionStatus('success')
           setTimeout(() => setExtractionStatus('idle'), 3000)
         },
-        onError: () => {
-          setExtractionStatus('error')
-          setTimeout(() => setExtractionStatus('idle'), 3000)
+        onError: (err) => {
+          const message =
+            (err as { response?: { data?: { message?: string } } }).response?.data?.message ??
+            "Échec de l'extraction. Vérifie le texte saisi."
+          setCompanyExtractionError(message)
         },
       }
     )
@@ -202,6 +212,7 @@ export function ContactModal({ contact, onClose }: IContactModalProps) {
 
   const handleExtractContactInfo = () => {
     setContactExtractionStatus('idle')
+    setContactExtractionError(null)
     setOutOfScopeNotice(null)
     extractContact.mutate(rawContactText, {
       onSuccess: (data) => {
@@ -258,16 +269,20 @@ export function ContactModal({ contact, onClose }: IContactModalProps) {
                 }
               )
             },
-            onError: () => {
-              setContactExtractionStatus('error')
-              setTimeout(() => setContactExtractionStatus('idle'), 3000)
+            onError: (err) => {
+              const message =
+                (err as { response?: { data?: { message?: string } } }).response?.data?.message ??
+                "Échec de l'extraction. Vérifie le texte saisi."
+              setContactExtractionError(message)
             },
           }
         )
       },
-      onError: () => {
-        setContactExtractionStatus('error')
-        setTimeout(() => setContactExtractionStatus('idle'), 3000)
+      onError: (err) => {
+        const message =
+          (err as { response?: { data?: { message?: string } } }).response?.data?.message ??
+          "Échec de l'extraction. Vérifie le texte saisi."
+        setContactExtractionError(message)
       },
     })
   }
@@ -488,9 +503,6 @@ export function ContactModal({ contact, onClose }: IContactModalProps) {
               {extractionStatus === 'success' && (
                 <p className="text-xs text-foreground">Entreprise mise à jour.</p>
               )}
-              {extractionStatus === 'error' && (
-                <p className="text-xs text-foreground">Échec de l'extraction. Vérifie le texte saisi.</p>
-              )}
             </div>
 
             <div className="rounded-lg border border-indigo-200/70 dark:border-indigo-900/40 bg-indigo-50/60 dark:bg-indigo-950/20 p-3 flex flex-col gap-2">
@@ -507,9 +519,6 @@ export function ContactModal({ contact, onClose }: IContactModalProps) {
               </Button>
               {contactExtractionStatus === 'success' && (
                 <p className="text-xs text-foreground">Infos mises à jour.</p>
-              )}
-              {contactExtractionStatus === 'error' && (
-                <p className="text-xs text-foreground">Échec de l'extraction. Vérifie le texte saisi.</p>
               )}
               {outOfScopeNotice && (
                 <p className="text-xs text-foreground">{outOfScopeNotice}</p>
@@ -653,6 +662,9 @@ export function ContactModal({ contact, onClose }: IContactModalProps) {
           placeholder={localCompany ? 'Colle ici le texte à jour de la page LinkedIn entreprise…' : 'Colle ici le texte de la page LinkedIn entreprise…'}
           className="flex w-full rounded-md border border-input bg-background text-foreground px-3 py-2 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring resize-none"
         />
+        {companyExtractionError && (
+          <p className="text-sm text-destructive">{companyExtractionError}</p>
+        )}
         <DialogFooter>
           <Button type="button" variant="outline" onClick={() => setIsCompanyModalOpen(false)}>
             Annuler
@@ -681,6 +693,9 @@ export function ContactModal({ contact, onClose }: IContactModalProps) {
           placeholder="Colle ici le texte du profil LinkedIn du contact…"
           className="flex w-full rounded-md border border-input bg-background text-foreground px-3 py-2 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring resize-none"
         />
+        {contactExtractionError && (
+          <p className="text-sm text-destructive">{contactExtractionError}</p>
+        )}
         <DialogFooter>
           <Button type="button" variant="outline" onClick={() => setIsContactInfoModalOpen(false)}>
             Annuler
