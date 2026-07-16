@@ -467,10 +467,10 @@ export function ContactModal({ contact, onClose }: IContactModalProps) {
               </div>
             </div>
 
-            <div className="border-t border-border pt-4 flex flex-col gap-2">
+            <div className="rounded-lg border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/40 p-3 flex flex-col gap-2">
               <span className="text-muted-foreground font-medium">Entreprise LinkedIn</span>
               {localCompany && (
-                <div className="rounded-md bg-muted px-3 py-2">
+                <div className="rounded-md bg-background/60 px-3 py-2">
                   <p className="font-medium">{localCompany.name}</p>
                   {localCompany.sector && (
                     <p className="text-xs text-muted-foreground">{localCompany.sector}{localCompany.size ? ` · ${localCompany.size}` : ''}</p>
@@ -493,7 +493,7 @@ export function ContactModal({ contact, onClose }: IContactModalProps) {
               )}
             </div>
 
-            <div className="border-t border-border pt-4 flex flex-col gap-2">
+            <div className="rounded-lg border border-indigo-200/70 dark:border-indigo-900/40 bg-indigo-50/60 dark:bg-indigo-950/20 p-3 flex flex-col gap-2">
               <span className="text-muted-foreground font-medium">
                 {localJobTitle ? 'Infos LinkedIn du contact' : 'Poste manquant'}
               </span>
