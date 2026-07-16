@@ -22,7 +22,7 @@ const CLASSIFICATION_PROMPT = `Tu es un classificateur de profils LinkedIn pour 
 À partir des infos suivantes, classe le contact dans UN des 5 flux :
 - 1a : RH/Talent Acquisition/Chargé de recrutement travaillant dans une ESN (entreprise de services numériques, conseil IT, prestation)
 - 1b : RH/Talent Acquisition/Chargé de recrutement travaillant dans une entreprise classique (recrutement interne pour ses propres équipes)
-- 2 : CTO, VP Engineering, Head of Tech, Directeur technique
+- 2 : CTO, VP Engineering, Head of Tech, Directeur technique, ou dirigeant (CEO/fondateur) d'une entreprise non-ESN qui évaluerait un profil technique en direct pour ses propres besoins
 - 3 : Lead Dev, Tech Lead, Engineering Manager (encadrement technique sans être CTO)
 - 4 : Business Manager, Directeur de projets ESN, Account Manager dans une ESN
 
