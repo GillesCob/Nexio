@@ -7,6 +7,7 @@ export const jobOfferRouter = Router()
 jobOfferRouter.use(authMiddleware)
 
 jobOfferRouter.post('/extract', jobOfferController.extractAndCreateJobOffer)
+jobOfferRouter.post('/search', jobOfferController.searchJobOffers)
 jobOfferRouter.get('/', jobOfferController.getJobOffers)
 jobOfferRouter.patch('/:id', jobOfferController.updateJobOffer)
 jobOfferRouter.delete('/:id', jobOfferController.deleteJobOffer)

@@ -22,3 +22,15 @@ export async function updateJobOffer(
 export async function deleteJobOffer(id: string): Promise<void> {
   await apiClient.delete(`/job-offers/${id}`)
 }
+
+export interface IJobSearchResult {
+  created: number
+  skippedExisting: number
+  skippedInvalid: number
+  sourceErrors: string[]
+}
+
+export async function searchJobOffers(motsCles?: string): Promise<IJobSearchResult> {
+  const response = await apiClient.post<IJobSearchResult>('/job-offers/search', { motsCles })
+  return response.data
+}

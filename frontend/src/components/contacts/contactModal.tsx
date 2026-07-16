@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import { Pencil, ChevronDown, ChevronUp } from 'lucide-react'
 import { useForm } from 'react-hook-form'
 import type { IContact, ICompany, ContactStatus, IUpdateContactPayload } from '@/types/contact'
-import { useUpdateContact, useDeleteContact, useExtractContact, useExtractCompany, useEnrichCompany, useSuggestTemplate, useCreateMessage, useGetMessages, useGetRelances, useSuggestRelance, useTouchContact } from '@/hooks/useContacts'
+import { useUpdateContact, useDeleteContact, useExtractContact, useExtractCompany, useEnrichCompany, useScoreContact, useSuggestTemplate, useCreateMessage, useGetMessages, useGetRelances, useSuggestRelance, useTouchContact } from '@/hooks/useContacts'
 import {
   Dialog,
   DialogContent,
@@ -51,6 +51,7 @@ export function ContactModal({ contact, onClose }: IContactModalProps) {
   const [suggestedRelance, setSuggestedRelance] = useState<string | null>(null)
   const [extractionStatus, setExtractionStatus] = useState<'idle' | 'success' | 'error'>('idle')
   const [contactExtractionStatus, setContactExtractionStatus] = useState<'idle' | 'success' | 'error'>('idle')
+  const [outOfScopeNotice, setOutOfScopeNotice] = useState<string | null>(null)
   const [copied, setCopied] = useState(false)
   const [copiedRelance, setCopiedRelance] = useState(false)
   const [localStatus, setLocalStatus] = useState<ContactStatus>(contact?.status ?? 'to_contact')
@@ -66,6 +67,7 @@ export function ContactModal({ contact, onClose }: IContactModalProps) {
   const extractContact = useExtractContact()
   const extractCompany = useExtractCompany()
   const enrichCompany = useEnrichCompany()
+  const scoreContact = useScoreContact()
   const suggestTemplate = useSuggestTemplate()
   const suggestRelance = useSuggestRelance()
   const createMessage = useCreateMessage()
@@ -95,6 +97,7 @@ export function ContactModal({ contact, onClose }: IContactModalProps) {
       setSuggestedRelance(null)
       setExtractionStatus('idle')
       setContactExtractionStatus('idle')
+      setOutOfScopeNotice(null)
       setIsCompanyModalOpen(false)
       setIsContactInfoModalOpen(false)
       setLocalStatus(contact.status)
@@ -181,8 +184,13 @@ export function ContactModal({ contact, onClose }: IContactModalProps) {
 
   const handleExtractContactInfo = () => {
     setContactExtractionStatus('idle')
+    setOutOfScopeNotice(null)
     extractContact.mutate(rawContactText, {
       onSuccess: (data) => {
+        const updatedName = data.name || contact.name
+        const updatedJobTitle = data.jobTitle || localJobTitle || undefined
+        const updatedCompany = data.company || contact.company || undefined
+
         updateContact.mutate(
           {
             id: contact.id,
@@ -200,6 +208,36 @@ export function ContactModal({ contact, onClose }: IContactModalProps) {
               setIsContactInfoModalOpen(false)
               setContactExtractionStatus('success')
               setTimeout(() => setContactExtractionStatus('idle'), 3000)
+
+              // Vérifie le scope à chaque mise à jour LinkedIn — hors scope : fermé automatiquement
+              // (jamais supprimé, un Contact fermé garde son historique de messages)
+              scoreContact.mutate(
+                {
+                  name: updatedName,
+                  jobTitle: updatedJobTitle,
+                  company: updatedCompany,
+                  location: contact.location ?? undefined,
+                },
+                {
+                  onSuccess: (result) => {
+                    if (!result.compatible) {
+                      const scopeNote = `Hors scope (détecté automatiquement) : ${result.reasons.join(', ')}`
+                      updateContact.mutate({
+                        id: contact.id,
+                        data: {
+                          status: 'closed',
+                          notes: contact.notes ? `${contact.notes}\n\n${scopeNote}` : scopeNote,
+                        },
+                      }, {
+                        onSuccess: () => {
+                          setLocalStatus('closed')
+                          setOutOfScopeNotice(`Fermé automatiquement, hors scope : ${result.reasons.join(', ')}`)
+                        },
+                      })
+                    }
+                  },
+                }
+              )
             },
             onError: () => {
               setContactExtractionStatus('error')
@@ -430,6 +468,9 @@ export function ContactModal({ contact, onClose }: IContactModalProps) {
               )}
               {contactExtractionStatus === 'error' && (
                 <p className="text-xs text-foreground">Échec de l'extraction. Vérifie le texte saisi.</p>
+              )}
+              {outOfScopeNotice && (
+                <p className="text-xs text-foreground">{outOfScopeNotice}</p>
               )}
             </div>
 
