@@ -12,7 +12,7 @@ export interface IFluxClassifierResult {
   flux: '1a' | '1b' | '2' | '3' | '4' | 'unknown'
   confidence: number
   reasoning: string
-  alternatives: Array<'1a' | '1b' | '2' | '3' | '4'>
+  alternatives: Array<'1a' | '1b' | '2' | '3' | '4' | 'unknown'>
 }
 
 const FLUX_CODES = ['1a', '1b', '2', '3', '4'] as const
@@ -38,11 +38,13 @@ Nom de l'entreprise : {companyName}
 Description : {companyDescription}
 Secteur : {companySector}`
 
+const fluxOrUnknownSchema = z.union([z.enum(FLUX_CODES), z.literal('unknown')])
+
 const fluxResultSchema = z.object({
-  flux: z.union([z.enum(FLUX_CODES), z.literal('unknown')]),
+  flux: fluxOrUnknownSchema,
   confidence: z.number().min(0).max(1),
   reasoning: z.string(),
-  alternatives: z.array(z.enum(FLUX_CODES)).max(2),
+  alternatives: z.array(fluxOrUnknownSchema).max(2),
 })
 
 const FALLBACK_PARSE_ERROR: IFluxClassifierResult = {
