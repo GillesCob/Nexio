@@ -199,6 +199,7 @@ export function ContactModal({ contact, onClose }: IContactModalProps) {
               ...(data.company ? { company: data.company } : {}),
               ...(data.linkedinUrl ? { linkedinUrl: data.linkedinUrl } : {}),
               ...(data.jobTitle ? { jobTitle: data.jobTitle } : {}),
+              ...(data.location ? { location: data.location } : {}),
             },
           },
           {
@@ -216,7 +217,7 @@ export function ContactModal({ contact, onClose }: IContactModalProps) {
                   name: updatedName,
                   jobTitle: updatedJobTitle,
                   company: updatedCompany,
-                  location: contact.location ?? undefined,
+                  location: data.location || contact.location || undefined,
                 },
                 {
                   onSuccess: (result) => {

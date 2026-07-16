@@ -8,6 +8,7 @@ interface ICreateContactData {
   company?: string;
   linkedinUrl?: string;
   jobTitle?: string;
+  location?: string;
   status?: ContactStatus;
   notes?: string;
   jobOfferId?: string;
@@ -20,6 +21,7 @@ interface IUpdateContactData {
   company?: string;
   linkedinUrl?: string;
   jobTitle?: string;
+  location?: string;
   status?: ContactStatus;
   notes?: string;
   jobOfferId?: string;

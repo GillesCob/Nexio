@@ -5,6 +5,7 @@ interface IExtractedContact {
   company?: string;
   linkedinUrl?: string;
   jobTitle?: string;
+  location?: string;
 }
 
 export async function extractContactFromText(rawText: string): Promise<IExtractedContact> {
@@ -18,7 +19,7 @@ export async function extractContactFromText(rawText: string): Promise<IExtracte
     messages: [
       {
         role: "user",
-        content: `Tu es un extracteur de données LinkedIn. Analyse ce texte et retourne UNIQUEMENT un objet JSON valide (sans markdown, sans explication) avec exactement ces clés : name (string, obligatoire), company (string ou null), linkedinUrl (string ou null), jobTitle (string ou null).
+        content: `Tu es un extracteur de données LinkedIn. Analyse ce texte et retourne UNIQUEMENT un objet JSON valide (sans markdown, sans explication) avec exactement ces clés : name (string, obligatoire), company (string ou null), linkedinUrl (string ou null), jobTitle (string ou null), location (string ou null, la ville uniquement, ex. "Casablanca" et non "Casablanca, Casablanca-Settat, Maroc").
 
 Texte LinkedIn :
 ${rawText}`,
