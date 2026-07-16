@@ -17,6 +17,7 @@ const createContactSchema = z.object({
   company: z.string().optional(),
   linkedinUrl: z.string().url().optional().or(z.literal('')),
   jobTitle: z.string().optional(),
+  location: z.string().optional(),
   status: contactStatusSchema.optional(),
   notes: z.string().optional(),
   jobOfferId: z.string().optional(),

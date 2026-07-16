@@ -80,7 +80,7 @@ export async function suggestRelance(contactId: string): Promise<{ message: stri
   return response.data
 }
 
-export async function autoPromote(): Promise<{ promoted: number }> {
-  const response = await apiClient.post<{ promoted: number }>('/contacts/auto-promote')
+export async function autoPromote(): Promise<{ promoted: number; closed: number }> {
+  const response = await apiClient.post<{ promoted: number; closed: number }>('/contacts/auto-promote')
   return response.data
 }

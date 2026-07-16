@@ -49,6 +49,7 @@ export function ContactModal({ contact, onClose }: IContactModalProps) {
   const [suggestedMessage, setSuggestedMessage] = useState<string | null>(null)
   const [templateError, setTemplateError] = useState<string | null>(null)
   const [suggestedRelance, setSuggestedRelance] = useState<string | null>(null)
+  const [relanceError, setRelanceError] = useState<string | null>(null)
   const [extractionStatus, setExtractionStatus] = useState<'idle' | 'success' | 'error'>('idle')
   const [contactExtractionStatus, setContactExtractionStatus] = useState<'idle' | 'success' | 'error'>('idle')
   const [outOfScopeNotice, setOutOfScopeNotice] = useState<string | null>(null)
@@ -57,6 +58,8 @@ export function ContactModal({ contact, onClose }: IContactModalProps) {
   const [localStatus, setLocalStatus] = useState<ContactStatus>(contact?.status ?? 'to_contact')
   const [localCompany, setLocalCompany] = useState<ICompany | undefined>(contact?.companyRef)
   const [localJobTitle, setLocalJobTitle] = useState(contact?.jobTitle ?? null)
+  const [localNotes, setLocalNotes] = useState(contact?.notes ?? '')
+  const [notesSaved, setNotesSaved] = useState(false)
   const [openEventId, setOpenEventId] = useState<string | null>(null)
   const [isTimelineOpen, setIsTimelineOpen] = useState(false)
   const [isCompanyModalOpen, setIsCompanyModalOpen] = useState(false)
@@ -95,6 +98,7 @@ export function ContactModal({ contact, onClose }: IContactModalProps) {
       setSuggestedMessage(null)
       setTemplateError(null)
       setSuggestedRelance(null)
+      setRelanceError(null)
       setExtractionStatus('idle')
       setContactExtractionStatus('idle')
       setOutOfScopeNotice(null)
@@ -103,6 +107,8 @@ export function ContactModal({ contact, onClose }: IContactModalProps) {
       setLocalStatus(contact.status)
       setLocalCompany(contact.companyRef)
       setLocalJobTitle(contact.jobTitle ?? null)
+      setLocalNotes(contact.notes ?? '')
+      setNotesSaved(false)
       setOpenEventId(null)
       setIsTimelineOpen(false)
     }
@@ -140,6 +146,18 @@ export function ContactModal({ contact, onClose }: IContactModalProps) {
       { onSuccess: () => { setIsEditing(false); onClose() } }
     )
   })
+
+  const handleSaveNotes = () => {
+    updateContact.mutate(
+      { id: contact.id, data: { notes: localNotes } },
+      {
+        onSuccess: () => {
+          setNotesSaved(true)
+          setTimeout(() => setNotesSaved(false), 2000)
+        },
+      }
+    )
+  }
 
   const handleDelete = () => {
     deleteContact.mutate(contact.id, { onSuccess: onClose })
@@ -199,6 +217,7 @@ export function ContactModal({ contact, onClose }: IContactModalProps) {
               ...(data.company ? { company: data.company } : {}),
               ...(data.linkedinUrl ? { linkedinUrl: data.linkedinUrl } : {}),
               ...(data.jobTitle ? { jobTitle: data.jobTitle } : {}),
+              ...(data.location ? { location: data.location } : {}),
             },
           },
           {
@@ -216,7 +235,7 @@ export function ContactModal({ contact, onClose }: IContactModalProps) {
                   name: updatedName,
                   jobTitle: updatedJobTitle,
                   company: updatedCompany,
-                  location: contact.location ?? undefined,
+                  location: data.location || contact.location || undefined,
                 },
                 {
                   onSuccess: (result) => {
@@ -277,9 +296,16 @@ export function ContactModal({ contact, onClose }: IContactModalProps) {
   }
 
   const handleSuggestRelance = () => {
+    setRelanceError(null)
     suggestRelance.mutate(contact.id, {
       onSuccess: (data) => {
         setSuggestedRelance(data.message)
+      },
+      onError: (err) => {
+        const message =
+          (err as { response?: { data?: { message?: string } } }).response?.data?.message ??
+          'Impossible de générer la relance.'
+        setRelanceError(message)
       },
     })
   }
@@ -418,12 +444,28 @@ export function ContactModal({ contact, onClose }: IContactModalProps) {
                 </a>
               </div>
             )}
-            {contact.notes && (
-              <div>
-                <span className="text-muted-foreground">Notes</span>
-                <p className="whitespace-pre-wrap">{contact.notes}</p>
+            <div>
+              <span className="text-muted-foreground">Notes</span>
+              <textarea
+                value={localNotes}
+                onChange={(e) => setLocalNotes(e.target.value)}
+                rows={3}
+                placeholder="Ajouter une note…"
+                className="mt-1 flex w-full rounded-md border border-input bg-background text-foreground px-3 py-2 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring resize-none"
+              />
+              <div className="flex items-center gap-2 mt-1.5">
+                <Button
+                  type="button"
+                  size="sm"
+                  variant="outline"
+                  onClick={handleSaveNotes}
+                  disabled={updateContact.isPending || localNotes === (contact.notes ?? '')}
+                >
+                  {updateContact.isPending ? 'Enregistrement…' : 'Enregistrer la note'}
+                </Button>
+                {notesSaved && <span className="text-xs text-muted-foreground">Note enregistrée</span>}
               </div>
-            )}
+            </div>
 
             <div className="border-t border-border pt-4 flex flex-col gap-2">
               <span className="text-muted-foreground font-medium">Entreprise LinkedIn</span>
@@ -538,6 +580,9 @@ export function ContactModal({ contact, onClose }: IContactModalProps) {
                   >
                     {suggestRelance.isPending ? 'Génération…' : 'Générer une relance'}
                   </Button>
+                )}
+                {relanceError && (
+                  <p className="text-xs text-foreground">{relanceError}</p>
                 )}
               </div>
             )}

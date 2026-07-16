@@ -37,6 +37,7 @@ export interface ICreateContactPayload {
   company?: string
   linkedinUrl?: string
   jobTitle?: string
+  location?: string
   status?: ContactStatus
   notes?: string
   jobOfferId?: string
@@ -48,6 +49,7 @@ export interface IUpdateContactPayload {
   company?: string
   linkedinUrl?: string
   jobTitle?: string
+  location?: string
   status?: ContactStatus
   notes?: string
   jobOfferId?: string
@@ -58,6 +60,7 @@ export interface IExtractedContact {
   company?: string
   linkedinUrl?: string
   jobTitle?: string
+  location?: string
 }
 
 export interface IScoreResult {
