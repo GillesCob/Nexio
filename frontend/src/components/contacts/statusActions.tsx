@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 
 // TODO: share with backend/src/data/statusTransitions.ts when monorepo is set up
 const STATUS_TRANSITIONS: Record<ContactStatus, { label: string; targetStatus: ContactStatus }[]> = {
-  to_contact: [],
+  to_contact: [{ label: "Invitation acceptée", targetStatus: "to_message" }],
   to_message: [
     { label: "Message envoyé", targetStatus: "contacted" },
     { label: "Pas intéressé", targetStatus: "closed" },
@@ -28,6 +28,7 @@ const STATUS_TRANSITIONS: Record<ContactStatus, { label: string; targetStatus: C
 };
 
 const ACTION_FEEDBACK: Record<string, string> = {
+  to_message: 'Contact passé en "Message à envoyer"',
   follow_up: 'Contact passé en "A relancer"',
   replied: 'Contact passé en "Echange en cours"',
   closed: "Contact clôturé",
