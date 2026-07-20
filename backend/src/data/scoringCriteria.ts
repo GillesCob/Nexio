@@ -40,6 +40,17 @@ export const SCORING_CRITERIA = {
     "manager technique",
     "directeur agence",
     "responsable agence",
+    // Dirigeants
+    "directeur général",
+    "directrice générale",
+    "DG",
+    "gérant",
+    "gérante",
+    "CEO",
+    "fondateur",
+    "fondatrice",
+    "président",
+    "présidente",
     // ESN / Consulting
     "business manager",
     "manager ESN",

@@ -50,6 +50,17 @@ export function KanbanBoard({ onOpenContact }: IKanbanBoardProps) {
     )
   }
 
+  const getColumnContacts = (status: ContactStatus) => {
+    const filtered = localContacts.filter((c) => c.status === status)
+    if (status === 'closed') {
+      return [...filtered].sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime())
+    }
+    if (status === 'follow_up') {
+      return [...filtered].sort((a, b) => new Date(a.updatedAt).getTime() - new Date(b.updatedAt).getTime())
+    }
+    return filtered
+  }
+
   if (isPending) {
     return (
       <div className="flex gap-4 overflow-x-auto pb-4">
@@ -71,7 +82,7 @@ export function KanbanBoard({ onOpenContact }: IKanbanBoardProps) {
             key={status}
             status={status}
             label={label}
-            contacts={localContacts.filter((c) => c.status === status)}
+            contacts={getColumnContacts(status)}
             onOpenContact={onOpenContact}
           />
         ))}

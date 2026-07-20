@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { Pencil, ChevronDown, ChevronUp } from 'lucide-react'
+import { Pencil, ChevronDown, ChevronUp, Clipboard, Check } from 'lucide-react'
 import { useForm } from 'react-hook-form'
 import type { IContact, ICompany, ContactStatus, IUpdateContactPayload } from '@/types/contact'
 import { useUpdateContact, useDeleteContact, useExtractContact, useExtractCompany, useEnrichCompany, useScoreContact, useSuggestTemplate, useCreateMessage, useGetMessages, useGetRelances, useSuggestRelance, useTouchContact } from '@/hooks/useContacts'
@@ -62,7 +62,7 @@ export function ContactModal({ contact, onClose }: IContactModalProps) {
   const [localJobTitle, setLocalJobTitle] = useState(contact?.jobTitle ?? null)
   const [localNotes, setLocalNotes] = useState(contact?.notes ?? '')
   const [notesSaved, setNotesSaved] = useState(false)
-  const [openEventId, setOpenEventId] = useState<string | null>(null)
+  const [copiedMessageId, setCopiedMessageId] = useState<string | null>(null)
   const [isTimelineOpen, setIsTimelineOpen] = useState(false)
   const [isCompanyModalOpen, setIsCompanyModalOpen] = useState(false)
   const [isContactInfoModalOpen, setIsContactInfoModalOpen] = useState(false)
@@ -113,7 +113,7 @@ export function ContactModal({ contact, onClose }: IContactModalProps) {
       setLocalJobTitle(contact.jobTitle ?? null)
       setLocalNotes(contact.notes ?? '')
       setNotesSaved(false)
-      setOpenEventId(null)
+      setCopiedMessageId(null)
       setIsTimelineOpen(false)
     }
   }, [contact, reset])
@@ -140,7 +140,12 @@ export function ContactModal({ contact, onClose }: IContactModalProps) {
   const handleStatusChange = (status: ContactStatus) => {
     updateContact.mutate(
       { id: contact.id, data: { status } },
-      { onSuccess: () => setLocalStatus(status) }
+      {
+        onSuccess: () => {
+          setLocalStatus(status)
+          if (status === 'closed') onClose()
+        },
+      }
     )
   }
 
@@ -262,6 +267,7 @@ export function ContactModal({ contact, onClose }: IContactModalProps) {
                         onSuccess: () => {
                           setLocalStatus('closed')
                           setOutOfScopeNotice(`Fermé automatiquement, hors scope : ${result.reasons.join(', ')}`)
+                          setTimeout(onClose, 2500)
                         },
                       })
                     }
@@ -611,24 +617,27 @@ export function ContactModal({ contact, onClose }: IContactModalProps) {
                 <ul className="flex flex-col">
                   {timelineEvents.map((event) => (
                     <li key={event.id} className="border-b border-border last:border-b-0">
-                      <div
-                        className={`flex items-center gap-3 py-2 px-1 text-sm${event.type === 'message' ? ' cursor-pointer hover:bg-muted rounded-md' : ''}`}
-                        onClick={() => {
-                          if (event.type !== 'message') return
-                          setOpenEventId(openEventId === event.id ? null : event.id)
-                        }}
-                      >
+                      <div className="flex items-center gap-3 py-2 px-1 text-sm">
                         <span className="text-xs text-muted-foreground shrink-0">{formatDate(event.date)}</span>
                         <span className="font-medium flex-1">{event.label}</span>
                         {event.type === 'message' && (
-                          <span className="text-muted-foreground text-xs">{openEventId === event.id ? '▲' : '▼'}</span>
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="icon"
+                            className="h-7 w-7 shrink-0"
+                            onClick={() => {
+                              navigator.clipboard.writeText(event.content)
+                              setCopiedMessageId(event.id)
+                              setTimeout(() => setCopiedMessageId(null), 2000)
+                            }}
+                          >
+                            {copiedMessageId === event.id
+                              ? <Check className="h-3.5 w-3.5" />
+                              : <Clipboard className="h-3.5 w-3.5" />}
+                          </Button>
                         )}
                       </div>
-                      {event.type === 'message' && openEventId === event.id && (
-                        <p className="whitespace-pre-wrap text-sm text-foreground bg-muted rounded-md px-3 py-2 mb-2">
-                          {event.content}
-                        </p>
-                      )}
                     </li>
                   ))}
                 </ul>
