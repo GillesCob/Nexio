@@ -6,6 +6,7 @@ export async function getContactStats(userId: string) {
 
   const byStatus = {
     to_contact: 0,
+    to_message: 0,
     contacted: 0,
     replied: 0,
     meeting_scheduled: 0,

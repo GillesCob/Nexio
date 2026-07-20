@@ -1,5 +1,6 @@
 export type ContactStatus =
   | 'to_contact'
+  | 'to_message'
   | 'contacted'
   | 'replied'
   | 'meeting_scheduled'

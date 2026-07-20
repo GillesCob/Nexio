@@ -17,6 +17,7 @@ import { StatusActions } from '@/components/contacts/statusActions'
 
 const STATUS_LABELS: Record<ContactStatus, string> = {
   to_contact: 'Invitation envoyée',
+  to_message: 'Message à envoyer',
   contacted: 'Contacté',
   replied: 'Echange en cours',
   meeting_scheduled: 'RDV planifié',
@@ -26,6 +27,7 @@ const STATUS_LABELS: Record<ContactStatus, string> = {
 
 const STATUS_OPTIONS: ContactStatus[] = [
   'to_contact',
+  'to_message',
   'contacted',
   'replied',
   'meeting_scheduled',

@@ -1,4 +1,4 @@
-type ContactStatus = "to_contact" | "contacted" | "replied" | "meeting_scheduled" | "follow_up" | "closed";
+type ContactStatus = "to_contact" | "to_message" | "contacted" | "replied" | "meeting_scheduled" | "follow_up" | "closed";
 
 interface IStatusTransition {
   label: string;
@@ -8,6 +8,10 @@ interface IStatusTransition {
 
 export const STATUS_TRANSITIONS: Record<ContactStatus, IStatusTransition[]> = {
   to_contact: [],
+  to_message: [
+    { label: "Message envoyé", targetStatus: "contacted" },
+    { label: "Pas intéressé", targetStatus: "closed" },
+  ],
   contacted: [
     { label: "Va voir", targetStatus: "follow_up" },
     { label: "A répondu", targetStatus: "replied" },

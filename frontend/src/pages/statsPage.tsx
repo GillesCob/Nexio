@@ -40,6 +40,7 @@ function SnapshotRow({ snapshot }: { snapshot: ILinkedInSnapshot }) {
 
 const STATUS_LABELS: Record<string, string> = {
   to_contact: 'Invitation envoyée',
+  to_message: 'Message à envoyer',
   contacted: 'Contacté',
   replied: 'A répondu',
   meeting_scheduled: 'Meeting planifié',
