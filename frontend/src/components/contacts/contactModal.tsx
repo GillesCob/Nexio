@@ -316,6 +316,7 @@ export function ContactModal({ contact, onClose }: IContactModalProps) {
     setCopied(true)
     setTimeout(() => setCopied(false), 2000)
     createMessage.mutate({ contactId: contact.id, content: suggestedMessage })
+    handleStatusChange('contacted')
   }
 
   const handleSuggestRelance = () => {

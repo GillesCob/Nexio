@@ -7,7 +7,7 @@ interface IStatusTransition {
 }
 
 export const STATUS_TRANSITIONS: Record<ContactStatus, IStatusTransition[]> = {
-  to_contact: [],
+  to_contact: [{ label: "Invitation acceptée", targetStatus: "to_message" }],
   to_message: [
     { label: "Message envoyé", targetStatus: "contacted" },
     { label: "Pas intéressé", targetStatus: "closed" },

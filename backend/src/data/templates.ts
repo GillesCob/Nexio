@@ -10,13 +10,13 @@ export const templates: ITemplate[] = [
     id: "1a_first_contact",
     label: "Recruteur ESN",
     targetProfile: "recruiter_esn",
-    body: `Bonjour {{firstName}},\n\nJe me permets de vous contacter car je suis en pleine transition vers le développement web full-stack après 10 ans en tant que BIM Manager dans le bâtiment.\n\nVotre activité chez {{companyName}} m'intéresse particulièrement, je serais ravi d'échanger sur les opportunités que vous accompagnez dans ce domaine.\n\nTout est sur gillescobigo.com. Je vous ai également fait une courte vidéo de présentation si vous préférez : {{videoLink}}\n\nSeriez-vous disponible pour un bref échange ?\n\nCordialement,\nGilles`,
+    body: `Bonjour {{firstName}},\n\nJe me permets de vous contacter car je suis en pleine transition vers le développement web full-stack après 10 ans en tant que BIM Manager dans le bâtiment.\n\nVotre activité chez {{companyName}} m'intéresse particulièrement, je serais ravi d'échanger sur les opportunités que vous accompagnez dans ce domaine.\n\nPour creuser, tout est sur gillescobigo.com : parcours, projets, code. Je vous ai également fait une courte vidéo de présentation si vous préférez : {{videoLink}}\n\nSeriez-vous disponible pour un bref échange ?\n\nCordialement,\nGilles`,
   },
   {
     id: "1b_first_contact",
     label: "Recruteur entreprise (interne)",
     targetProfile: "recruiter_entreprise",
-    body: `Bonjour {{firstName}},\n\nJe me permets de vous contacter car je suis en pleine transition vers le développement web full-stack après 10 ans en tant que BIM Manager dans le bâtiment.\n\nSi un poste de développeur fullstack est ouvert au sein de vos équipes chez {{companyName}}, je serais ravi d'échanger.\n\nTout est sur gillescobigo.com. Je vous ai également fait une courte vidéo de présentation si vous préférez : {{videoLink}}\n\nSeriez-vous disponible pour un bref échange ?\n\nCordialement,\nGilles`,
+    body: `Bonjour {{firstName}},\n\nJe me permets de vous contacter car je suis en pleine transition vers le développement web full-stack après 10 ans en tant que BIM Manager dans le bâtiment.\n\nSi un poste de développeur fullstack est ouvert au sein de vos équipes chez {{companyName}}, je serais ravi d'échanger.\n\nPour creuser, tout est sur gillescobigo.com : parcours, projets, code. Je vous ai également fait une courte vidéo de présentation si vous préférez : {{videoLink}}\n\nSeriez-vous disponible pour un bref échange ?\n\nCordialement,\nGilles`,
   },
   {
     id: "2_first_contact",
