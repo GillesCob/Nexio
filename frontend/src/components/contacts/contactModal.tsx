@@ -539,7 +539,7 @@ export function ContactModal({ contact, onClose }: IContactModalProps) {
               </div>
             </div>
 
-            {localStatus === 'to_contact' && messages.length === 0 && (
+            {localStatus === 'to_message' && messages.length === 0 && (
               <div className="border-t border-border pt-4 flex flex-col gap-2">
                 <span className="text-muted-foreground font-medium">Message 1er contact</span>
                 {suggestedMessage ? (
