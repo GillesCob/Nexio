@@ -13,7 +13,7 @@ export async function createMessage(userId: string, contactId: string, content: 
   await assertContactOwnership(userId, contactId)
   const [message] = await prisma.$transaction([
     prisma.message.create({ data: { contactId, content } }),
-    prisma.contact.update({ where: { id: contactId }, data: { status: 'contacted' } }),
+    prisma.contact.update({ where: { id: contactId }, data: { status: 'contacted', contactedAt: new Date() } }),
   ])
   return message
 }
