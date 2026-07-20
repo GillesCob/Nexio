@@ -5,6 +5,7 @@ import * as contactService from '../services/contactService'
 
 const contactStatusSchema = z.enum([
   'to_contact',
+  'to_message',
   'contacted',
   'replied',
   'meeting_scheduled',

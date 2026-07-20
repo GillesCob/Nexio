@@ -28,6 +28,7 @@ enum JobOfferStatus {
 
 enum ContactStatus {
   to_contact
+  to_message
   contacted
   replied
   meeting_scheduled

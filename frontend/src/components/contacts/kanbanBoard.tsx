@@ -7,6 +7,7 @@ import { KanbanColumn } from './kanbanColumn'
 
 const COLUMNS: { status: ContactStatus; label: string }[] = [
   { status: 'to_contact', label: 'Invitation envoyée' },
+  { status: 'to_message', label: 'Message à envoyer' },
   { status: 'contacted', label: 'Contacté' },
   { status: 'replied', label: 'Echange en cours' },
   { status: 'meeting_scheduled', label: 'RDV planifié' },
@@ -50,6 +51,17 @@ export function KanbanBoard({ onOpenContact }: IKanbanBoardProps) {
     )
   }
 
+  const getColumnContacts = (status: ContactStatus) => {
+    const filtered = localContacts.filter((c) => c.status === status)
+    if (status === 'closed') {
+      return [...filtered].sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime())
+    }
+    if (status === 'follow_up') {
+      return [...filtered].sort((a, b) => new Date(a.updatedAt).getTime() - new Date(b.updatedAt).getTime())
+    }
+    return filtered
+  }
+
   if (isPending) {
     return (
       <div className="flex gap-4 overflow-x-auto pb-4">
@@ -71,7 +83,7 @@ export function KanbanBoard({ onOpenContact }: IKanbanBoardProps) {
             key={status}
             status={status}
             label={label}
-            contacts={localContacts.filter((c) => c.status === status)}
+            contacts={getColumnContacts(status)}
             onOpenContact={onOpenContact}
           />
         ))}

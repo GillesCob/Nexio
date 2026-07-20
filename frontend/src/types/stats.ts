@@ -21,6 +21,7 @@ export interface ILinkedInReminder {
 
 export interface IContactStatsByStatus {
   to_contact: number
+  to_message: number
   contacted: number
   replied: number
   meeting_scheduled: number

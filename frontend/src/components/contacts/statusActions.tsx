@@ -5,6 +5,10 @@ import { Button } from "@/components/ui/button";
 // TODO: share with backend/src/data/statusTransitions.ts when monorepo is set up
 const STATUS_TRANSITIONS: Record<ContactStatus, { label: string; targetStatus: ContactStatus }[]> = {
   to_contact: [],
+  to_message: [
+    { label: "Message envoyé", targetStatus: "contacted" },
+    { label: "Pas intéressé", targetStatus: "closed" },
+  ],
   contacted: [
     { label: "Va voir", targetStatus: "follow_up" },
     { label: "A répondu", targetStatus: "replied" },
@@ -27,7 +31,7 @@ const ACTION_FEEDBACK: Record<string, string> = {
   follow_up: 'Contact passé en "A relancer"',
   replied: 'Contact passé en "Echange en cours"',
   closed: "Contact clôturé",
-  contacted: 'Relance envoyée, contact repassé en "Contacté"',
+  contacted: 'Contact passé en "Contacté"',
   meeting_scheduled: "RDV planifié",
 };
 
