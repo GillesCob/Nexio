@@ -430,105 +430,111 @@ export function ContactModal({ contact, onClose }: IContactModalProps) {
           </form>
         ) : (
           <div className="mt-2 min-w-0 space-y-4 text-sm">
-            {localJobTitle && (
-              <div>
-                <span className="text-muted-foreground">Poste</span>
-                <p className="font-medium">{localJobTitle}</p>
-              </div>
-            )}
-            {contact.company && (
-              <div>
-                <span className="text-muted-foreground">Entreprise</span>
-                <p className="font-medium">{contact.company}</p>
-              </div>
-            )}
-            <div>
-              <span className="text-muted-foreground">Statut</span>
-              <p className="font-medium mb-2">{STATUS_LABELS[localStatus]}</p>
-              <StatusActions
-                contact={{ ...contact, status: localStatus }}
-                onStatusChange={handleStatusChange}
-                isRepliedAlert={!!repliedRelanceInfo}
-                onTouch={() => touchContact.mutate(contact.id)}
-              />
-            </div>
-            {contact.linkedinUrl && (
-              <div>
-                <span className="text-muted-foreground">LinkedIn</span>
-                <a
-                  href={contact.linkedinUrl}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="block font-medium text-primary hover:underline truncate"
-                >
-                  {contact.linkedinUrl}
-                </a>
-              </div>
-            )}
-            <div>
-              <span className="text-muted-foreground">Notes</span>
-              <textarea
-                value={localNotes}
-                onChange={(e) => setLocalNotes(e.target.value)}
-                rows={3}
-                placeholder="Ajouter une note…"
-                className="mt-1 flex w-full rounded-md border border-input bg-background text-foreground px-3 py-2 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring resize-none"
-              />
-              <div className="flex items-center gap-2 mt-1.5">
-                <Button
-                  type="button"
-                  size="sm"
-                  variant="outline"
-                  onClick={handleSaveNotes}
-                  disabled={updateContact.isPending || localNotes === (contact.notes ?? '')}
-                >
-                  {updateContact.isPending ? 'Enregistrement…' : 'Enregistrer la note'}
-                </Button>
-                {notesSaved && <span className="text-xs text-muted-foreground">Note enregistrée</span>}
-              </div>
-            </div>
-
-            <div className="rounded-lg border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/40 p-3 flex flex-col gap-2">
-              <span className="text-muted-foreground font-medium">Entreprise LinkedIn</span>
-              {localCompany && (
-                <div className="rounded-md bg-background/60 px-3 py-2">
-                  <p className="font-medium">{localCompany.name}</p>
-                  {localCompany.sector && (
-                    <p className="text-xs text-muted-foreground">{localCompany.sector}{localCompany.size ? ` · ${localCompany.size}` : ''}</p>
-                  )}
+            <div className="space-y-4">
+              <h3 className="text-sm font-semibold text-foreground">Contact</h3>
+              {localJobTitle && (
+                <div>
+                  <span className="text-muted-foreground">Poste</span>
+                  <p className="font-medium">{localJobTitle}</p>
                 </div>
               )}
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => setIsCompanyModalOpen(true)}
-                className="self-start"
-              >
-                {localCompany ? 'Mettre à jour les infos entreprise' : "Extraire l'entreprise"}
-              </Button>
-              {extractionStatus === 'success' && (
-                <p className="text-xs text-foreground">Entreprise mise à jour.</p>
+              <div>
+                <span className="text-muted-foreground">Statut</span>
+                <p className="font-medium mb-2">{STATUS_LABELS[localStatus]}</p>
+                <StatusActions
+                  contact={{ ...contact, status: localStatus }}
+                  onStatusChange={handleStatusChange}
+                  isRepliedAlert={!!repliedRelanceInfo}
+                  onTouch={() => touchContact.mutate(contact.id)}
+                />
+              </div>
+              {contact.linkedinUrl && (
+                <div>
+                  <span className="text-muted-foreground">LinkedIn</span>
+                  <a
+                    href={contact.linkedinUrl}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="block font-medium text-primary hover:underline truncate"
+                  >
+                    {contact.linkedinUrl}
+                  </a>
+                </div>
               )}
+              <div>
+                <span className="text-muted-foreground">Notes</span>
+                <textarea
+                  value={localNotes}
+                  onChange={(e) => setLocalNotes(e.target.value)}
+                  rows={3}
+                  placeholder="Ajouter une note…"
+                  className="mt-1 flex w-full rounded-md border border-input bg-background text-foreground px-3 py-2 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring resize-none"
+                />
+                <div className="flex items-center gap-2 mt-1.5">
+                  <Button
+                    type="button"
+                    size="sm"
+                    variant="outline"
+                    onClick={handleSaveNotes}
+                    disabled={updateContact.isPending || localNotes === (contact.notes ?? '')}
+                  >
+                    {updateContact.isPending ? 'Enregistrement…' : 'Enregistrer la note'}
+                  </Button>
+                  {notesSaved && <span className="text-xs text-muted-foreground">Note enregistrée</span>}
+                </div>
+              </div>
+
+              <div className="rounded-lg border border-indigo-200/70 dark:border-indigo-900/40 bg-indigo-50/60 dark:bg-indigo-950/20 p-3 flex flex-col gap-2">
+                <span className="text-muted-foreground font-medium">
+                  {localJobTitle ? 'Infos LinkedIn du contact' : 'Poste manquant'}
+                </span>
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => setIsContactInfoModalOpen(true)}
+                  className="self-start"
+                >
+                  {localJobTitle ? 'Mettre à jour les infos LinkedIn' : 'Extraire les infos'}
+                </Button>
+                {contactExtractionStatus === 'success' && (
+                  <p className="text-xs text-foreground">Infos mises à jour.</p>
+                )}
+                {outOfScopeNotice && (
+                  <p className="text-xs text-foreground">{outOfScopeNotice}</p>
+                )}
+              </div>
             </div>
 
-            <div className="rounded-lg border border-indigo-200/70 dark:border-indigo-900/40 bg-indigo-50/60 dark:bg-indigo-950/20 p-3 flex flex-col gap-2">
-              <span className="text-muted-foreground font-medium">
-                {localJobTitle ? 'Infos LinkedIn du contact' : 'Poste manquant'}
-              </span>
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => setIsContactInfoModalOpen(true)}
-                className="self-start"
-              >
-                {localJobTitle ? 'Mettre à jour les infos LinkedIn' : 'Extraire les infos'}
-              </Button>
-              {contactExtractionStatus === 'success' && (
-                <p className="text-xs text-foreground">Infos mises à jour.</p>
+            <div className="space-y-4 border-t border-border pt-4">
+              <h3 className="text-sm font-semibold text-foreground">Entreprise</h3>
+              {contact.company && (
+                <div>
+                  <span className="text-muted-foreground">Entreprise</span>
+                  <p className="font-medium">{contact.company}</p>
+                </div>
               )}
-              {outOfScopeNotice && (
-                <p className="text-xs text-foreground">{outOfScopeNotice}</p>
-              )}
+              <div className="rounded-lg border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/40 p-3 flex flex-col gap-2">
+                <span className="text-muted-foreground font-medium">Entreprise LinkedIn</span>
+                {localCompany && (
+                  <div className="rounded-md bg-background/60 px-3 py-2">
+                    <p className="font-medium">{localCompany.name}</p>
+                    {localCompany.sector && (
+                      <p className="text-xs text-muted-foreground">{localCompany.sector}{localCompany.size ? ` · ${localCompany.size}` : ''}</p>
+                    )}
+                  </div>
+                )}
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => setIsCompanyModalOpen(true)}
+                  className="self-start"
+                >
+                  {localCompany ? 'Mettre à jour les infos entreprise' : "Extraire l'entreprise"}
+                </Button>
+                {extractionStatus === 'success' && (
+                  <p className="text-xs text-foreground">Entreprise mise à jour.</p>
+                )}
+              </div>
             </div>
 
             {localStatus === 'to_contact' && messages.length === 0 && (
