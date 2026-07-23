@@ -576,7 +576,7 @@ export function ContactModal({ contact, onClose }: IContactModalProps) {
               </div>
             )}
 
-            {localStatus === 'follow_up' && (
+            {(localStatus === 'follow_up' || localStatus === 'contacted') && (
               <div className="border-t border-border pt-4 flex flex-col gap-2">
                 <span className="text-muted-foreground font-medium">Relance</span>
                 {suggestedRelance ? (

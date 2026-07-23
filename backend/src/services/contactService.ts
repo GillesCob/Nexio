@@ -38,17 +38,11 @@ async function assertOwnership(userId: string, contactId: string) {
 
 export async function createContact(userId: string, data: ICreateContactData) {
   const { contactedAt, ...rest } = data;
-  const createData = contactedAt ? { ...rest, userId, status: "contacted" as ContactStatus } : { ...rest, userId };
+  const createData = contactedAt
+    ? { ...rest, userId, status: "contacted" as ContactStatus, contactedAt: new Date(contactedAt) }
+    : { ...rest, userId };
 
   const contact = await prisma.contact.create({ data: createData });
-
-  let contactAfterDateUpdate = contact;
-  if (contactedAt) {
-    contactAfterDateUpdate = await prisma.contact.update({
-      where: { id: contact.id },
-      data: { updatedAt: new Date(contactedAt) },
-    });
-  }
 
   let companyDescription: string | null = null;
   let companySector: string | null = null;
@@ -80,7 +74,7 @@ export async function createContact(userId: string, data: ICreateContactData) {
     }
   }
 
-  return contactAfterDateUpdate;
+  return contact;
 }
 
 export async function getContacts(userId: string) {
@@ -108,11 +102,21 @@ export async function updateContact(userId: string, contactId: string, data: IUp
   await assertOwnership(userId, contactId);
   const current = await prisma.contact.findUnique({
     where: { id: contactId },
-    select: { updatedAt: true },
+    select: { updatedAt: true, contactedAt: true },
   });
+
+  if (shouldPreserveUpdatedAt) {
+    return prisma.contact.update({
+      where: { id: contactId },
+      data: { companyId, company, updatedAt: current?.updatedAt },
+    });
+  }
+
+  const becomingContacted = data.status === "contacted" && !current?.contactedAt;
+
   return prisma.contact.update({
     where: { id: contactId },
-    data: shouldPreserveUpdatedAt ? { companyId, company, updatedAt: current?.updatedAt } : data,
+    data: becomingContacted ? { ...data, contactedAt: new Date() } : data,
   });
 }
 

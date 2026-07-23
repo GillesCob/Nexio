@@ -61,7 +61,14 @@ export async function autoPromoteToFollowUp(userId: string): Promise<number> {
     Date.now() - RELANCE_CONFIG.contactedDelayDays * 24 * 60 * 60 * 1000
   )
   const result = await prisma.contact.updateMany({
-    where: { userId, status: 'contacted', updatedAt: { lt: contactedCutoff } },
+    where: {
+      userId,
+      status: 'contacted',
+      OR: [
+        { contactedAt: { lt: contactedCutoff } },
+        { contactedAt: null, updatedAt: { lt: contactedCutoff } },
+      ],
+    },
     data: { status: 'follow_up' },
   })
   return result.count
