@@ -13,3 +13,10 @@ export function generateRefreshToken(userId: string): string {
   }
   return jwt.sign({ userId }, process.env.JWT_REFRESH_SECRET!, options)
 }
+
+export function generateExtensionToken(userId: string, role: string): string {
+  const options: SignOptions = {
+    expiresIn: (process.env.EXTENSION_TOKEN_EXPIRES_IN ?? '180d') as SignOptions['expiresIn'],
+  }
+  return jwt.sign({ userId, role }, process.env.JWT_SECRET!, options)
+}

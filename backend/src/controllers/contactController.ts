@@ -42,8 +42,20 @@ export async function createContact(req: Request, res: Response, next: NextFunct
   try {
     const userId = req.user!.userId
     const data = createContactSchema.parse(req.body)
-    const contact = await contactService.createContact(userId, data)
-    res.status(201).json(contact)
+    const { contact, outcome, needsCompanyInfo } = await contactService.createContact(userId, data)
+
+    if (!contact) {
+      // outcome "ambiguous" : plusieurs contacts partagent ce nom, rien touché volontairement
+      res.status(409).json({
+        name: data.name,
+        outcome,
+        needsCompanyInfo,
+        message: `Plusieurs contacts nommés "${data.name}" déjà en base — à résoudre manuellement dans Nexio, rien n'a été modifié.`,
+      })
+      return
+    }
+
+    res.status(outcome === 'created' ? 201 : 200).json({ ...contact, outcome, needsCompanyInfo })
   } catch (err) {
     handleZod(err, next)
   }

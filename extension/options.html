@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="utf-8" />
+    <title>Nexio – Réglages extension</title>
+    <style>
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+        max-width: 480px;
+        margin: 24px auto;
+        padding: 0 16px;
+      }
+      label {
+        display: block;
+        margin-top: 16px;
+        font-weight: 600;
+        font-size: 14px;
+      }
+      input {
+        width: 100%;
+        box-sizing: border-box;
+        padding: 8px;
+        font-size: 14px;
+        margin-top: 4px;
+      }
+      button {
+        margin-top: 16px;
+        padding: 8px 16px;
+        font-size: 14px;
+        cursor: pointer;
+      }
+      p.hint {
+        font-size: 12px;
+        color: #666;
+      }
+      #status {
+        margin-top: 12px;
+        font-size: 13px;
+      }
+    </style>
+  </head>
+  <body>
+    <h2>Réglages Nexio</h2>
+    <p class="hint">
+      Le token s'obtient en étant connecté sur Nexio puis en appelant
+      <code>POST /auth/extension-token</code> avec ton access token du moment (Bearer). Valide 180
+      jours, à régénérer une fois expiré.
+    </p>
+
+    <label for="api-url">URL de l'API Nexio</label>
+    <input id="api-url" type="text" placeholder="https://nexio-api.gillescobigo.com" />
+
+    <label for="token">Token extension</label>
+    <input id="token" type="text" placeholder="eyJhbGciOi..." spellcheck="false" />
+
+    <button id="save-btn">Enregistrer</button>
+    <div id="status"></div>
+
+    <script src="options.js"></script>
+  </body>
+</html>
