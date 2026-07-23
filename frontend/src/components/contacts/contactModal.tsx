@@ -154,7 +154,7 @@ export function ContactModal({ contact, onClose }: IContactModalProps) {
   const handleSave = handleSubmit((data) => {
     updateContact.mutate(
       { id: contact.id, data },
-      { onSuccess: () => { setIsEditing(false); onClose() } }
+      { onSuccess: () => { setIsEditing(false) } }
     )
   })
 
