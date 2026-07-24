@@ -63,7 +63,7 @@ export function StatsPage() {
   }
 
   return (
-    <main className="p-8">
+    <main className="p-4 sm:p-8">
       <Navbar />
 
       <div className="max-w-5xl mx-auto space-y-12">

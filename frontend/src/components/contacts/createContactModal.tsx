@@ -87,7 +87,7 @@ export function CreateContactModal({ open, onClose, onCreated }: ICreateContactM
         if (!open) handleClose();
       }}
     >
-      <DialogContent className="max-h-[90vh] overflow-y-auto">
+      <DialogContent className="max-h-[90dvh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Ajouter un contact</DialogTitle>
         </DialogHeader>
@@ -100,7 +100,7 @@ export function CreateContactModal({ open, onClose, onCreated }: ICreateContactM
             onChange={(e) => setRawText(e.target.value)}
             rows={4}
             placeholder="Colle ici le texte copié depuis un profil LinkedIn..."
-            className="flex w-full rounded-md border border-input bg-background text-foreground px-3 py-2 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring resize-none"
+            className="flex w-full rounded-md border border-input bg-background text-foreground px-3 py-2 text-base shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring resize-none"
           />
           <Button
             type="button"
@@ -183,7 +183,7 @@ export function CreateContactModal({ open, onClose, onCreated }: ICreateContactM
               id="create-notes"
               {...register("notes")}
               rows={3}
-              className="flex w-full rounded-md border border-input bg-background text-foreground px-3 py-2 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring resize-none"
+              className="flex w-full rounded-md border border-input bg-background text-foreground px-3 py-2 text-base shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring resize-none"
             />
           </div>
           <div className="flex flex-col gap-2">

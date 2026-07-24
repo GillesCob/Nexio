@@ -25,7 +25,7 @@ export function LoginPage() {
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
-    <main className="flex min-h-screen items-center justify-center px-4">
+    <main className="flex min-h-dvh items-center justify-center px-4">
       <div className="w-full max-w-sm space-y-6">
         <h1 className="text-2xl font-semibold text-center">Connexion</h1>
 

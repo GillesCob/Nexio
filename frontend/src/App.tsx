@@ -7,10 +7,12 @@ import { StatsPage } from '@/pages/statsPage'
 import { JobOffersPage } from '@/pages/jobOffersPage'
 import { ProtectedRoute } from '@/components/protectedRoute'
 import AuthInitializer from '@/components/authInitializer'
+import { ScrollToTop } from '@/components/scrollToTop'
 
 export function App() {
   return (
     <AuthInitializer>
+      <ScrollToTop />
       <Routes>
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />

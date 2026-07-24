@@ -35,7 +35,7 @@ export function JobOffersPage() {
   }
 
   return (
-    <main className="p-8">
+    <main className="p-4 sm:p-8">
       <Navbar />
       <div className="flex items-center justify-end gap-3 mb-2">
         <Button variant="outline" onClick={handleSearch} disabled={searchJobOffers.isPending}>

@@ -383,7 +383,7 @@ export function ContactModal({ contact, onClose }: IContactModalProps) {
   return (
     <>
     <Dialog open={!!contact} onOpenChange={(open) => { if (!open) onClose() }}>
-      <DialogContent className="max-h-[90vh] overflow-y-auto">
+      <DialogContent className="max-h-[90dvh] overflow-y-auto">
         <DialogHeader>
           <div className="flex items-center justify-between pr-10">
             <DialogTitle>{isEditing ? 'Modifier le contact' : contact.name}</DialogTitle>
@@ -446,7 +446,7 @@ export function ContactModal({ contact, onClose }: IContactModalProps) {
               <select
                 id="status"
                 {...register('status')}
-                className="flex h-9 w-full rounded-md border border-input bg-background text-foreground px-3 py-1 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+                className="flex h-9 w-full rounded-md border border-input bg-background text-foreground px-3 py-1 text-base shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
               >
                 {STATUS_OPTIONS.map((s) => (
                   <option key={s} value={s}>{STATUS_LABELS[s]}</option>
@@ -459,7 +459,7 @@ export function ContactModal({ contact, onClose }: IContactModalProps) {
                 id="notes"
                 {...register('notes')}
                 rows={3}
-                className="flex w-full rounded-md border border-input bg-background text-foreground px-3 py-2 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring resize-none"
+                className="flex w-full rounded-md border border-input bg-background text-foreground px-3 py-2 text-base shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring resize-none"
               />
             </div>
             <DialogFooter className="mt-2">
@@ -509,7 +509,7 @@ export function ContactModal({ contact, onClose }: IContactModalProps) {
                   onChange={(e) => setLocalNotes(e.target.value)}
                   rows={3}
                   placeholder="Ajouter une note…"
-                  className="mt-1 flex w-full rounded-md border border-input bg-background text-foreground px-3 py-2 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring resize-none"
+                  className="mt-1 flex w-full rounded-md border border-input bg-background text-foreground px-3 py-2 text-base shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring resize-none"
                 />
                 <div className="flex items-center gap-2 mt-1.5">
                   <Button
@@ -733,7 +733,7 @@ export function ContactModal({ contact, onClose }: IContactModalProps) {
           rows={6}
           autoFocus
           placeholder={localCompany ? 'Colle ici le texte à jour de la page LinkedIn entreprise…' : 'Colle ici le texte de la page LinkedIn entreprise…'}
-          className="flex w-full rounded-md border border-input bg-background text-foreground px-3 py-2 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring resize-none"
+          className="flex w-full rounded-md border border-input bg-background text-foreground px-3 py-2 text-base shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring resize-none"
         />
         {companyExtractionError && (
           <p className="text-sm text-destructive">{companyExtractionError}</p>
@@ -764,7 +764,7 @@ export function ContactModal({ contact, onClose }: IContactModalProps) {
           rows={6}
           autoFocus
           placeholder="Colle ici le texte du profil LinkedIn du contact…"
-          className="flex w-full rounded-md border border-input bg-background text-foreground px-3 py-2 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring resize-none"
+          className="flex w-full rounded-md border border-input bg-background text-foreground px-3 py-2 text-base shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring resize-none"
         />
         {contactExtractionError && (
           <p className="text-sm text-destructive">{contactExtractionError}</p>
