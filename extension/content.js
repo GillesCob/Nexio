@@ -6,13 +6,28 @@ function cleanText(text) {
     .join("\n");
 }
 
-// Signal retenu après plusieurs échecs sur d'autres approches (id="experience" absent des
-// pages, classes CSS générées donc inutilisables, présence d'un type de contrat "· CDI" pas
-// systématique — ex. poste de co-fondateur ou "aujourd'hui" sans contrat affiché) : la ligne
-// de durée ("· 12 ans", "· 5 mois", "· 3 mois") est présente dans TOUTE ligne d'expérience
-// réelle observée, contrat affiché ou non, et absente des liens publicitaires/suggérés
-// rencontrés (qui affichent un nombre d'abonnés, jamais une durée). L'entreprise est
-// systématiquement la ligne juste avant celle-ci.
+function slugToName(slug) {
+  return slug
+    .split("-")
+    .filter(Boolean)
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(" ");
+}
+
+// Trouve l'élément portant le titre visible "Expérience" (pas d'id ni de classe stable sur
+// cette section, vérifié absent sur plusieurs profils) en cherchant le texte lui-même via
+// TreeWalker, plutôt que de deviner un sélecteur structurel.
+function findExperienceHeading() {
+  const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
+  let node;
+  while ((node = walker.nextNode())) {
+    if (node.textContent.trim() === "Expérience") return node.parentElement;
+  }
+  return null;
+}
+
+// Nom lisible depuis un lien d'expérience : la ligne juste avant la durée ("· 12 ans",
+// "· 5 mois") si elle existe (le plus propre), sinon null (le slug de l'URL prend le relais).
 const DURATION_PATTERN = /\d+\s*(mois|ans?)\b/i;
 
 function companyFromLink(link) {
@@ -28,16 +43,22 @@ function companyFromLink(link) {
   return companyLine.split("·")[0].trim() || null;
 }
 
+// Le premier lien entreprise/école qui apparaît après le titre "Expérience" dans l'ordre du
+// DOM : c'est ce que Gilles veut, rien de plus compliqué. Pas de repli sur toute la page si le
+// titre n'est pas trouvé (a déjà remonté des liens sponsorisés/suggérés par le passé).
 function findFirstCompanyLink() {
-  const links = Array.from(document.querySelectorAll('a[href*="/company/"], a[href*="/school/"]'));
+  const heading = findExperienceHeading();
+  if (!heading) return null;
+
+  const links = Array.from(document.querySelectorAll('a[href*="/company/"], a[href*="/school/"]')).filter(
+    (link) => heading.compareDocumentPosition(link) & Node.DOCUMENT_POSITION_FOLLOWING
+  );
 
   for (const link of links) {
     const match = link.href.match(/linkedin\.com\/(company|school)\/([^/?]+)/);
     if (!match) continue;
 
-    const name = companyFromLink(link);
-    if (!name) continue; // pas de ligne de durée = probablement pas une vraie expérience
-
+    const name = companyFromLink(link) || slugToName(match[2]);
     return {
       url: `https://www.linkedin.com/${match[1]}/${match[2]}/`,
       name,
@@ -75,10 +96,12 @@ function extractText() {
     rawText: cleanText(container?.innerText),
     isCompany,
     firstCompany: findFirstCompanyLink(),
+    experienceHeadingFound: Boolean(findExperienceHeading()),
   };
 }
 
 function diagnoseCompanyLinks() {
+  const heading = findExperienceHeading();
   const allLinks = Array.from(document.querySelectorAll('a[href*="/company/"], a[href*="/school/"]'));
 
   const lines = allLinks.map((link, i) => {
@@ -86,15 +109,21 @@ function diagnoseCompanyLinks() {
       .split("\n")
       .map((l) => l.trim())
       .filter(Boolean);
+    const isAfterHeading = heading
+      ? Boolean(heading.compareDocumentPosition(link) & Node.DOCUMENT_POSITION_FOLLOWING)
+      : false;
     const name = companyFromLink(link);
-    const tag = name ? `[RETENU : "${name}"] ` : "";
+    const tag = isAfterHeading ? `[APRÈS "Expérience"${name ? ` : "${name}"` : ""}] ` : "";
     const preview = rawLines.join(" ⏎ ").slice(0, 80);
     return `${i}. ${tag}${link.href} — ${preview}`;
   });
 
-  return [`Nombre de liens /company/ ou /school/ sur toute la page : ${allLinks.length}`, "", ...lines].join(
-    "\n"
-  );
+  return [
+    `Titre "Expérience" trouvé sur la page : ${heading ? "oui" : "non"}`,
+    `Nombre de liens /company/ ou /school/ sur toute la page : ${allLinks.length}`,
+    "",
+    ...lines,
+  ].join("\n");
 }
 
 function diagnose() {
@@ -128,53 +157,20 @@ function diagnose() {
   return { url: location.href, dump: `${diagnoseCompanyLinks()}\n\n=== Blocs de la page ===\n${dump}` };
 }
 
-function wait(ms) {
-  return new Promise((resolve) => setTimeout(resolve, ms));
-}
-
-function hasExperienceLinkRendered() {
-  return Array.from(document.querySelectorAll('a[href*="/company/"], a[href*="/school/"]')).some(
-    (link) => companyFromLink(link) !== null
-  );
-}
-
 // LinkedIn ne rend la section Expériences dans le DOM qu'une fois qu'elle a été scrollée à
-// l'écran (chargement différé). `window.scrollBy` s'est révélé sans effet (LinkedIn scrolle
-// vraisemblablement un conteneur interne, pas la fenêtre globale) : on combine plusieurs
-// techniques de scroll pour maximiser les chances de déclencher le rendu, quel que soit le
-// mécanisme exact utilisé par LinkedIn, et on attend plus longtemps (jusqu'à ~5s) avant
-// d'abandonner.
-async function ensureExperienceRendered() {
-  if (hasExperienceLinkRendered()) return;
-
-  const footer = document.querySelector("footer");
-  footer?.scrollIntoView({ block: "end", behavior: "smooth" });
-  window.scrollTo({ top: document.body.scrollHeight, behavior: "smooth" });
-  document.scrollingElement?.scrollTo?.({ top: document.scrollingElement.scrollHeight, behavior: "smooth" });
-
-  for (let i = 0; i < 12; i++) {
-    await wait(400);
-    if (hasExperienceLinkRendered()) return;
-  }
-}
+// l'écran (chargement différé). Confirmé par test réel : un scroll déclenché en JS
+// (`scrollIntoView`/`scrollTo`) n'a AUCUN effet sur ce chargement, seul un vrai scroll humain
+// le déclenche (Gilles l'a vérifié : après un scroll manuel jusqu'à la section, un second clic
+// sur l'extension a fonctionné). Inutile de simuler un scroll qui ne marche pas — on se contente
+// de vérifier l'état, et le popup guide Gilles vers un scroll manuel si besoin.
 
 chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
   if (message?.type === "NEXIO_EXTRACT") {
-    const isCompany = location.href.includes("/company/") || location.href.includes("/school/");
-    if (isCompany) {
-      sendResponse(extractText());
-    } else {
-      ensureExperienceRendered().then(() => sendResponse(extractText()));
-    }
+    sendResponse(extractText());
     return true;
   }
   if (message?.type === "NEXIO_DIAGNOSE") {
-    const isCompany = location.href.includes("/company/") || location.href.includes("/school/");
-    if (isCompany) {
-      sendResponse(diagnose());
-    } else {
-      ensureExperienceRendered().then(() => sendResponse(diagnose()));
-    }
+    sendResponse(diagnose());
     return true;
   }
   return true;

@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react'
 import { Pencil, ChevronDown, ChevronUp, Clipboard, Check } from 'lucide-react'
 import { useForm } from 'react-hook-form'
-import type { IContact, ICompany, ContactStatus, IUpdateContactPayload } from '@/types/contact'
-import { useUpdateContact, useDeleteContact, useExtractContact, useExtractCompany, useEnrichCompany, useScoreContact, useSuggestTemplate, useCreateMessage, useGetMessages, useGetRelances, useSuggestRelance, useTouchContact } from '@/hooks/useContacts'
+import type { IContact, ICompany, ContactStatus, IUpdateContactPayload, FluxCode } from '@/types/contact'
+import { useUpdateContact, useDeleteContact, useExtractContact, useExtractCompany, useEnrichCompany, useUpdateCompany, useScoreContact, useSuggestTemplate, useCreateMessage, useGetMessages, useGetRelances, useSuggestRelance, useTouchContact } from '@/hooks/useContacts'
 import {
   Dialog,
   DialogContent,
@@ -24,6 +24,16 @@ const STATUS_LABELS: Record<ContactStatus, string> = {
   follow_up: 'A relancer',
   closed: 'Fermé',
 }
+
+const FLUX_LABELS: Record<FluxCode, string> = {
+  '1a': 'RH / Recrutement — ESN',
+  '1b': 'RH / Recrutement — Entreprise classique',
+  '2': 'CTO / Dirigeant technique',
+  '3': 'Lead Dev / Tech Lead',
+  '4': 'Business Manager — ESN',
+}
+
+const FLUX_OPTIONS: FluxCode[] = ['1a', '1b', '2', '3', '4']
 
 const STATUS_OPTIONS: ContactStatus[] = [
   'to_contact',
@@ -48,17 +58,13 @@ export function ContactModal({ contact, onClose }: IContactModalProps) {
   const [isEditing, setIsEditing] = useState(false)
   const [rawCompanyText, setRawCompanyText] = useState('')
   const [rawContactText, setRawContactText] = useState('')
-  const [suggestedMessage, setSuggestedMessage] = useState<string | null>(null)
   const [templateError, setTemplateError] = useState<string | null>(null)
-  const [suggestedRelance, setSuggestedRelance] = useState<string | null>(null)
   const [relanceError, setRelanceError] = useState<string | null>(null)
   const [extractionStatus, setExtractionStatus] = useState<'idle' | 'success' | 'error'>('idle')
   const [contactExtractionStatus, setContactExtractionStatus] = useState<'idle' | 'success' | 'error'>('idle')
   const [companyExtractionError, setCompanyExtractionError] = useState<string | null>(null)
   const [contactExtractionError, setContactExtractionError] = useState<string | null>(null)
   const [outOfScopeNotice, setOutOfScopeNotice] = useState<string | null>(null)
-  const [copied, setCopied] = useState(false)
-  const [copiedRelance, setCopiedRelance] = useState(false)
   const [localStatus, setLocalStatus] = useState<ContactStatus>(contact?.status ?? 'to_contact')
   const [localCompany, setLocalCompany] = useState<ICompany | undefined>(contact?.companyRef)
   const [localJobTitle, setLocalJobTitle] = useState(contact?.jobTitle ?? null)
@@ -68,12 +74,15 @@ export function ContactModal({ contact, onClose }: IContactModalProps) {
   const [isTimelineOpen, setIsTimelineOpen] = useState(false)
   const [isCompanyModalOpen, setIsCompanyModalOpen] = useState(false)
   const [isContactInfoModalOpen, setIsContactInfoModalOpen] = useState(false)
+  const [localSector, setLocalSector] = useState('')
+  const [sectorSaved, setSectorSaved] = useState(false)
 
   const updateContact = useUpdateContact()
   const deleteContact = useDeleteContact()
   const extractContact = useExtractContact()
   const extractCompany = useExtractCompany()
   const enrichCompany = useEnrichCompany()
+  const updateCompany = useUpdateCompany()
   const scoreContact = useScoreContact()
   const suggestTemplate = useSuggestTemplate()
   const suggestRelance = useSuggestRelance()
@@ -99,9 +108,7 @@ export function ContactModal({ contact, onClose }: IContactModalProps) {
       setIsEditing(false)
       setRawCompanyText('')
       setRawContactText('')
-      setSuggestedMessage(null)
       setTemplateError(null)
-      setSuggestedRelance(null)
       setRelanceError(null)
       setExtractionStatus('idle')
       setContactExtractionStatus('idle')
@@ -115,6 +122,8 @@ export function ContactModal({ contact, onClose }: IContactModalProps) {
       setLocalJobTitle(contact.jobTitle ?? null)
       setLocalNotes(contact.notes ?? '')
       setNotesSaved(false)
+      setLocalSector(contact.companyRef?.sector ?? '')
+      setSectorSaved(false)
       setCopiedMessageId(null)
       setIsTimelineOpen(false)
     }
@@ -165,6 +174,23 @@ export function ContactModal({ contact, onClose }: IContactModalProps) {
         onSuccess: () => {
           setNotesSaved(true)
           setTimeout(() => setNotesSaved(false), 2000)
+        },
+      }
+    )
+  }
+
+  const handleFluxChange = (flux: FluxCode) => {
+    updateContact.mutate({ id: contact.id, data: { flux } })
+  }
+
+  const handleSaveSector = () => {
+    if (!localCompany) return
+    updateCompany.mutate(
+      { companyId: localCompany.id, data: { sector: localSector } },
+      {
+        onSuccess: () => {
+          setSectorSaved(true)
+          setTimeout(() => setSectorSaved(false), 2000)
         },
       }
     )
@@ -295,11 +321,25 @@ export function ContactModal({ contact, onClose }: IContactModalProps) {
     })
   }
 
+  // Ouvre le profil LinkedIn du contact dans un nouvel onglet et ferme la fiche : le texte est
+  // déjà dans le presse-papier, Gilles n'a plus qu'à coller sur la page qui s'ouvre.
+  const openLinkedInAndClose = () => {
+    if (contact.linkedinUrl) {
+      window.open(contact.linkedinUrl, '_blank', 'noopener')
+    }
+    onClose()
+  }
+
+  // Génère, copie et enchaîne sur LinkedIn en un seul clic : Gilles ne relit le texte qu'une
+  // fois collé, pas la peine d'un aller-retour "Générer" puis "Copier" puis changer d'onglet.
   const handleSuggestTemplate = () => {
     setTemplateError(null)
     suggestTemplate.mutate(contact.id, {
       onSuccess: (data) => {
-        setSuggestedMessage(data.message)
+        navigator.clipboard.writeText(data.message)
+        createMessage.mutate({ contactId: contact.id, content: data.message })
+        handleStatusChange('contacted')
+        openLinkedInAndClose()
       },
       onError: (err) => {
         const message =
@@ -310,20 +350,14 @@ export function ContactModal({ contact, onClose }: IContactModalProps) {
     })
   }
 
-  const handleCopyMessage = () => {
-    if (!suggestedMessage) return
-    navigator.clipboard.writeText(suggestedMessage)
-    setCopied(true)
-    setTimeout(() => setCopied(false), 2000)
-    createMessage.mutate({ contactId: contact.id, content: suggestedMessage })
-    handleStatusChange('contacted')
-  }
-
   const handleSuggestRelance = () => {
     setRelanceError(null)
     suggestRelance.mutate(contact.id, {
       onSuccess: (data) => {
-        setSuggestedRelance(data.message)
+        navigator.clipboard.writeText(data.message)
+        createMessage.mutate({ contactId: contact.id, content: data.message })
+        handleStatusChange('contacted')
+        openLinkedInAndClose()
       },
       onError: (err) => {
         const message =
@@ -332,15 +366,6 @@ export function ContactModal({ contact, onClose }: IContactModalProps) {
         setRelanceError(message)
       },
     })
-  }
-
-  const handleCopyRelance = () => {
-    if (!suggestedRelance) return
-    navigator.clipboard.writeText(suggestedRelance)
-    setCopiedRelance(true)
-    setTimeout(() => setCopiedRelance(false), 3000)
-    createMessage.mutate({ contactId: contact.id, content: suggestedRelance })
-    handleStatusChange('contacted')
   }
 
   return (
@@ -537,39 +562,70 @@ export function ContactModal({ contact, onClose }: IContactModalProps) {
                 {extractionStatus === 'success' && (
                   <p className="text-xs text-foreground">Entreprise mise à jour.</p>
                 )}
+                {localCompany && !localCompany.sector && (
+                  <div className="flex flex-col gap-1.5 pt-1">
+                    <Label htmlFor="company-sector" className="text-xs">
+                      Secteur manquant (bloque la classification) — complète-le à la main
+                    </Label>
+                    <div className="flex gap-2">
+                      <Input
+                        id="company-sector"
+                        value={localSector}
+                        onChange={(e) => setLocalSector(e.target.value)}
+                        placeholder="ex: Services et conseil en informatique"
+                        className="text-base"
+                      />
+                      <Button
+                        type="button"
+                        variant="outline"
+                        onClick={handleSaveSector}
+                        disabled={updateCompany.isPending || !localSector.trim()}
+                      >
+                        {updateCompany.isPending ? 'Enregistrement…' : 'Enregistrer'}
+                      </Button>
+                    </div>
+                    {sectorSaved && <span className="text-xs text-muted-foreground">Secteur enregistré, classification relancée.</span>}
+                  </div>
+                )}
+              </div>
+
+              <div className="flex flex-col gap-1.5">
+                <Label htmlFor="contact-flux" className="text-xs text-muted-foreground font-medium">
+                  Flux de prospection {contact.flux && contact.fluxConfidence === 1 ? '(choisi manuellement)' : contact.flux ? '(estimé par l\'IA)' : '(non classifié)'}
+                </Label>
+                <select
+                  id="contact-flux"
+                  value={contact.flux ?? ''}
+                  onChange={(e) => handleFluxChange(e.target.value as FluxCode)}
+                  className="flex h-10 w-full rounded-md border border-input bg-background text-foreground px-3 py-2 text-base shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+                >
+                  <option value="" disabled>
+                    Choisir le flux…
+                  </option>
+                  {FLUX_OPTIONS.map((code) => (
+                    <option key={code} value={code}>
+                      {FLUX_LABELS[code]}
+                    </option>
+                  ))}
+                </select>
               </div>
             </div>
 
             {localStatus === 'to_message' && messages.length === 0 && (
               <div className="border-t border-border pt-4 flex flex-col gap-2">
-                <span className="text-muted-foreground font-medium">Message 1er contact</span>
-                {suggestedMessage ? (
-                  copied ? (
-                    <p className="text-sm text-muted-foreground">Message copié, visible dans la timeline</p>
-                  ) : (
-                    <div className="flex flex-col gap-2">
-                      <textarea
-                        readOnly
-                        value={suggestedMessage}
-                        rows={8}
-                        className="flex w-full rounded-md border border-input bg-background text-foreground px-3 py-2 text-sm shadow-sm resize-none"
-                      />
-                      <Button type="button" variant="outline" onClick={handleCopyMessage} className="self-end">
-                        Copier
-                      </Button>
-                    </div>
-                  )
-                ) : (
-                  <Button
-                    type="button"
-                    variant="outline"
-                    onClick={handleSuggestTemplate}
-                    disabled={suggestTemplate.isPending}
-                    className="self-start"
-                  >
-                    {suggestTemplate.isPending ? 'Génération…' : 'Générer le message'}
-                  </Button>
-                )}
+                <div className="flex items-center justify-between gap-2">
+                  <span className="text-muted-foreground font-medium">Message 1er contact</span>
+                  <div className="flex items-center gap-2">
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={handleSuggestTemplate}
+                      disabled={suggestTemplate.isPending}
+                    >
+                      {suggestTemplate.isPending ? 'Génération…' : 'Générer le message'}
+                    </Button>
+                  </div>
+                </div>
                 {templateError && (
                   <p className="text-xs text-foreground">{templateError}</p>
                 )}
@@ -578,33 +634,19 @@ export function ContactModal({ contact, onClose }: IContactModalProps) {
 
             {(localStatus === 'follow_up' || localStatus === 'contacted') && (
               <div className="border-t border-border pt-4 flex flex-col gap-2">
-                <span className="text-muted-foreground font-medium">Relance</span>
-                {suggestedRelance ? (
-                  <div className="flex flex-col gap-2">
-                    <textarea
-                      readOnly
-                      value={suggestedRelance}
-                      rows={8}
-                      className="flex w-full rounded-md border border-input bg-background text-foreground px-3 py-2 text-sm shadow-sm resize-none"
-                    />
-                    <Button type="button" variant="outline" onClick={handleCopyRelance} className="self-end">
-                      {copiedRelance ? 'Copié ✓' : 'Copier'}
+                <div className="flex items-center justify-between gap-2">
+                  <span className="text-muted-foreground font-medium">Relance</span>
+                  <div className="flex items-center gap-2">
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={handleSuggestRelance}
+                      disabled={suggestRelance.isPending}
+                    >
+                      {suggestRelance.isPending ? 'Génération…' : 'Générer une relance'}
                     </Button>
-                    {copiedRelance && (
-                      <p className="text-sm text-muted-foreground">Message copié, contact repassé en Contacté</p>
-                    )}
                   </div>
-                ) : (
-                  <Button
-                    type="button"
-                    variant="outline"
-                    onClick={handleSuggestRelance}
-                    disabled={suggestRelance.isPending}
-                    className="self-start"
-                  >
-                    {suggestRelance.isPending ? 'Génération…' : 'Générer une relance'}
-                  </Button>
-                )}
+                </div>
                 {relanceError && (
                   <p className="text-xs text-foreground">{relanceError}</p>
                 )}

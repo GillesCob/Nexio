@@ -40,6 +40,14 @@ export async function enrichCompany(companyId: string, rawText: string): Promise
   return response.data
 }
 
+export async function updateCompany(
+  companyId: string,
+  data: { sector?: string; description?: string; size?: string }
+): Promise<ICompany> {
+  const response = await apiClient.patch<ICompany>(`/companies/${companyId}`, data)
+  return response.data
+}
+
 export async function suggestTemplate(contactId: string): Promise<{ message: string }> {
   const response = await apiClient.get<{ message: string }>(`/contacts/${contactId}/suggest-template`)
   return response.data

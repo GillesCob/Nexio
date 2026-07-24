@@ -4,36 +4,17 @@ import { prisma } from '../lib/prisma'
 import { extractCompanyFromText } from './extractCompanyService'
 import { classifyContactFlux } from './fluxClassifier'
 
-export async function enrichCompany(companyId: string, rawText: string) {
-  const extracted = await extractCompanyFromText(rawText)
-
-  let company
-  try {
-    company = await prisma.company.update({
-      where: { id: companyId },
-      data: extracted,
-    })
-  } catch (err) {
-    if (err instanceof Prisma.PrismaClientKnownRequestError && err.code === 'P2025') {
-      throw new AppError(404, 'Company not found')
-    }
-    throw err
-  }
-
-  if (!company.sector) {
-    return company
-  }
+async function reclassifyUnclassifiedContacts(company: Company) {
+  if (!company.sector) return
 
   const companyDescription = company.description ?? null
   const companySector = company.sector
 
   const unclassifiedContacts = await prisma.contact.findMany({
-    where: { companyId, flux: null },
+    where: { companyId: company.id, flux: null },
   })
 
-  if (unclassifiedContacts.length === 0) {
-    return company
-  }
+  if (unclassifiedContacts.length === 0) return
 
   await Promise.all(
     unclassifiedContacts.map(async (contact) => {
@@ -55,6 +36,47 @@ export async function enrichCompany(companyId: string, rawText: string) {
       }
     })
   )
+}
+
+export async function enrichCompany(companyId: string, rawText: string) {
+  const extracted = await extractCompanyFromText(rawText)
+
+  let company
+  try {
+    company = await prisma.company.update({
+      where: { id: companyId },
+      data: extracted,
+    })
+  } catch (err) {
+    if (err instanceof Prisma.PrismaClientKnownRequestError && err.code === 'P2025') {
+      throw new AppError(404, 'Company not found')
+    }
+    throw err
+  }
+
+  await reclassifyUnclassifiedContacts(company)
+
+  return company
+}
+
+interface IUpdateCompanyData {
+  sector?: string
+  description?: string
+  size?: string
+}
+
+export async function updateCompany(companyId: string, data: IUpdateCompanyData) {
+  let company
+  try {
+    company = await prisma.company.update({ where: { id: companyId }, data })
+  } catch (err) {
+    if (err instanceof Prisma.PrismaClientKnownRequestError && err.code === 'P2025') {
+      throw new AppError(404, 'Company not found')
+    }
+    throw err
+  }
+
+  await reclassifyUnclassifiedContacts(company)
 
   return company
 }

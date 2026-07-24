@@ -110,30 +110,54 @@ function showManualCompanyInput(contactId) {
 }
 
 extractButton.addEventListener("click", async () => {
+  if (extractButton.disabled) return; // évite un deuxième clic pendant le traitement en cours
+
   nextStep.innerHTML = "";
-  status.textContent = "";
+  status.textContent = "Chargement…";
+  extractButton.disabled = true;
+  extractButton.textContent = "Chargement…";
 
-  const { apiUrl, token } = await getConfig();
-  if (!token) {
-    status.textContent = "Configure d'abord le token dans les réglages de l'extension (clic droit sur l'icône > Options).";
-    return;
+  try {
+    const { apiUrl, token } = await getConfig();
+    if (!token) {
+      status.textContent = "Configure d'abord le token dans les réglages de l'extension (clic droit sur l'icône > Options).";
+      return;
+    }
+
+    const tab = await getActiveLinkedInTab();
+    if (!tab) {
+      status.textContent = "Ouvre un profil ou une page entreprise LinkedIn d'abord.";
+      return;
+    }
+
+    const page = await sendToContentScript(tab.id, { type: "NEXIO_EXTRACT" });
+    if (!page?.rawText) {
+      status.textContent = "Extraction impossible sur cette page (recharge et réessaie).";
+      return;
+    }
+
+    const rawTextWithUrl = `${page.rawText}\n\nLien LinkedIn : ${page.url}`;
+    status.textContent = "Envoi à Nexio...";
+
+    await handleExtractedPage(apiUrl, token, page, rawTextWithUrl, tab.id);
+  } finally {
+    extractButton.disabled = false;
+    extractButton.textContent = "Extraire et envoyer à Nexio";
   }
+});
 
-  const tab = await getActiveLinkedInTab();
-  if (!tab) {
-    status.textContent = "Ouvre un profil ou une page entreprise LinkedIn d'abord.";
-    return;
-  }
+function closeTabSoon(tabId) {
+  setTimeout(() => chrome.tabs.remove(tabId), 1200);
+}
 
-  const page = await sendToContentScript(tab.id, { type: "NEXIO_EXTRACT" });
-  if (!page?.rawText) {
-    status.textContent = "Extraction impossible sur cette page (recharge et réessaie).";
-    return;
-  }
+// Recharge le(s) onglet(s) Nexio déjà ouverts après une mutation réussie, pour que les
+// pastilles/statuts du kanban reflètent le changement sans que Gilles ait à recharger à la main.
+async function reloadOpenNexioTabs() {
+  const tabs = await chrome.tabs.query({ url: "https://nexio.gillescobigo.com/*" });
+  tabs.forEach((t) => t.id && chrome.tabs.reload(t.id));
+}
 
-  const rawTextWithUrl = `${page.rawText}\n\nLien LinkedIn : ${page.url}`;
-  status.textContent = "Envoi à Nexio...";
-
+async function handleExtractedPage(apiUrl, token, page, rawTextWithUrl, tabId) {
   try {
     if (page.isCompany) {
       const { pendingContactId } = await chrome.storage.session.get("pendingContactId");
@@ -145,10 +169,12 @@ extractButton.addEventListener("click", async () => {
 
       if (pendingContactId) {
         await chrome.storage.session.remove(["pendingContactId", "pendingCompany"]);
-        status.textContent = `Entreprise "${company.name}" liée au contact. ✓`;
+        status.textContent = `Entreprise "${company.name}" liée au contact. ✓ Fermeture de l'onglet…`;
       } else {
-        status.textContent = `Entreprise "${company.name}" créée/mise à jour (aucun contact en attente à lier). ✓`;
+        status.textContent = `Entreprise "${company.name}" créée/mise à jour (aucun contact en attente à lier). ✓ Fermeture de l'onglet…`;
       }
+      await reloadOpenNexioTabs();
+      closeTabSoon(tabId);
     } else {
       const extracted = await apiPost(apiUrl, token, "/contacts/extract", {
         rawText: rawTextWithUrl,
@@ -163,6 +189,7 @@ extractButton.addEventListener("click", async () => {
       };
 
       const contact = await apiPost(apiUrl, token, "/contacts", contactPayload);
+      await reloadOpenNexioTabs();
 
       const contactLabel =
         contact.outcome === "unchanged"
@@ -182,6 +209,10 @@ extractButton.addEventListener("click", async () => {
           pendingCompany: page.firstCompany,
         });
         showOpenCompanyButton(page.firstCompany);
+      } else if (!page.experienceHeadingFound) {
+        // Section Expériences pas encore chargée par LinkedIn (chargement différé au scroll) :
+        // pas la peine de proposer un lien manuel tout de suite, un vrai scroll + reclic suffit.
+        status.textContent = `${contactLabel}. Section Expériences pas encore chargée sur LinkedIn — scrolle jusqu'à elle sur la page, puis reclique sur "Extraire".`;
       } else {
         status.textContent = `${contactLabel}. Il manque les infos de son entreprise, aucun lien détecté automatiquement dans les Expériences.`;
         showManualCompanyInput(contact.id);
@@ -191,27 +222,38 @@ extractButton.addEventListener("click", async () => {
     status.textContent = `Échec : ${err.message}`;
     showRawTextFallback(page.rawText, page.url);
   }
-});
+}
 
 diagnoseButton.addEventListener("click", async () => {
-  const tab = await getActiveLinkedInTab();
-  if (!tab) {
-    status.textContent = "Ouvre un profil ou une page entreprise LinkedIn d'abord.";
-    return;
-  }
-
-  const response = await sendToContentScript(tab.id, { type: "NEXIO_DIAGNOSE" });
-  if (!response?.dump) {
-    status.textContent = "Diagnostic impossible sur cette page.";
-    return;
-  }
-
-  const text = `${response.dump}\n\nURL : ${response.url}`;
+  if (diagnoseButton.disabled) return;
+  diagnoseButton.disabled = true;
+  const originalLabel = diagnoseButton.textContent;
+  diagnoseButton.textContent = "Diagnostic en cours…";
+  status.textContent = "";
 
   try {
-    await navigator.clipboard.writeText(text);
-    status.textContent = "Diagnostic copié — colle-le à Claude pour ajuster les sélecteurs.";
-  } catch {
-    status.textContent = "Échec de la copie dans le presse-papiers.";
+    const tab = await getActiveLinkedInTab();
+    if (!tab) {
+      status.textContent = "Ouvre un profil ou une page entreprise LinkedIn d'abord.";
+      return;
+    }
+
+    const response = await sendToContentScript(tab.id, { type: "NEXIO_DIAGNOSE" });
+    if (!response?.dump) {
+      status.textContent = "Diagnostic impossible sur cette page.";
+      return;
+    }
+
+    const text = `${response.dump}\n\nURL : ${response.url}`;
+
+    try {
+      await navigator.clipboard.writeText(text);
+      status.textContent = "Diagnostic copié — colle-le à Claude pour ajuster les sélecteurs.";
+    } catch {
+      status.textContent = "Échec de la copie dans le presse-papiers.";
+    }
+  } finally {
+    diagnoseButton.disabled = false;
+    diagnoseButton.textContent = originalLabel;
   }
 });
