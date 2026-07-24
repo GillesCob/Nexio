@@ -65,8 +65,6 @@ export function ContactModal({ contact, onClose }: IContactModalProps) {
   const [companyExtractionError, setCompanyExtractionError] = useState<string | null>(null)
   const [contactExtractionError, setContactExtractionError] = useState<string | null>(null)
   const [outOfScopeNotice, setOutOfScopeNotice] = useState<string | null>(null)
-  const [copied, setCopied] = useState(false)
-  const [copiedRelance, setCopiedRelance] = useState(false)
   const [localStatus, setLocalStatus] = useState<ContactStatus>(contact?.status ?? 'to_contact')
   const [localCompany, setLocalCompany] = useState<ICompany | undefined>(contact?.companyRef)
   const [localJobTitle, setLocalJobTitle] = useState(contact?.jobTitle ?? null)
@@ -323,17 +321,25 @@ export function ContactModal({ contact, onClose }: IContactModalProps) {
     })
   }
 
-  // Génère et copie en un seul clic : Gilles ne relit le texte qu'une fois collé dans LinkedIn,
-  // pas la peine d'un aller-retour "Générer" puis "Copier" séparé.
+  // Ouvre le profil LinkedIn du contact dans un nouvel onglet et ferme la fiche : le texte est
+  // déjà dans le presse-papier, Gilles n'a plus qu'à coller sur la page qui s'ouvre.
+  const openLinkedInAndClose = () => {
+    if (contact.linkedinUrl) {
+      window.open(contact.linkedinUrl, '_blank', 'noopener')
+    }
+    onClose()
+  }
+
+  // Génère, copie et enchaîne sur LinkedIn en un seul clic : Gilles ne relit le texte qu'une
+  // fois collé, pas la peine d'un aller-retour "Générer" puis "Copier" puis changer d'onglet.
   const handleSuggestTemplate = () => {
     setTemplateError(null)
     suggestTemplate.mutate(contact.id, {
       onSuccess: (data) => {
         navigator.clipboard.writeText(data.message)
-        setCopied(true)
-        setTimeout(() => setCopied(false), 2000)
         createMessage.mutate({ contactId: contact.id, content: data.message })
         handleStatusChange('contacted')
+        openLinkedInAndClose()
       },
       onError: (err) => {
         const message =
@@ -349,10 +355,9 @@ export function ContactModal({ contact, onClose }: IContactModalProps) {
     suggestRelance.mutate(contact.id, {
       onSuccess: (data) => {
         navigator.clipboard.writeText(data.message)
-        setCopiedRelance(true)
-        setTimeout(() => setCopiedRelance(false), 3000)
         createMessage.mutate({ contactId: contact.id, content: data.message })
         handleStatusChange('contacted')
+        openLinkedInAndClose()
       },
       onError: (err) => {
         const message =
@@ -611,7 +616,6 @@ export function ContactModal({ contact, onClose }: IContactModalProps) {
                 <div className="flex items-center justify-between gap-2">
                   <span className="text-muted-foreground font-medium">Message 1er contact</span>
                   <div className="flex items-center gap-2">
-                    {copied && <span className="text-xs text-muted-foreground">Copié ✓</span>}
                     <Button
                       type="button"
                       variant="outline"
@@ -633,7 +637,6 @@ export function ContactModal({ contact, onClose }: IContactModalProps) {
                 <div className="flex items-center justify-between gap-2">
                   <span className="text-muted-foreground font-medium">Relance</span>
                   <div className="flex items-center gap-2">
-                    {copiedRelance && <span className="text-xs text-muted-foreground">Copié ✓</span>}
                     <Button
                       type="button"
                       variant="outline"
