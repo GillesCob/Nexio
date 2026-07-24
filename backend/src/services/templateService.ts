@@ -35,6 +35,12 @@ export async function suggestTemplate(userId: string, contactId: string): Promis
   })
 
   if (!templateId) {
+    if (contact.flux && contact.relanceCount === 1) {
+      throw new AppError(
+        400,
+        "Dernier message (clôture) mis en pause jusqu'au 6 septembre, retour de congés estivaux — rien à générer avant."
+      )
+    }
     throw new AppError(
       400,
       "Ce contact n'a pas encore été classifié (flux manquant), impossible de choisir un template automatiquement. Mets à jour les infos entreprise pour déclencher la classification."

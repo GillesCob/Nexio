@@ -40,8 +40,8 @@ describe("selectTemplate", () => {
     expect(selectTemplate({ flux: "1b", contactedAt: new Date("2026-08-01"), relanceCount: 0 })).toBe("1b_relance");
   });
 
-  it("cas 10 : flux 1b, relanceCount 1 → 1b_relance_final", () => {
-    expect(selectTemplate({ flux: "1b", contactedAt: new Date("2026-06-01"), relanceCount: 1 })).toBe("1b_relance_final");
+  it("cas 10 : flux 1b, relanceCount 1, après la pause estivale → 1b_relance_final", () => {
+    expect(selectTemplate({ flux: "1b", contactedAt: new Date("2026-06-01"), relanceCount: 1 }, new Date("2026-09-10"))).toBe("1b_relance_final");
   });
 
   it("cas 11 : flux 1b, relanceCount 2 → null", () => {
@@ -82,29 +82,46 @@ describe("selectTemplate", () => {
     expect(selectTemplate({ flux: "4", contactedAt: new Date("2026-12-01"), relanceCount: 0 })).toBe("4_relance_after_17_07");
   });
 
-  // --- relance finale ---
-  it("cas 20 : flux 1a, relanceCount 1 → 1a_relance_final", () => {
-    expect(selectTemplate({ flux: "1a", contactedAt: new Date("2026-06-01"), relanceCount: 1 })).toBe("1a_relance_final");
+  // --- relance finale (après la pause estivale, cf. cas 26-29 pour la pause elle-même) ---
+  it("cas 20 : flux 1a, relanceCount 1, après la pause → 1a_relance_final", () => {
+    expect(selectTemplate({ flux: "1a", contactedAt: new Date("2026-06-01"), relanceCount: 1 }, new Date("2026-09-10"))).toBe("1a_relance_final");
   });
 
-  it("cas 21 : flux 2, relanceCount 1 → 2_relance_final", () => {
-    expect(selectTemplate({ flux: "2", contactedAt: new Date("2026-08-01"), relanceCount: 1 })).toBe("2_relance_final");
+  it("cas 21 : flux 2, relanceCount 1, après la pause → 2_relance_final", () => {
+    expect(selectTemplate({ flux: "2", contactedAt: new Date("2026-08-01"), relanceCount: 1 }, new Date("2026-09-10"))).toBe("2_relance_final");
   });
 
-  it("cas 22 : flux 3, relanceCount 1 → 3_relance_final", () => {
-    expect(selectTemplate({ flux: "3", contactedAt: new Date("2026-06-01"), relanceCount: 1 })).toBe("3_relance_final");
+  it("cas 22 : flux 3, relanceCount 1, après la pause → 3_relance_final", () => {
+    expect(selectTemplate({ flux: "3", contactedAt: new Date("2026-06-01"), relanceCount: 1 }, new Date("2026-09-10"))).toBe("3_relance_final");
   });
 
-  it("cas 23 : flux 4, relanceCount 1 → 4_relance_final", () => {
-    expect(selectTemplate({ flux: "4", contactedAt: new Date("2026-08-01"), relanceCount: 1 })).toBe("4_relance_final");
+  it("cas 23 : flux 4, relanceCount 1, après la pause → 4_relance_final", () => {
+    expect(selectTemplate({ flux: "4", contactedAt: new Date("2026-08-01"), relanceCount: 1 }, new Date("2026-09-10"))).toBe("4_relance_final");
   });
 
-  // --- relanceCount >= 2 (toutes les relances envoyées) ---
+  // --- relanceCount >= 2 (toutes les relances envoyées, peu importe la date) ---
   it("cas 24 : flux 1a, relanceCount 2 → null", () => {
     expect(selectTemplate({ flux: "1a", contactedAt: new Date("2026-06-01"), relanceCount: 2 })).toBeNull();
   });
 
   it("cas 25 : flux 2, relanceCount 3 → null", () => {
     expect(selectTemplate({ flux: "2", contactedAt: new Date("2026-08-01"), relanceCount: 3 })).toBeNull();
+  });
+
+  // --- pause estivale sur le message de clôture (relanceCount 1, avant le 6 septembre) ---
+  it("cas 26 : flux 1b, relanceCount 1, avant la pause (date du jour par défaut) → null", () => {
+    expect(selectTemplate({ flux: "1b", contactedAt: new Date("2026-06-01"), relanceCount: 1 })).toBeNull();
+  });
+
+  it("cas 27 : flux 1a, relanceCount 1, la veille du 6 septembre → null", () => {
+    expect(selectTemplate({ flux: "1a", contactedAt: new Date("2026-06-01"), relanceCount: 1 }, new Date("2026-09-05"))).toBeNull();
+  });
+
+  it("cas 28 : flux 1a, relanceCount 1, pile le 6 septembre → 1a_relance_final", () => {
+    expect(selectTemplate({ flux: "1a", contactedAt: new Date("2026-06-01"), relanceCount: 1 }, new Date("2026-09-06"))).toBe("1a_relance_final");
+  });
+
+  it("cas 29 : flux 3, relanceCount 1, contact devenu éligible pendant l'été → null tant que le 6/09 n'est pas atteint", () => {
+    expect(selectTemplate({ flux: "3", contactedAt: new Date("2026-08-20"), relanceCount: 1 }, new Date("2026-08-25"))).toBeNull();
   });
 });
