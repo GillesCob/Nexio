@@ -2,8 +2,22 @@ import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import { BrowserRouter } from 'react-router-dom'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import { registerSW } from 'virtual:pwa-register'
 import './index.css'
 import { App } from './App'
+
+// Enregistrement manuel plutôt que le script auto-injecté par défaut : celui-ci ne revérifie
+// jamais après le premier chargement. Une PWA rouverte depuis l'écran d'accueil ne fait
+// souvent qu'un "resume" (pas un vrai rechargement), donc elle ratait les mises à jour bien
+// plus longtemps qu'un onglet de navigateur classique. On force une vérification à chaque
+// retour au premier plan, en plus du enregistrement initial.
+const updateSW = registerSW({ immediate: true })
+
+document.addEventListener('visibilitychange', () => {
+  if (document.visibilityState === 'visible') {
+    updateSW()
+  }
+})
 
 ;(() => {
   const stored = localStorage.getItem('theme')

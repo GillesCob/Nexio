@@ -8,6 +8,11 @@ export default defineConfig({
     react(),
     VitePWA({
       registerType: 'autoUpdate',
+      // Enregistrement manuel (main.tsx) plutôt que le script auto-injecté : celui-ci ne
+      // vérifie qu'une fois au chargement, jamais ensuite. Une PWA rouverte depuis l'écran
+      // d'accueil ne fait pas toujours un vrai rechargement de page (juste un "resume"), donc
+      // elle ratait les mises à jour bien plus souvent qu'un onglet de navigateur classique.
+      injectRegister: false,
       includeAssets: ['onglet.png', 'apple-touch-icon.png'],
       manifest: {
         name: 'Nexio',
