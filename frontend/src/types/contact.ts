@@ -18,6 +18,8 @@ export interface ICompany {
   updatedAt: string
 }
 
+export type FluxCode = '1a' | '1b' | '2' | '3' | '4'
+
 export interface IContact {
   id: string
   name: string
@@ -30,6 +32,8 @@ export interface IContact {
   jobOfferId?: string
   companyId?: string
   companyRef?: ICompany
+  flux?: FluxCode
+  fluxConfidence?: number
   createdAt: string
   updatedAt: string
 }
@@ -55,6 +59,7 @@ export interface IUpdateContactPayload {
   status?: ContactStatus
   notes?: string
   jobOfferId?: string
+  flux?: FluxCode
 }
 
 export interface IExtractedContact {

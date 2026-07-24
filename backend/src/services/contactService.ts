@@ -126,6 +126,7 @@ interface IUpdateContactData {
   notes?: string;
   jobOfferId?: string;
   companyId?: string;
+  flux?: "1a" | "1b" | "2" | "3" | "4";
 }
 
 async function assertOwnership(userId: string, contactId: string) {
@@ -222,10 +223,13 @@ export async function updateContact(userId: string, contactId: string, data: IUp
   }
 
   const becomingContacted = data.status === "contacted" && !current?.contactedAt;
+  // Un flux choisi à la main est une décision humaine, pas une estimation IA : confiance maximale,
+  // remplace toujours une éventuelle classification automatique précédente.
+  const manualFlux = data.flux ? { fluxConfidence: 1 } : {};
 
   return prisma.contact.update({
     where: { id: contactId },
-    data: becomingContacted ? { ...data, contactedAt: new Date() } : data,
+    data: becomingContacted ? { ...data, ...manualFlux, contactedAt: new Date() } : { ...data, ...manualFlux },
   });
 }
 

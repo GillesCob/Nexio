@@ -9,14 +9,22 @@ import { prisma } from '../lib/prisma'
 const extractSchema = z.object({ rawText: z.string().min(1), contactId: z.string().optional() })
 const enrichParamsSchema = z.object({ id: z.string() })
 const enrichBodySchema = z.object({ rawText: z.string().min(1) })
+const updateParamsSchema = z.object({ id: z.string() })
+const updateBodySchema = z.object({
+  sector: z.string().optional(),
+  description: z.string().optional(),
+  size: z.string().optional(),
+})
 
 function toGroqAppError(err: APIError): AppError {
-  return new AppError(
-    err.status === 429 ? 429 : 502,
-    err.status === 429
-      ? 'Quota Groq quotidien atteint, réessaie plus tard.'
-      : "Erreur du service d'extraction IA, réessaie."
-  )
+  if (err.status !== 429) {
+    return new AppError(502, "Erreur du service d'extraction IA, réessaie.")
+  }
+
+  // Le corps de l'erreur Groq contient le quota réel ("Used X, Limit Y", délai avant retry) :
+  // plus utile qu'un message générique pour savoir si ça vaut le coup de réessayer maintenant.
+  const raw = (err as { error?: { error?: { message?: string } } }).error?.error?.message
+  return new AppError(429, raw ? `Quota Groq atteint : ${raw}` : 'Quota Groq quotidien atteint, réessaie plus tard.')
 }
 
 export async function extractCompany(req: Request, res: Response, next: NextFunction): Promise<void> {
@@ -35,7 +43,12 @@ export async function extractCompany(req: Request, res: Response, next: NextFunc
     if (contactId) {
       await companyService.linkAndClassifyContact(company, contactId)
     }
-    res.status(existing ? 200 : 201).json(company)
+
+    // Secteur manquant = classification de flux impossible en aval, en silence sinon : signalé
+    // explicitement pour que Gilles sache qu'il doit le compléter à la main (PATCH /companies/:id).
+    const warning = company.sector ? undefined : 'Secteur non détecté par l\'IA, à compléter manuellement pour permettre la classification.'
+
+    res.status(existing ? 200 : 201).json({ ...company, warning })
   } catch (err) {
     if (err instanceof z.ZodError) {
       next(new AppError(400, err.errors[0].message))
@@ -54,12 +67,31 @@ export async function enrichCompany(req: Request, res: Response, next: NextFunct
     const { id } = enrichParamsSchema.parse(req.params)
     const { rawText } = enrichBodySchema.parse(req.body)
     const company = await companyService.enrichCompany(id, rawText)
-    res.json(company)
+    const warning = company.sector ? undefined : 'Secteur non détecté par l\'IA, à compléter manuellement pour permettre la classification.'
+    res.json({ ...company, warning })
   } catch (err) {
     if (err instanceof z.ZodError) {
       next(new AppError(400, err.errors[0].message))
     } else if (err instanceof APIError) {
       next(toGroqAppError(err))
+    } else {
+      next(err)
+    }
+  }
+}
+
+// Édition manuelle (secteur en priorité) : quand l'IA a oublié un champ ou qu'on veut le
+// corriger directement, sans repasser par une extraction Groq. Reclassifie automatiquement les
+// contacts de cette entreprise encore sans flux si le secteur vient d'être renseigné.
+export async function updateCompany(req: Request, res: Response, next: NextFunction): Promise<void> {
+  try {
+    const { id } = updateParamsSchema.parse(req.params)
+    const data = updateBodySchema.parse(req.body)
+    const company = await companyService.updateCompany(id, data)
+    res.json(company)
+  } catch (err) {
+    if (err instanceof z.ZodError) {
+      next(new AppError(400, err.errors[0].message))
     } else {
       next(err)
     }

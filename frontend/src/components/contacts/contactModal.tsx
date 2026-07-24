@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react'
 import { Pencil, ChevronDown, ChevronUp, Clipboard, Check } from 'lucide-react'
 import { useForm } from 'react-hook-form'
-import type { IContact, ICompany, ContactStatus, IUpdateContactPayload } from '@/types/contact'
-import { useUpdateContact, useDeleteContact, useExtractContact, useExtractCompany, useEnrichCompany, useScoreContact, useSuggestTemplate, useCreateMessage, useGetMessages, useGetRelances, useSuggestRelance, useTouchContact } from '@/hooks/useContacts'
+import type { IContact, ICompany, ContactStatus, IUpdateContactPayload, FluxCode } from '@/types/contact'
+import { useUpdateContact, useDeleteContact, useExtractContact, useExtractCompany, useEnrichCompany, useUpdateCompany, useScoreContact, useSuggestTemplate, useCreateMessage, useGetMessages, useGetRelances, useSuggestRelance, useTouchContact } from '@/hooks/useContacts'
 import {
   Dialog,
   DialogContent,
@@ -24,6 +24,16 @@ const STATUS_LABELS: Record<ContactStatus, string> = {
   follow_up: 'A relancer',
   closed: 'Fermé',
 }
+
+const FLUX_LABELS: Record<FluxCode, string> = {
+  '1a': 'RH / Recrutement — ESN',
+  '1b': 'RH / Recrutement — Entreprise classique',
+  '2': 'CTO / Dirigeant technique',
+  '3': 'Lead Dev / Tech Lead',
+  '4': 'Business Manager — ESN',
+}
+
+const FLUX_OPTIONS: FluxCode[] = ['1a', '1b', '2', '3', '4']
 
 const STATUS_OPTIONS: ContactStatus[] = [
   'to_contact',
@@ -68,12 +78,15 @@ export function ContactModal({ contact, onClose }: IContactModalProps) {
   const [isTimelineOpen, setIsTimelineOpen] = useState(false)
   const [isCompanyModalOpen, setIsCompanyModalOpen] = useState(false)
   const [isContactInfoModalOpen, setIsContactInfoModalOpen] = useState(false)
+  const [localSector, setLocalSector] = useState('')
+  const [sectorSaved, setSectorSaved] = useState(false)
 
   const updateContact = useUpdateContact()
   const deleteContact = useDeleteContact()
   const extractContact = useExtractContact()
   const extractCompany = useExtractCompany()
   const enrichCompany = useEnrichCompany()
+  const updateCompany = useUpdateCompany()
   const scoreContact = useScoreContact()
   const suggestTemplate = useSuggestTemplate()
   const suggestRelance = useSuggestRelance()
@@ -115,6 +128,8 @@ export function ContactModal({ contact, onClose }: IContactModalProps) {
       setLocalJobTitle(contact.jobTitle ?? null)
       setLocalNotes(contact.notes ?? '')
       setNotesSaved(false)
+      setLocalSector(contact.companyRef?.sector ?? '')
+      setSectorSaved(false)
       setCopiedMessageId(null)
       setIsTimelineOpen(false)
     }
@@ -165,6 +180,23 @@ export function ContactModal({ contact, onClose }: IContactModalProps) {
         onSuccess: () => {
           setNotesSaved(true)
           setTimeout(() => setNotesSaved(false), 2000)
+        },
+      }
+    )
+  }
+
+  const handleFluxChange = (flux: FluxCode) => {
+    updateContact.mutate({ id: contact.id, data: { flux } })
+  }
+
+  const handleSaveSector = () => {
+    if (!localCompany) return
+    updateCompany.mutate(
+      { companyId: localCompany.id, data: { sector: localSector } },
+      {
+        onSuccess: () => {
+          setSectorSaved(true)
+          setTimeout(() => setSectorSaved(false), 2000)
         },
       }
     )
@@ -537,6 +569,52 @@ export function ContactModal({ contact, onClose }: IContactModalProps) {
                 {extractionStatus === 'success' && (
                   <p className="text-xs text-foreground">Entreprise mise à jour.</p>
                 )}
+                {localCompany && !localCompany.sector && (
+                  <div className="flex flex-col gap-1.5 pt-1">
+                    <Label htmlFor="company-sector" className="text-xs">
+                      Secteur manquant (bloque la classification) — complète-le à la main
+                    </Label>
+                    <div className="flex gap-2">
+                      <Input
+                        id="company-sector"
+                        value={localSector}
+                        onChange={(e) => setLocalSector(e.target.value)}
+                        placeholder="ex: Services et conseil en informatique"
+                        className="text-base"
+                      />
+                      <Button
+                        type="button"
+                        variant="outline"
+                        onClick={handleSaveSector}
+                        disabled={updateCompany.isPending || !localSector.trim()}
+                      >
+                        {updateCompany.isPending ? 'Enregistrement…' : 'Enregistrer'}
+                      </Button>
+                    </div>
+                    {sectorSaved && <span className="text-xs text-muted-foreground">Secteur enregistré, classification relancée.</span>}
+                  </div>
+                )}
+              </div>
+
+              <div className="flex flex-col gap-1.5">
+                <Label htmlFor="contact-flux" className="text-xs text-muted-foreground font-medium">
+                  Flux de prospection {contact.flux && contact.fluxConfidence === 1 ? '(choisi manuellement)' : contact.flux ? '(estimé par l\'IA)' : '(non classifié)'}
+                </Label>
+                <select
+                  id="contact-flux"
+                  value={contact.flux ?? ''}
+                  onChange={(e) => handleFluxChange(e.target.value as FluxCode)}
+                  className="flex h-10 w-full rounded-md border border-input bg-background text-foreground px-3 py-2 text-base shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+                >
+                  <option value="" disabled>
+                    Choisir le flux…
+                  </option>
+                  {FLUX_OPTIONS.map((code) => (
+                    <option key={code} value={code}>
+                      {FLUX_LABELS[code]}
+                    </option>
+                  ))}
+                </select>
               </div>
             </div>
 
