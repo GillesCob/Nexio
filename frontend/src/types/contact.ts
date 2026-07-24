@@ -20,6 +20,8 @@ export interface ICompany {
 
 export type FluxCode = '1a' | '1b' | '2' | '3' | '4'
 
+export type ContactCloseReason = 'not_interested' | 'not_now'
+
 export interface IContact {
   id: string
   name: string
@@ -34,6 +36,8 @@ export interface IContact {
   companyRef?: ICompany
   flux?: FluxCode
   fluxConfidence?: number
+  closeReason?: ContactCloseReason
+  remindAt?: string
   createdAt: string
   updatedAt: string
 }
@@ -60,6 +64,8 @@ export interface IUpdateContactPayload {
   notes?: string
   jobOfferId?: string
   flux?: FluxCode
+  closeReason?: ContactCloseReason
+  remindAt?: string
 }
 
 export interface IExtractedContact {

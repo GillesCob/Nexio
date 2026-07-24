@@ -28,9 +28,12 @@ const createContactSchema = z.object({
 
 // 'unknown' non inclus : réservé au résultat IA, un choix manuel est toujours tranché.
 const fluxSchema = z.enum(['1a', '1b', '2', '3', '4'])
+const closeReasonSchema = z.enum(['not_interested', 'not_now'])
 
 const updateContactSchema = createContactSchema.partial().extend({
   flux: fluxSchema.optional(),
+  closeReason: closeReasonSchema.optional(),
+  remindAt: z.string().optional(),
 })
 
 const paramsSchema = z.object({ id: z.string() })
