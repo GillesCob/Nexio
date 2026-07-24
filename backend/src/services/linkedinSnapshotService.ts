@@ -5,13 +5,9 @@ import { STATS_CONFIG } from "../data/statsConfig";
 interface IExtractedSnapshot {
   weekLabel: string;
   impressions: number;
-  impressionsVariation: number;
   followers: number;
-  followersVariation: number;
   profileViews: number;
-  profileViewsVariation: number;
   searchAppearances: number;
-  searchAppearancesVariation: number;
   postsCount: number;
   commentsCount: number;
 }
@@ -28,17 +24,13 @@ export async function extractLinkedInSnapshot(rawText: string): Promise<IExtract
         content: `Tu es un extracteur de statistiques LinkedIn. Analyse ce texte issu de la page analytics LinkedIn et retourne UNIQUEMENT un objet JSON valide (sans markdown, sans explication) avec exactement ces clés :
 - weekLabel (string, ex: "17 juin–23 juin") : la période de la semaine si mentionnée, sinon null
 - impressions (number) : nombre d'impressions
-- impressionsVariation (number) : variation en valeur absolue (positif = hausse, négatif = baisse)
 - followers (number) : nombre d'abonnés
-- followersVariation (number) : variation
 - profileViews (number) : nombre de vues du profil
-- profileViewsVariation (number) : variation
 - searchAppearances (number) : nombre d'apparitions dans les recherches
-- searchAppearancesVariation (number) : variation
 - postsCount (number) : nombre de posts publiés sur la période
 - commentsCount (number) : nombre de commentaires reçus sur la période
 
-Si une valeur est absente du texte, utilise 0.
+Ignore tout pourcentage ou variation affiché à côté de ces chiffres sur la page LinkedIn, ne retourne que les valeurs brutes ci-dessus. Si une valeur est absente du texte, utilise 0.
 
 Texte LinkedIn :
 ${rawText}`,
@@ -57,18 +49,27 @@ ${rawText}`,
 }
 
 export async function saveLinkedInSnapshot(userId: string, data: IExtractedSnapshot) {
+  // Variations calculées par Nexio par rapport au dernier snapshot enregistré (évolution
+  // réelle semaine à semaine), plutôt que de recopier le pourcentage affiché par LinkedIn
+  // (qui compare à une période que Gilles ne maîtrise pas et jugée peu pertinente).
+  const previous = await prisma.linkedInSnapshot.findFirst({
+    where: { userId },
+    orderBy: { createdAt: "desc" },
+  });
+
   return prisma.linkedInSnapshot.create({
     data: {
       userId,
       weekLabel: data.weekLabel ?? "",
       impressions: data.impressions,
-      impressionsVariation: data.impressionsVariation,
+      impressionsVariation: data.impressions - (previous?.impressions ?? data.impressions),
       followers: data.followers,
-      followersVariation: data.followersVariation,
+      followersVariation: data.followers - (previous?.followers ?? data.followers),
       profileViews: data.profileViews,
-      profileViewsVariation: data.profileViewsVariation,
+      profileViewsVariation: data.profileViews - (previous?.profileViews ?? data.profileViews),
       searchAppearances: data.searchAppearances,
-      searchAppearancesVariation: data.searchAppearancesVariation,
+      searchAppearancesVariation:
+        data.searchAppearances - (previous?.searchAppearances ?? data.searchAppearances),
       postsCount: data.postsCount,
       commentsCount: data.commentsCount,
     },

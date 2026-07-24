@@ -2,6 +2,7 @@ import { Request, Response, NextFunction } from 'express'
 import { z } from 'zod'
 import * as authService from '../services/authService'
 import { AppError } from '../middlewares/errorMiddleware'
+import { generateExtensionToken } from '../lib/jwt'
 
 const COOKIE_OPTIONS = {
   httpOnly: true,
@@ -73,6 +74,16 @@ export async function logout(req: Request, res: Response, next: NextFunction): P
     if (userId) await authService.logout(userId)
     res.clearCookie('refreshToken', { httpOnly: true, sameSite: 'strict' })
     res.status(204).send()
+  } catch (err) {
+    next(err)
+  }
+}
+
+export async function extensionToken(req: Request, res: Response, next: NextFunction): Promise<void> {
+  try {
+    const { userId, role } = req.user!
+    const accessToken = generateExtensionToken(userId, role)
+    res.json({ accessToken })
   } catch (err) {
     next(err)
   }

@@ -53,7 +53,7 @@ export function KanbanBoard({ onOpenContact }: IKanbanBoardProps) {
 
   const getColumnContacts = (status: ContactStatus) => {
     const filtered = localContacts.filter((c) => c.status === status)
-    if (status === 'closed') {
+    if (status === 'closed' || status === 'to_message') {
       return [...filtered].sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime())
     }
     if (status === 'follow_up') {
