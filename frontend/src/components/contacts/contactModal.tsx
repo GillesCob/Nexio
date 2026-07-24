@@ -58,9 +58,7 @@ export function ContactModal({ contact, onClose }: IContactModalProps) {
   const [isEditing, setIsEditing] = useState(false)
   const [rawCompanyText, setRawCompanyText] = useState('')
   const [rawContactText, setRawContactText] = useState('')
-  const [suggestedMessage, setSuggestedMessage] = useState<string | null>(null)
   const [templateError, setTemplateError] = useState<string | null>(null)
-  const [suggestedRelance, setSuggestedRelance] = useState<string | null>(null)
   const [relanceError, setRelanceError] = useState<string | null>(null)
   const [extractionStatus, setExtractionStatus] = useState<'idle' | 'success' | 'error'>('idle')
   const [contactExtractionStatus, setContactExtractionStatus] = useState<'idle' | 'success' | 'error'>('idle')
@@ -112,9 +110,7 @@ export function ContactModal({ contact, onClose }: IContactModalProps) {
       setIsEditing(false)
       setRawCompanyText('')
       setRawContactText('')
-      setSuggestedMessage(null)
       setTemplateError(null)
-      setSuggestedRelance(null)
       setRelanceError(null)
       setExtractionStatus('idle')
       setContactExtractionStatus('idle')
@@ -327,11 +323,17 @@ export function ContactModal({ contact, onClose }: IContactModalProps) {
     })
   }
 
+  // Génère et copie en un seul clic : Gilles ne relit le texte qu'une fois collé dans LinkedIn,
+  // pas la peine d'un aller-retour "Générer" puis "Copier" séparé.
   const handleSuggestTemplate = () => {
     setTemplateError(null)
     suggestTemplate.mutate(contact.id, {
       onSuccess: (data) => {
-        setSuggestedMessage(data.message)
+        navigator.clipboard.writeText(data.message)
+        setCopied(true)
+        setTimeout(() => setCopied(false), 2000)
+        createMessage.mutate({ contactId: contact.id, content: data.message })
+        handleStatusChange('contacted')
       },
       onError: (err) => {
         const message =
@@ -342,20 +344,15 @@ export function ContactModal({ contact, onClose }: IContactModalProps) {
     })
   }
 
-  const handleCopyMessage = () => {
-    if (!suggestedMessage) return
-    navigator.clipboard.writeText(suggestedMessage)
-    setCopied(true)
-    setTimeout(() => setCopied(false), 2000)
-    createMessage.mutate({ contactId: contact.id, content: suggestedMessage })
-    handleStatusChange('contacted')
-  }
-
   const handleSuggestRelance = () => {
     setRelanceError(null)
     suggestRelance.mutate(contact.id, {
       onSuccess: (data) => {
-        setSuggestedRelance(data.message)
+        navigator.clipboard.writeText(data.message)
+        setCopiedRelance(true)
+        setTimeout(() => setCopiedRelance(false), 3000)
+        createMessage.mutate({ contactId: contact.id, content: data.message })
+        handleStatusChange('contacted')
       },
       onError: (err) => {
         const message =
@@ -364,15 +361,6 @@ export function ContactModal({ contact, onClose }: IContactModalProps) {
         setRelanceError(message)
       },
     })
-  }
-
-  const handleCopyRelance = () => {
-    if (!suggestedRelance) return
-    navigator.clipboard.writeText(suggestedRelance)
-    setCopiedRelance(true)
-    setTimeout(() => setCopiedRelance(false), 3000)
-    createMessage.mutate({ contactId: contact.id, content: suggestedRelance })
-    handleStatusChange('contacted')
   }
 
   return (
@@ -620,34 +608,20 @@ export function ContactModal({ contact, onClose }: IContactModalProps) {
 
             {localStatus === 'to_message' && messages.length === 0 && (
               <div className="border-t border-border pt-4 flex flex-col gap-2">
-                <span className="text-muted-foreground font-medium">Message 1er contact</span>
-                {suggestedMessage ? (
-                  copied ? (
-                    <p className="text-sm text-muted-foreground">Message copié, visible dans la timeline</p>
-                  ) : (
-                    <div className="flex flex-col gap-2">
-                      <textarea
-                        readOnly
-                        value={suggestedMessage}
-                        rows={8}
-                        className="flex w-full rounded-md border border-input bg-background text-foreground px-3 py-2 text-sm shadow-sm resize-none"
-                      />
-                      <Button type="button" variant="outline" onClick={handleCopyMessage} className="self-end">
-                        Copier
-                      </Button>
-                    </div>
-                  )
-                ) : (
-                  <Button
-                    type="button"
-                    variant="outline"
-                    onClick={handleSuggestTemplate}
-                    disabled={suggestTemplate.isPending}
-                    className="self-start"
-                  >
-                    {suggestTemplate.isPending ? 'Génération…' : 'Générer le message'}
-                  </Button>
-                )}
+                <div className="flex items-center justify-between gap-2">
+                  <span className="text-muted-foreground font-medium">Message 1er contact</span>
+                  <div className="flex items-center gap-2">
+                    {copied && <span className="text-xs text-muted-foreground">Copié ✓</span>}
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={handleSuggestTemplate}
+                      disabled={suggestTemplate.isPending}
+                    >
+                      {suggestTemplate.isPending ? 'Génération…' : 'Générer le message'}
+                    </Button>
+                  </div>
+                </div>
                 {templateError && (
                   <p className="text-xs text-foreground">{templateError}</p>
                 )}
@@ -656,33 +630,20 @@ export function ContactModal({ contact, onClose }: IContactModalProps) {
 
             {(localStatus === 'follow_up' || localStatus === 'contacted') && (
               <div className="border-t border-border pt-4 flex flex-col gap-2">
-                <span className="text-muted-foreground font-medium">Relance</span>
-                {suggestedRelance ? (
-                  <div className="flex flex-col gap-2">
-                    <textarea
-                      readOnly
-                      value={suggestedRelance}
-                      rows={8}
-                      className="flex w-full rounded-md border border-input bg-background text-foreground px-3 py-2 text-sm shadow-sm resize-none"
-                    />
-                    <Button type="button" variant="outline" onClick={handleCopyRelance} className="self-end">
-                      {copiedRelance ? 'Copié ✓' : 'Copier'}
+                <div className="flex items-center justify-between gap-2">
+                  <span className="text-muted-foreground font-medium">Relance</span>
+                  <div className="flex items-center gap-2">
+                    {copiedRelance && <span className="text-xs text-muted-foreground">Copié ✓</span>}
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={handleSuggestRelance}
+                      disabled={suggestRelance.isPending}
+                    >
+                      {suggestRelance.isPending ? 'Génération…' : 'Générer une relance'}
                     </Button>
-                    {copiedRelance && (
-                      <p className="text-sm text-muted-foreground">Message copié, contact repassé en Contacté</p>
-                    )}
                   </div>
-                ) : (
-                  <Button
-                    type="button"
-                    variant="outline"
-                    onClick={handleSuggestRelance}
-                    disabled={suggestRelance.isPending}
-                    className="self-start"
-                  >
-                    {suggestRelance.isPending ? 'Génération…' : 'Générer une relance'}
-                  </Button>
-                )}
+                </div>
                 {relanceError && (
                   <p className="text-xs text-foreground">{relanceError}</p>
                 )}
