@@ -6,7 +6,7 @@ const FALLBACK_MODEL = "llama-3.1-8b-instant";
 // au lieu de le retenter (et payer l'aller-retour perdu) à chaque appel — sous forte charge, ça
 // doublait le temps de réponse de chaque extraction. Ré-essayé automatiquement passé ce délai,
 // pas besoin de redéployer si le quota se libère entre-temps.
-const PRIMARY_COOLDOWN_MS = 60_000;
+const PRIMARY_COOLDOWN_MS = 10 * 60_000;
 
 const client = new Groq({ apiKey: process.env.GROQ_API_KEY });
 
