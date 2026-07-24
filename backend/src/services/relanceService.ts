@@ -101,3 +101,18 @@ export async function autoCloseStaleReplied(userId: string): Promise<number> {
 
   return staleContacts.length
 }
+
+// "Pas pour le moment" (closeReason=not_now) programme une réouverture a remindAt : repasse en
+// "Message a envoyer" pour repartir sur un message frais, pas une relance de l'ancien fil.
+export async function autoReopenScheduled(userId: string): Promise<number> {
+  const result = await prisma.contact.updateMany({
+    where: {
+      userId,
+      status: 'closed',
+      closeReason: 'not_now',
+      remindAt: { lte: new Date() },
+    },
+    data: { status: 'to_message', closeReason: null, remindAt: null },
+  })
+  return result.count
+}

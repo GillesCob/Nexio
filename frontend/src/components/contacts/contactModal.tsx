@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { Pencil, ChevronDown, ChevronUp, Clipboard, Check } from 'lucide-react'
 import { useForm } from 'react-hook-form'
-import type { IContact, ICompany, ContactStatus, IUpdateContactPayload, FluxCode } from '@/types/contact'
+import type { IContact, ICompany, ContactStatus, IUpdateContactPayload, FluxCode, ContactCloseReason } from '@/types/contact'
 import { useUpdateContact, useDeleteContact, useExtractContact, useExtractCompany, useEnrichCompany, useUpdateCompany, useScoreContact, useSuggestTemplate, useCreateMessage, useGetMessages, useGetRelances, useSuggestRelance, useTouchContact } from '@/hooks/useContacts'
 import {
   Dialog,
@@ -155,6 +155,18 @@ export function ContactModal({ contact, onClose }: IContactModalProps) {
         onSuccess: () => {
           setLocalStatus(status)
           if (status === 'closed') onClose()
+        },
+      }
+    )
+  }
+
+  const handleCloseContact = (closeReason: ContactCloseReason, remindAt?: string) => {
+    updateContact.mutate(
+      { id: contact.id, data: { status: 'closed', closeReason, remindAt } },
+      {
+        onSuccess: () => {
+          setLocalStatus('closed')
+          onClose()
         },
       }
     )
@@ -472,6 +484,7 @@ export function ContactModal({ contact, onClose }: IContactModalProps) {
                 <StatusActions
                   contact={{ ...contact, status: localStatus }}
                   onStatusChange={handleStatusChange}
+                  onCloseContact={handleCloseContact}
                   isRepliedAlert={!!repliedRelanceInfo}
                   onTouch={() => touchContact.mutate(contact.id)}
                 />

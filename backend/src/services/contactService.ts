@@ -127,6 +127,8 @@ interface IUpdateContactData {
   jobOfferId?: string;
   companyId?: string;
   flux?: "1a" | "1b" | "2" | "3" | "4";
+  closeReason?: "not_interested" | "not_now";
+  remindAt?: string;
 }
 
 async function assertOwnership(userId: string, contactId: string) {
@@ -226,10 +228,22 @@ export async function updateContact(userId: string, contactId: string, data: IUp
   // Un flux choisi à la main est une décision humaine, pas une estimation IA : confiance maximale,
   // remplace toujours une éventuelle classification automatique précédente.
   const manualFlux = data.flux ? { fluxConfidence: 1 } : {};
+  const { remindAt: remindAtInput, ...dataWithoutRemindAt } = data;
+  const remindAtDate = remindAtInput ? { remindAt: new Date(remindAtInput) } : {};
+  // Sortir de "closed" (reprise manuelle) efface les métadonnées de fermeture : sans ça, un
+  // remindAt périmé pourrait rouvrir le contact une seconde fois plus tard pour rien.
+  const clearCloseMeta =
+    data.status && data.status !== "closed" ? { closeReason: null, remindAt: null } : {};
 
   return prisma.contact.update({
     where: { id: contactId },
-    data: becomingContacted ? { ...data, ...manualFlux, contactedAt: new Date() } : { ...data, ...manualFlux },
+    data: {
+      ...dataWithoutRemindAt,
+      ...manualFlux,
+      ...remindAtDate,
+      ...clearCloseMeta,
+      ...(becomingContacted ? { contactedAt: new Date() } : {}),
+    },
   });
 }
 

@@ -36,6 +36,11 @@ enum ContactStatus {
   closed
 }
 
+enum ContactCloseReason {
+  not_interested
+  not_now
+}
+
 model User {
   id           String   @id @default(cuid())
   email        String   @unique
@@ -111,6 +116,8 @@ model Contact {
   flux           String?
   fluxConfidence Float?
   location       String?
+  closeReason    ContactCloseReason?
+  remindAt       DateTime?
   createdAt      DateTime      @default(now())
   updatedAt      DateTime      @updatedAt
 
