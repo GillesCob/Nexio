@@ -23,7 +23,7 @@ export function DashboardPage() {
     });
   }, []);
   return (
-    <main className="p-8">
+    <main className="p-4 sm:p-8">
       <Navbar />
       <div className="flex justify-end mb-6">
         <Button onClick={() => setIsCreateOpen(true)}>+ Ajouter un contact</Button>

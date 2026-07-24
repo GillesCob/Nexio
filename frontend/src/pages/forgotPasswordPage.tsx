@@ -12,7 +12,7 @@ export function ForgotPasswordPage() {
 
   if (isSuccess) {
     return (
-      <main className="flex min-h-screen items-center justify-center px-4">
+      <main className="flex min-h-dvh items-center justify-center px-4">
         <div className="w-full max-w-sm space-y-4 text-center">
           <h1 className="text-2xl font-semibold">Email envoyé</h1>
           <p className="text-muted-foreground">
@@ -28,7 +28,7 @@ export function ForgotPasswordPage() {
   }
 
   return (
-    <main className="flex min-h-screen items-center justify-center px-4">
+    <main className="flex min-h-dvh items-center justify-center px-4">
       <div className="w-full max-w-sm space-y-6">
         <div className="space-y-1">
           <h1 className="text-2xl font-semibold text-center">Mot de passe oublié</h1>

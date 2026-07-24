@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { Link, useLocation } from 'react-router-dom'
-import { Moon, Sun, LayoutDashboard, Briefcase, BarChart3, LogOut, HelpCircle } from 'lucide-react'
+import { Moon, Sun, LayoutDashboard, Briefcase, BarChart3, LogOut, HelpCircle, Download } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
 import { Logo } from '@/components/ui/logo'
@@ -8,6 +8,9 @@ import { useLogout } from '@/hooks/useAuth'
 import { useDarkMode } from '@/hooks/useDarkMode'
 import { useAuthStore } from '@/store/authStore'
 import { TutorialModal } from '@/components/tutorial/tutorialModal'
+import { IosInstallModal } from '@/components/iosInstallModal'
+import { useIosInstallPrompt } from '@/hooks/useIosInstallPrompt'
+import { useAndroidInstallPrompt } from '@/hooks/useAndroidInstallPrompt'
 import type { LucideIcon } from 'lucide-react'
 
 interface INavLink {
@@ -28,6 +31,8 @@ export function Navbar() {
   const { theme, toggle } = useDarkMode()
   const user = useAuthStore((s) => s.user)
   const [tutorialOpen, setTutorialOpen] = useState(false)
+  const iosInstall = useIosInstallPrompt()
+  const androidInstall = useAndroidInstallPrompt()
 
   return (
     <>
@@ -54,6 +59,18 @@ export function Navbar() {
         ))}
       </div>
       <div className="ml-auto flex items-center gap-2">
+        {androidInstall.canInstall && (
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={androidInstall.promptInstall}
+            aria-label="Installer l'application"
+            className="flex items-center gap-1.5"
+          >
+            <Download className="h-4 w-4 shrink-0" />
+            <span className="hidden sm:inline">Installer</span>
+          </Button>
+        )}
         {user?.role === 'guest' && (
           <Button
             variant="ghost"
@@ -83,6 +100,7 @@ export function Navbar() {
       </div>
     </nav>
     <TutorialModal open={tutorialOpen} onClose={() => setTutorialOpen(false)} />
+    <IosInstallModal open={iosInstall.show} onClose={iosInstall.close} onDismiss={iosInstall.dismiss} />
     </>
   )
 }
