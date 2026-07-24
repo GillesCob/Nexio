@@ -351,7 +351,7 @@ export function ContactModal({ contact, onClose }: IContactModalProps) {
   // pop-up, même si l'ouverture vient bien d'une action de l'utilisateur au départ.
   const handleSuggestTemplate = () => {
     setTemplateError(null)
-    const tab = window.open('', '_blank', 'noopener')
+    const tab = window.open('', '_blank')
     suggestTemplate.mutate(contact.id, {
       onSuccess: (data) => {
         navigator.clipboard.writeText(data.message)
@@ -371,7 +371,7 @@ export function ContactModal({ contact, onClose }: IContactModalProps) {
 
   const handleSuggestRelance = () => {
     setRelanceError(null)
-    const tab = window.open('', '_blank', 'noopener')
+    const tab = window.open('', '_blank')
     suggestRelance.mutate(contact.id, {
       onSuccess: (data) => {
         navigator.clipboard.writeText(data.message)

@@ -10,10 +10,20 @@ async function assertContactOwnership(userId: string, contactId: string) {
 }
 
 export async function createMessage(userId: string, contactId: string, content: string) {
-  await assertContactOwnership(userId, contactId)
+  const contact = await assertContactOwnership(userId, contactId)
+  // contactedAt déjà renseigné = ce nouveau message est une relance (pas le 1er contact) : incrémenter
+  // relanceCount, sinon selectTemplate() renvoie indéfiniment la même version faute de progression.
+  const isRelance = contact.contactedAt !== null
   const [message] = await prisma.$transaction([
     prisma.message.create({ data: { contactId, content } }),
-    prisma.contact.update({ where: { id: contactId }, data: { status: 'contacted', contactedAt: new Date() } }),
+    prisma.contact.update({
+      where: { id: contactId },
+      data: {
+        status: 'contacted',
+        contactedAt: new Date(),
+        ...(isRelance ? { relanceCount: { increment: 1 } } : {}),
+      },
+    }),
   ])
   return message
 }

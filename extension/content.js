@@ -54,18 +54,34 @@ function findFirstCompanyLink() {
     (link) => heading.compareDocumentPosition(link) & Node.DOCUMENT_POSITION_FOLLOWING
   );
 
+  // Chaque entreprise d'expérience apparaît souvent en plusieurs liens vers le même href : un
+  // lien logo sans texte visible (l'icône), suivi du vrai lien texte avec nom + durée. Prendre le
+  // tout premier lien matché retournait le slug numérique de l'URL (ex. "1929") si ce premier lien
+  // était le logo vide, au lieu du vrai nom d'entreprise porté par le lien suivant. On garde le
+  // premier href rencontré comme repli, mais on ne s'arrête que sur le premier lien qui porte
+  // effectivement un nom exploitable (ligne avant la durée).
+  let fallback = null;
+
   for (const link of links) {
     const match = link.href.match(/linkedin\.com\/(company|school)\/([^/?]+)/);
     if (!match) continue;
 
-    const name = companyFromLink(link) || slugToName(match[2]);
-    return {
-      url: `https://www.linkedin.com/${match[1]}/${match[2]}/`,
-      name,
-    };
+    if (!fallback) fallback = match;
+
+    const name = companyFromLink(link);
+    if (name) {
+      return {
+        url: `https://www.linkedin.com/${match[1]}/${match[2]}/`,
+        name,
+      };
+    }
   }
 
-  return null;
+  if (!fallback) return null;
+  return {
+    url: `https://www.linkedin.com/${fallback[1]}/${fallback[2]}/`,
+    name: slugToName(fallback[2]),
+  };
 }
 
 function extractText() {
