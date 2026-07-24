@@ -333,27 +333,34 @@ export function ContactModal({ contact, onClose }: IContactModalProps) {
     })
   }
 
-  // Ouvre le profil LinkedIn du contact dans un nouvel onglet et ferme la fiche : le texte est
-  // déjà dans le presse-papier, Gilles n'a plus qu'à coller sur la page qui s'ouvre.
-  const openLinkedInAndClose = () => {
-    if (contact.linkedinUrl) {
-      window.open(contact.linkedinUrl, '_blank', 'noopener')
+  // Navigue l'onglet déjà ouvert vers le profil LinkedIn et ferme la fiche : le texte est déjà
+  // dans le presse-papier, Gilles n'a plus qu'à coller sur la page qui s'ouvre.
+  const navigateToLinkedInAndClose = (tab: Window | null) => {
+    if (tab && contact.linkedinUrl) {
+      tab.location.href = contact.linkedinUrl
+    } else {
+      tab?.close()
     }
     onClose()
   }
 
   // Génère, copie et enchaîne sur LinkedIn en un seul clic : Gilles ne relit le texte qu'une
   // fois collé, pas la peine d'un aller-retour "Générer" puis "Copier" puis changer d'onglet.
+  // L'onglet doit s'ouvrir de façon synchrone dans le clic (avant l'appel réseau) : mobile
+  // (surtout Safari iOS) bloque tout window.open() déclenché après un délai async comme un
+  // pop-up, même si l'ouverture vient bien d'une action de l'utilisateur au départ.
   const handleSuggestTemplate = () => {
     setTemplateError(null)
+    const tab = window.open('', '_blank', 'noopener')
     suggestTemplate.mutate(contact.id, {
       onSuccess: (data) => {
         navigator.clipboard.writeText(data.message)
         createMessage.mutate({ contactId: contact.id, content: data.message })
         handleStatusChange('contacted')
-        openLinkedInAndClose()
+        navigateToLinkedInAndClose(tab)
       },
       onError: (err) => {
+        tab?.close()
         const message =
           (err as { response?: { data?: { message?: string } } }).response?.data?.message ??
           'Impossible de générer le message.'
@@ -364,14 +371,16 @@ export function ContactModal({ contact, onClose }: IContactModalProps) {
 
   const handleSuggestRelance = () => {
     setRelanceError(null)
+    const tab = window.open('', '_blank', 'noopener')
     suggestRelance.mutate(contact.id, {
       onSuccess: (data) => {
         navigator.clipboard.writeText(data.message)
         createMessage.mutate({ contactId: contact.id, content: data.message })
         handleStatusChange('contacted')
-        openLinkedInAndClose()
+        navigateToLinkedInAndClose(tab)
       },
       onError: (err) => {
+        tab?.close()
         const message =
           (err as { response?: { data?: { message?: string } } }).response?.data?.message ??
           'Impossible de générer la relance.'
