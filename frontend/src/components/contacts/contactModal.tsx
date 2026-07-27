@@ -333,41 +333,26 @@ export function ContactModal({ contact, onClose }: IContactModalProps) {
     })
   }
 
-  // Navigue l'onglet déjà ouvert vers le profil LinkedIn et ferme la fiche : le texte est déjà
-  // dans le presse-papier, Gilles n'a plus qu'à coller sur la page qui s'ouvre.
-  const navigateToLinkedInAndClose = (tab: Window | null) => {
-    if (tab && contact.linkedinUrl) {
-      tab.location.href = contact.linkedinUrl
-    } else {
-      tab?.close()
-    }
-    onClose()
-  }
-
-  // Génère, copie et enchaîne sur LinkedIn en un seul clic : Gilles ne relit le texte qu'une
-  // fois collé, pas la peine d'un aller-retour "Générer" puis "Copier" puis changer d'onglet.
-  // L'onglet doit s'ouvrir de façon synchrone dans le clic (avant l'appel réseau) : mobile
-  // (surtout Safari iOS) bloque tout window.open() déclenché après un délai async comme un
-  // pop-up, même si l'ouverture vient bien d'une action de l'utilisateur au départ.
-  // Ne pré-ouvrir l'onglet vierge que si le contact a une URL LinkedIn à viser : sinon (contact
-  // issu d'une candidature spontanée sur le site d'une entreprise, sans profil LinkedIn), l'onglet
-  // vierge n'avait nulle part où naviguer et restait affiché tel quel (vu comme "page blanche").
+  // Génère, enregistre et copie. Gilles garde en permanence un onglet LinkedIn épinglé (recherche +
+  // extension d'extraction) : ouvrir un nouvel onglet ici n'apportait rien de plus que ce qu'il a déjà
+  // sous la main, et volait le focus de l'onglet Nexio au passage — la copie presse-papier échoue si le
+  // document appelant n'a plus le focus (restriction navigateur), ce qui expliquait un presse-papier
+  // vide en plus de l'onglet vierge resté ouvert. Gilles colle directement sur son onglet LinkedIn déjà
+  // épinglé, plus besoin d'un aller-retour d'onglet généré par le clic.
   const handleSuggestTemplate = () => {
     setTemplateError(null)
-    const tab = contact.linkedinUrl ? window.open('', '_blank') : null
     suggestTemplate.mutate(contact.id, {
       onSuccess: (data) => {
-        navigator.clipboard.writeText(data.message).catch(() => {})
         createMessage.mutate({ contactId: contact.id, content: data.message })
         handleStatusChange('contacted')
-        if (tab) {
-          navigateToLinkedInAndClose(tab)
-        } else {
-          setTemplateError('Message copié dans le presse-papier. Ce contact n’a pas d’URL LinkedIn enregistrée, colle-le à la main sur le bon site.')
-        }
+        navigator.clipboard
+          .writeText(data.message)
+          .then(onClose)
+          .catch(() => {
+            setTemplateError('Message généré et enregistré, mais la copie dans le presse-papier a échoué. Récupère-le via "Copier" dans l’historique ci-dessous.')
+          })
       },
       onError: (err) => {
-        tab?.close()
         const message =
           (err as { response?: { data?: { message?: string } } }).response?.data?.message ??
           'Impossible de générer le message.'
@@ -378,20 +363,18 @@ export function ContactModal({ contact, onClose }: IContactModalProps) {
 
   const handleSuggestRelance = () => {
     setRelanceError(null)
-    const tab = contact.linkedinUrl ? window.open('', '_blank') : null
     suggestRelance.mutate(contact.id, {
       onSuccess: (data) => {
-        navigator.clipboard.writeText(data.message).catch(() => {})
         createMessage.mutate({ contactId: contact.id, content: data.message })
         handleStatusChange('contacted')
-        if (tab) {
-          navigateToLinkedInAndClose(tab)
-        } else {
-          setRelanceError('Message copié dans le presse-papier. Ce contact n’a pas d’URL LinkedIn enregistrée, colle-le à la main sur le bon site.')
-        }
+        navigator.clipboard
+          .writeText(data.message)
+          .then(onClose)
+          .catch(() => {
+            setRelanceError('Message généré et enregistré, mais la copie dans le presse-papier a échoué. Récupère-le via "Copier" dans l’historique ci-dessous.')
+          })
       },
       onError: (err) => {
-        tab?.close()
         const message =
           (err as { response?: { data?: { message?: string } } }).response?.data?.message ??
           'Impossible de générer la relance.'
