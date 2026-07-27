@@ -349,15 +349,22 @@ export function ContactModal({ contact, onClose }: IContactModalProps) {
   // L'onglet doit s'ouvrir de façon synchrone dans le clic (avant l'appel réseau) : mobile
   // (surtout Safari iOS) bloque tout window.open() déclenché après un délai async comme un
   // pop-up, même si l'ouverture vient bien d'une action de l'utilisateur au départ.
+  // Ne pré-ouvrir l'onglet vierge que si le contact a une URL LinkedIn à viser : sinon (contact
+  // issu d'une candidature spontanée sur le site d'une entreprise, sans profil LinkedIn), l'onglet
+  // vierge n'avait nulle part où naviguer et restait affiché tel quel (vu comme "page blanche").
   const handleSuggestTemplate = () => {
     setTemplateError(null)
-    const tab = window.open('', '_blank')
+    const tab = contact.linkedinUrl ? window.open('', '_blank') : null
     suggestTemplate.mutate(contact.id, {
       onSuccess: (data) => {
-        navigator.clipboard.writeText(data.message)
+        navigator.clipboard.writeText(data.message).catch(() => {})
         createMessage.mutate({ contactId: contact.id, content: data.message })
         handleStatusChange('contacted')
-        navigateToLinkedInAndClose(tab)
+        if (tab) {
+          navigateToLinkedInAndClose(tab)
+        } else {
+          setTemplateError('Message copié dans le presse-papier. Ce contact n’a pas d’URL LinkedIn enregistrée, colle-le à la main sur le bon site.')
+        }
       },
       onError: (err) => {
         tab?.close()
@@ -371,13 +378,17 @@ export function ContactModal({ contact, onClose }: IContactModalProps) {
 
   const handleSuggestRelance = () => {
     setRelanceError(null)
-    const tab = window.open('', '_blank')
+    const tab = contact.linkedinUrl ? window.open('', '_blank') : null
     suggestRelance.mutate(contact.id, {
       onSuccess: (data) => {
-        navigator.clipboard.writeText(data.message)
+        navigator.clipboard.writeText(data.message).catch(() => {})
         createMessage.mutate({ contactId: contact.id, content: data.message })
         handleStatusChange('contacted')
-        navigateToLinkedInAndClose(tab)
+        if (tab) {
+          navigateToLinkedInAndClose(tab)
+        } else {
+          setRelanceError('Message copié dans le presse-papier. Ce contact n’a pas d’URL LinkedIn enregistrée, colle-le à la main sur le bon site.')
+        }
       },
       onError: (err) => {
         tab?.close()
