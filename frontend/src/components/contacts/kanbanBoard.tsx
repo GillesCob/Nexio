@@ -64,7 +64,7 @@ export function KanbanBoard({ onOpenContact }: IKanbanBoardProps) {
 
   if (isPending) {
     return (
-      <div className="flex gap-4 overflow-x-auto pb-4 h-full">
+      <div className="flex gap-4 overflow-x-auto pb-4 h-full snap-x snap-mandatory">
         {COLUMNS.map(({ status }) => (
           <div key={status} className="flex flex-col w-64 shrink-0">
             <div className="h-6 w-32 bg-muted rounded animate-pulse mb-3" />
@@ -77,7 +77,7 @@ export function KanbanBoard({ onOpenContact }: IKanbanBoardProps) {
 
   return (
     <DragDropContext onDragEnd={handleDragEnd}>
-      <div className="flex gap-4 overflow-x-auto pb-4 h-full">
+      <div className="flex gap-4 overflow-x-auto pb-4 h-full snap-x snap-mandatory">
         {COLUMNS.map(({ status, label }) => (
           <KanbanColumn
             key={status}

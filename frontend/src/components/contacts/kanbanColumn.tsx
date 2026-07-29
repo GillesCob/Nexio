@@ -11,7 +11,7 @@ interface IKanbanColumnProps {
 
 export function KanbanColumn({ status, label, contacts, onOpenContact }: IKanbanColumnProps) {
   return (
-    <div className="flex flex-col w-64 shrink-0 h-full">
+    <div className="flex flex-col w-64 shrink-0 h-full snap-center">
       <div className="flex items-center justify-between mb-3 px-1 py-1 bg-background">
         <h3 className="text-sm font-semibold text-foreground">{label}</h3>
         <span className="text-xs font-medium bg-muted text-muted-foreground rounded-full px-2 py-0.5">
