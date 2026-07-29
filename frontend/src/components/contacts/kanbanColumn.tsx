@@ -11,8 +11,8 @@ interface IKanbanColumnProps {
 
 export function KanbanColumn({ status, label, contacts, onOpenContact }: IKanbanColumnProps) {
   return (
-    <div className="flex flex-col w-64 shrink-0">
-      <div className="sticky top-0 z-10 flex items-center justify-between mb-3 px-1 py-1 bg-background">
+    <div className="flex flex-col w-64 shrink-0 h-full">
+      <div className="flex items-center justify-between mb-3 px-1 py-1 bg-background">
         <h3 className="text-sm font-semibold text-foreground">{label}</h3>
         <span className="text-xs font-medium bg-muted text-muted-foreground rounded-full px-2 py-0.5">
           {contacts.length}
@@ -24,7 +24,7 @@ export function KanbanColumn({ status, label, contacts, onOpenContact }: IKanban
             ref={provided.innerRef}
             {...provided.droppableProps}
             className={`
-              flex flex-col gap-2 rounded-lg p-2 min-h-[200px] transition-colors
+              flex flex-col gap-2 rounded-lg p-2 flex-1 min-h-0 overflow-y-auto transition-colors
               ${snapshot.isDraggingOver ? 'bg-accent' : 'bg-muted/40'}
             `}
           >

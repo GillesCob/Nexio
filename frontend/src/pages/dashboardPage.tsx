@@ -23,7 +23,7 @@ export function DashboardPage() {
     });
   }, []);
   return (
-    <main className="p-4 sm:p-8">
+    <main className="h-dvh flex flex-col p-4 sm:p-8">
       <Navbar />
       <div className="flex justify-end mb-6">
         <Button onClick={() => setIsCreateOpen(true)}>+ Ajouter un contact</Button>
@@ -31,7 +31,9 @@ export function DashboardPage() {
 
       <LinkedInReminderBanner />
       <RelanceBanner onOpenContact={setSelectedContact} />
-      <KanbanBoard onOpenContact={setSelectedContact} />
+      <div className="flex-1 min-h-0">
+        <KanbanBoard onOpenContact={setSelectedContact} />
+      </div>
 
       <ContactModal contact={selectedContact} onClose={() => setSelectedContact(null)} />
 
