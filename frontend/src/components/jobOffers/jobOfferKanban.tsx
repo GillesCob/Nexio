@@ -50,7 +50,7 @@ export function JobOfferKanban({ onOpenJobOffer }: IJobOfferKanbanProps) {
 
   if (isPending) {
     return (
-      <div className="flex gap-4 overflow-x-auto pb-4">
+      <div className="flex gap-4 overflow-x-auto pb-4 snap-x snap-mandatory">
         {COLUMNS.map(({ status }) => (
           <div key={status} className="flex flex-col w-64 shrink-0">
             <div className="h-6 w-32 bg-muted rounded animate-pulse mb-3" />
@@ -63,9 +63,9 @@ export function JobOfferKanban({ onOpenJobOffer }: IJobOfferKanbanProps) {
 
   return (
     <DragDropContext onDragEnd={handleDragEnd}>
-      <div className="flex gap-4 overflow-x-auto pb-4">
+      <div className="flex gap-4 overflow-x-auto pb-4 snap-x snap-mandatory">
         {COLUMNS.map(({ status, label }) => (
-          <div key={status} className="flex flex-col w-64 shrink-0">
+          <div key={status} className="flex flex-col w-64 shrink-0 snap-center">
             <div className="flex items-center justify-between mb-3 px-1">
               <h3 className="text-sm font-semibold text-foreground">{label}</h3>
               <span className="text-xs font-medium bg-muted text-muted-foreground rounded-full px-2 py-0.5">
