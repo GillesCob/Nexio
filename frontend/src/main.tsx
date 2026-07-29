@@ -10,12 +10,15 @@ import { App } from './App'
 // jamais après le premier chargement. Une PWA rouverte depuis l'écran d'accueil ne fait
 // souvent qu'un "resume" (pas un vrai rechargement), donc elle ratait les mises à jour bien
 // plus longtemps qu'un onglet de navigateur classique. On force une vérification à chaque
-// retour au premier plan, en plus du enregistrement initial.
+// retour au premier plan, en plus du enregistrement initial. `updateSW(true)` est obligatoire
+// ici : sans l'argument, le nouveau service worker reste en attente tant que ce client reste
+// ouvert, ce qui n'arrive quasiment jamais sur une PWA mobile juste suspendue/reprise par l'OS
+// (contrairement à un onglet desktop classique, régulièrement fermé/rouvert).
 const updateSW = registerSW({ immediate: true })
 
 document.addEventListener('visibilitychange', () => {
   if (document.visibilityState === 'visible') {
-    updateSW()
+    updateSW(true)
   }
 })
 
