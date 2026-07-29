@@ -5,6 +5,7 @@ import { ForgotPasswordPage } from '@/pages/forgotPasswordPage'
 import { DashboardPage } from '@/pages/dashboardPage'
 import { StatsPage } from '@/pages/statsPage'
 import { JobOffersPage } from '@/pages/jobOffersPage'
+import { ProspectCompaniesPage } from '@/pages/prospectCompaniesPage'
 import { ProtectedRoute } from '@/components/protectedRoute'
 import AuthInitializer from '@/components/authInitializer'
 import { ScrollToTop } from '@/components/scrollToTop'
@@ -38,6 +39,14 @@ export function App() {
           element={
             <ProtectedRoute>
               <JobOffersPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/prospects"
+          element={
+            <ProtectedRoute>
+              <ProspectCompaniesPage />
             </ProtectedRoute>
           }
         />

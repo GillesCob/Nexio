@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { Link, useLocation } from 'react-router-dom'
-import { Moon, Sun, LayoutDashboard, Briefcase, BarChart3, LogOut, HelpCircle, Download } from 'lucide-react'
+import { Moon, Sun, LayoutDashboard, Briefcase, BarChart3, LogOut, HelpCircle, Download, Building2 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
 import { Logo } from '@/components/ui/logo'
@@ -22,6 +22,7 @@ interface INavLink {
 const NAV_LINKS: INavLink[] = [
   { label: 'Contacts', href: '/dashboard', icon: LayoutDashboard },
   { label: 'Annonces', href: '/job-offers', icon: Briefcase },
+  { label: 'Entreprises', href: '/prospects', icon: Building2 },
   { label: 'Stats', href: '/stats', icon: BarChart3 },
 ]
 
