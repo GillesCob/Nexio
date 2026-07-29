@@ -7,6 +7,7 @@ import { contactRouter } from './routes/contactRoutes'
 import { companyRouter } from './routes/companyRoutes'
 import { statsRouter } from './routes/statsRoutes'
 import { jobOfferRouter } from './routes/jobOfferRoutes'
+import { prospectCompanyRouter } from './routes/prospectCompanyRoutes'
 import { errorMiddleware } from './middlewares/errorMiddleware'
 
 export const app = express()
@@ -26,5 +27,6 @@ app.use('/contacts', contactRouter)
 app.use('/companies', companyRouter)
 app.use('/stats', statsRouter)
 app.use('/job-offers', jobOfferRouter)
+app.use('/prospect-companies', prospectCompanyRouter)
 
 app.use(errorMiddleware)
