@@ -48,38 +48,45 @@ describe("selectTemplate", () => {
     expect(selectTemplate({ flux: "1b", contactedAt: new Date("2026-06-01"), relanceCount: 2 })).toBeNull();
   });
 
-  // --- relance before PROD_DATE (avant 17/07/2026) ---
-  it("cas 12 : flux 1a, avant PROD_DATE, relanceCount 0 → 1a_relance_before_17_07", () => {
-    expect(selectTemplate({ flux: "1a", contactedAt: new Date("2026-06-01"), relanceCount: 0 })).toBe("1a_relance_before_17_07");
+  // --- contact d'abord messagé avant PROD_DATE (17/07/2026) : Cerithe pas encore en ligne au 1er
+  // message, la relance l'annonce comme une vraie nouveauté → variante "after_17_07" ---
+  it("cas 12 : flux 1a, 1er contact avant PROD_DATE, relanceCount 0 → 1a_relance_after_17_07", () => {
+    expect(selectTemplate({ flux: "1a", contactedAt: new Date("2026-06-01"), relanceCount: 0 })).toBe("1a_relance_after_17_07");
   });
 
-  it("cas 13 : flux 2, avant PROD_DATE, relanceCount 0 → 2_relance_before_17_07", () => {
-    expect(selectTemplate({ flux: "2", contactedAt: new Date("2026-06-01"), relanceCount: 0 })).toBe("2_relance_before_17_07");
+  it("cas 13 : flux 2, 1er contact avant PROD_DATE, relanceCount 0 → 2_relance_after_17_07", () => {
+    expect(selectTemplate({ flux: "2", contactedAt: new Date("2026-06-01"), relanceCount: 0 })).toBe("2_relance_after_17_07");
   });
 
-  it("cas 14 : flux 3, veille de PROD_DATE, relanceCount 0 → 3_relance_before_17_07", () => {
-    expect(selectTemplate({ flux: "3", contactedAt: new Date("2026-07-16"), relanceCount: 0 })).toBe("3_relance_before_17_07");
+  it("cas 14 : flux 3, 1er contact la veille de PROD_DATE, relanceCount 0 → 3_relance_after_17_07", () => {
+    expect(selectTemplate({ flux: "3", contactedAt: new Date("2026-07-16"), relanceCount: 0 })).toBe("3_relance_after_17_07");
   });
 
-  it("cas 15 : flux 4, avant PROD_DATE, relanceCount 0 → 4_relance_before_17_07", () => {
-    expect(selectTemplate({ flux: "4", contactedAt: new Date("2026-06-15"), relanceCount: 0 })).toBe("4_relance_before_17_07");
+  it("cas 15 : flux 4, 1er contact avant PROD_DATE, relanceCount 0 → 4_relance_after_17_07", () => {
+    expect(selectTemplate({ flux: "4", contactedAt: new Date("2026-06-15"), relanceCount: 0 })).toBe("4_relance_after_17_07");
   });
 
-  // --- relance after PROD_DATE (à partir du 17/07/2026) ---
-  it("cas 16 : flux 1a, pile PROD_DATE, relanceCount 0 → 1a_relance_after_17_07", () => {
-    expect(selectTemplate({ flux: "1a", contactedAt: new Date("2026-07-17"), relanceCount: 0 })).toBe("1a_relance_after_17_07");
+  // --- contact d'abord messagé à partir de PROD_DATE (17/07/2026) : Cerithe déjà en ligne et déjà
+  // accessible depuis le 1er message, pas la peine de le réintroduire → variante générique
+  // "before_17_07" ---
+  it("cas 16 : flux 1a, 1er contact pile PROD_DATE, relanceCount 0 → 1a_relance_before_17_07", () => {
+    expect(selectTemplate({ flux: "1a", contactedAt: new Date("2026-07-17"), relanceCount: 0 })).toBe("1a_relance_before_17_07");
   });
 
-  it("cas 17 : flux 2, après PROD_DATE, relanceCount 0 → 2_relance_after_17_07", () => {
-    expect(selectTemplate({ flux: "2", contactedAt: new Date("2026-08-01"), relanceCount: 0 })).toBe("2_relance_after_17_07");
+  it("cas 17 : flux 2, 1er contact après PROD_DATE, relanceCount 0 → 2_relance_before_17_07", () => {
+    expect(selectTemplate({ flux: "2", contactedAt: new Date("2026-08-01"), relanceCount: 0 })).toBe("2_relance_before_17_07");
   });
 
-  it("cas 18 : flux 3, après PROD_DATE, relanceCount 0 → 3_relance_after_17_07", () => {
-    expect(selectTemplate({ flux: "3", contactedAt: new Date("2026-09-15"), relanceCount: 0 })).toBe("3_relance_after_17_07");
+  it("cas 18 : flux 3, 1er contact après PROD_DATE, relanceCount 0 → 3_relance_before_17_07", () => {
+    expect(selectTemplate({ flux: "3", contactedAt: new Date("2026-09-15"), relanceCount: 0 })).toBe("3_relance_before_17_07");
   });
 
-  it("cas 19 : flux 4, après PROD_DATE, relanceCount 0 → 4_relance_after_17_07", () => {
-    expect(selectTemplate({ flux: "4", contactedAt: new Date("2026-12-01"), relanceCount: 0 })).toBe("4_relance_after_17_07");
+  it("cas 19 : flux 4, 1er contact après PROD_DATE, relanceCount 0 → 4_relance_before_17_07", () => {
+    expect(selectTemplate({ flux: "4", contactedAt: new Date("2026-12-01"), relanceCount: 0 })).toBe("4_relance_before_17_07");
+  });
+
+  it("cas 19b : flux 1a, 1er contact le 20/07 (cas réel Eva Malbeau, Groupe SII), relanceCount 0 → 1a_relance_before_17_07, jamais la variante qui réintroduit Cerithe", () => {
+    expect(selectTemplate({ flux: "1a", contactedAt: new Date("2026-07-20"), relanceCount: 0 })).toBe("1a_relance_before_17_07");
   });
 
   // --- relance finale (après la pause estivale, cf. cas 26-29 pour la pause elle-même) ---
