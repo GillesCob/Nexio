@@ -25,12 +25,15 @@ export async function createProspectCompany(userId: string, data: ICreateProspec
 
 export async function getProspectCompanies(userId: string) {
   return prisma.prospectCompany.findMany({
-    where: { userId },
+    where: { userId, excludedAt: null },
     orderBy: { createdAt: 'desc' },
   })
 }
 
 export async function deleteProspectCompany(userId: string, prospectCompanyId: string) {
   await assertOwnership(userId, prospectCompanyId)
-  await prisma.prospectCompany.delete({ where: { id: prospectCompanyId } })
+  await prisma.prospectCompany.update({
+    where: { id: prospectCompanyId },
+    data: { excludedAt: new Date() },
+  })
 }
