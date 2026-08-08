@@ -20,7 +20,7 @@ export const relanceTemplates: IRelanceTemplate[] = [
 
 Je me permets de revenir vers vous suite à mon message du {{lastContactDate}}.
 
-Cerithe vient de passer en production. C'est le projet dont je vous parlais et il est maintenant en ligne. Depuis gillescobigo.com vous pouvez d'ailleurs accéder aux démos de mes différents projets et vous faire une idée concrète de ce que je construis.
+Cerithe, un de mes projets, est maintenant en ligne. Depuis gillescobigo.com vous pouvez d'ailleurs accéder aux démos de mes différents projets et vous faire une idée concrète de ce que je construis.
 
 Je reste à la recherche d'un poste fullstack dans la région {{locationWithDe}} et {{companyName}} m'intéresse toujours.
 
@@ -46,7 +46,7 @@ Gilles`,
     id: '1b_relance',
     label: 'Relance recruteur entreprise (interne)',
     targetProfile: 'recruiter_entreprise',
-    body: `Bonjour {{firstName}},\n\nJe me permets de relancer mon message précédent, au cas où il serait passé sous les radars.\n\nJe suis en reconversion active vers le développement web (React, Node.js, TypeScript) avec un background BIM assez atypique. Si un poste de développeur fullstack est toujours ouvert au sein de vos équipes chez {{companyName}}, je serais ravi d'échanger.\n\nBonne continuation,\nGilles`,
+    body: `Bonjour {{firstName}},\n\nJe me permets de relancer mon message précédent, au cas où il serait passé sous les radars.\n\nJe suis en reconversion active vers le développement web (React, Node.js, TypeScript) avec un background BIM assez atypique. Je reste à la recherche d'un poste de développeur fullstack et {{companyName}} m'intéresse toujours. Si un profil comme le mien peut être utile au sein de vos équipes, je serais ravi d'échanger.\n\nBonne continuation,\nGilles`,
   },
   {
     id: '1b_relance_final',
@@ -169,7 +169,7 @@ Gilles`,
 
 Je me permets de revenir vers vous suite à mon message du {{lastContactDate}}.
 
-Cerithe vient de passer en production dans les délais annoncés. Le projet est accessible en démo sur gillescobigo.com, aux côtés de Nexio, un CRM de suivi de recherche d'emploi que j'ai également mis en ligne depuis.
+Cerithe, un de mes projets, est accessible en démo sur gillescobigo.com, aux côtés de Nexio, un CRM de suivi de recherche d'emploi que j'ai également mis en ligne depuis.
 
 Je reste dispo immédiatement, mobile sur Bordeaux, Pau, Bayonne et Mont-de-Marsan. Si un de vos clients cherche un profil fullstack, je suis preneur d'un échange.
 

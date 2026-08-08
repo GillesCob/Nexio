@@ -60,14 +60,16 @@ export async function autoPromoteToFollowUp(userId: string): Promise<number> {
   const contactedCutoff = new Date(
     Date.now() - RELANCE_CONFIG.contactedDelayDays * 24 * 60 * 60 * 1000
   )
+  // contactedAt = null signifie qu'aucun message n'a jamais été réellement généré pour ce contact
+  // (cf templateSelector.ts, qui ne renvoie le 1er message que si contactedAt est null) : le
+  // promouvoir en follow_up ferait générer une relance qui affiche en fait le 1er contact,
+  // incohérence détectée le 08/08 sur Morgane Boitel. Ne promouvoir que les contacts réellement
+  // déjà messagés.
   const result = await prisma.contact.updateMany({
     where: {
       userId,
       status: 'contacted',
-      OR: [
-        { contactedAt: { lt: contactedCutoff } },
-        { contactedAt: null, updatedAt: { lt: contactedCutoff } },
-      ],
+      contactedAt: { lt: contactedCutoff },
     },
     data: { status: 'follow_up' },
   })
