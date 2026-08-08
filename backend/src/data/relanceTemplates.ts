@@ -46,7 +46,7 @@ Gilles`,
     id: '1b_relance',
     label: 'Relance recruteur entreprise (interne)',
     targetProfile: 'recruiter_entreprise',
-    body: `Bonjour {{firstName}},\n\nJe me permets de relancer mon message précédent, au cas où il serait passé sous les radars.\n\nJe suis en reconversion active vers le développement web (React, Node.js, TypeScript) avec un background BIM assez atypique. Si un poste de développeur fullstack est toujours ouvert au sein de vos équipes chez {{companyName}}, je serais ravi d'échanger.\n\nBonne continuation,\nGilles`,
+    body: `Bonjour {{firstName}},\n\nJe me permets de relancer mon message précédent, au cas où il serait passé sous les radars.\n\nJe suis en reconversion active vers le développement web (React, Node.js, TypeScript) avec un background BIM assez atypique. Je reste à la recherche d'un poste de développeur fullstack et {{companyName}} m'intéresse toujours. Si un profil comme le mien peut être utile au sein de vos équipes, je serais ravi d'échanger.\n\nBonne continuation,\nGilles`,
   },
   {
     id: '1b_relance_final',
