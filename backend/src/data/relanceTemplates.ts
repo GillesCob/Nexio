@@ -20,7 +20,7 @@ export const relanceTemplates: IRelanceTemplate[] = [
 
 Je me permets de revenir vers vous suite à mon message du {{lastContactDate}}.
 
-Cerithe vient de passer en production. C'est le projet dont je vous parlais et il est maintenant en ligne. Depuis gillescobigo.com vous pouvez d'ailleurs accéder aux démos de mes différents projets et vous faire une idée concrète de ce que je construis.
+Cerithe, un de mes projets, est maintenant en ligne. Depuis gillescobigo.com vous pouvez d'ailleurs accéder aux démos de mes différents projets et vous faire une idée concrète de ce que je construis.
 
 Je reste à la recherche d'un poste fullstack dans la région {{locationWithDe}} et {{companyName}} m'intéresse toujours.
 
@@ -169,7 +169,7 @@ Gilles`,
 
 Je me permets de revenir vers vous suite à mon message du {{lastContactDate}}.
 
-Cerithe vient de passer en production dans les délais annoncés. Le projet est accessible en démo sur gillescobigo.com, aux côtés de Nexio, un CRM de suivi de recherche d'emploi que j'ai également mis en ligne depuis.
+Cerithe, un de mes projets, est accessible en démo sur gillescobigo.com, aux côtés de Nexio, un CRM de suivi de recherche d'emploi que j'ai également mis en ligne depuis.
 
 Je reste dispo immédiatement, mobile sur Bordeaux, Pau, Bayonne et Mont-de-Marsan. Si un de vos clients cherche un profil fullstack, je suis preneur d'un échange.
 
