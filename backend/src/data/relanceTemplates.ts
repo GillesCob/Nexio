@@ -152,9 +152,7 @@ Gilles`,
 
 Je me permets de revenir vers vous suite à mon message du {{lastContactDate}}.
 
-Pour vous donner plus de visibilité sur mon profil : développeur fullstack, stack Node.js, TypeScript, React, Postgres. Dispo immédiatement, mobile sur Bordeaux, Pau, Bayonne et Mont-de-Marsan.
-
-Profil hybride avec 10 ans dans le bâtiment, dont BIM Manager sur Mareterra à Monaco. Mes projets, dont Cerithe (un carnet de santé numérique du bâtiment) et Nexio (un CRM de suivi de recherche d'emploi), sont accessibles en démo sur gillescobigo.com.
+Toujours disponible et mobile sur Bordeaux, Pau, Bayonne et Mont-de-Marsan. Mes projets, dont Cerithe (un carnet de santé numérique du bâtiment) et Nexio (un CRM de suivi de recherche d'emploi), sont visibles en démo sur gillescobigo.com.
 
 Si un de vos clients cherche un profil fullstack dans la région, je serais ravi d'échanger.
 
@@ -169,9 +167,9 @@ Gilles`,
 
 Je me permets de revenir vers vous suite à mon message du {{lastContactDate}}.
 
-Cerithe, un de mes projets, est accessible en démo sur gillescobigo.com, aux côtés de Nexio, un CRM de suivi de recherche d'emploi.
+Toujours disponible et mobile sur Bordeaux, Pau, Bayonne et Mont-de-Marsan. Depuis, Cerithe (un de mes projets) est passé en production, accessible en démo sur gillescobigo.com aux côtés de Nexio, un CRM de suivi de recherche d'emploi.
 
-Je reste dispo immédiatement, mobile sur Bordeaux, Pau, Bayonne et Mont-de-Marsan. Si un de vos clients cherche un profil fullstack, je suis preneur d'un échange.
+Si un de vos clients cherche un profil fullstack, je suis preneur d'un échange.
 
 À votre disposition.
 Gilles`,
