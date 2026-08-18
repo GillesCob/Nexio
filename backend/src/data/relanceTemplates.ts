@@ -62,7 +62,7 @@ Gilles`,
 
 Je me permets de revenir vers vous suite à mon message du {{lastContactDate}}.
 
-Depuis, j'ai mis en ligne deux projets : Cerithe, un carnet de santé numérique du bâtiment, et Nexio, un CRM de suivi de recherche d'emploi avec extraction IA des profils LinkedIn et scoring automatique des annonces. Démos accessibles directement sur gillescobigo.com, code sur GitHub, et un article par jour qui documente chaque décision technique.
+Nexio, un CRM de suivi de recherche d'emploi avec extraction IA des profils LinkedIn et scoring automatique des annonces, est également accessible en démo sur gillescobigo.com, aux côtés de Cerithe, code sur GitHub et un article par jour qui documente chaque décision technique.
 
 Je reste à la recherche d'un poste fullstack dans la région {{locationWithDe}} et {{companyName}} m'intéresse toujours.
 
@@ -77,7 +77,7 @@ Gilles`,
 
 Je me permets de revenir vers vous suite à mon message du {{lastContactDate}}.
 
-Depuis, j'ai mis en ligne Nexio, un CRM de suivi de recherche d'emploi avec extraction IA des profils LinkedIn et scoring automatique des annonces. Démo accessible directement sur gillescobigo.com, et le code est sur GitHub.
+Depuis, Cerithe est passé en production. C'est le projet dont je vous parlais et il est maintenant en ligne, accessible en démo sur gillescobigo.com, aux côtés de Nexio, un CRM de suivi de recherche d'emploi avec extraction IA des profils LinkedIn et scoring automatique des annonces.
 
 Je reste à la recherche d'un poste fullstack dans la région {{locationWithDe}} et {{companyName}} m'intéresse toujours.
 
@@ -107,7 +107,7 @@ Gilles`,
 
 Je me permets de revenir vers vous suite à mon message du {{lastContactDate}}.
 
-Depuis, j'ai mis en ligne deux projets : Cerithe, un carnet de santé numérique du bâtiment, et Nexio, un CRM de suivi de recherche d'emploi avec extraction IA des profils LinkedIn et scoring automatique des annonces. Démos accessibles directement sur gillescobigo.com, code sur GitHub, et un article par jour qui documente chaque décision technique, autant pour ancrer ce que j'apprends que pour partager une démarche.
+Nexio, un CRM de suivi de recherche d'emploi avec extraction IA des profils LinkedIn et scoring automatique des annonces, est également accessible en démo sur gillescobigo.com, aux côtés de Cerithe, code sur GitHub et un article par jour qui documente chaque décision technique.
 
 Je reste à la recherche d'un poste fullstack dans la région {{locationWithDe}} et {{companyName}} m'intéresse toujours.
 
@@ -122,7 +122,7 @@ Gilles`,
 
 Je me permets de revenir vers vous suite à mon message du {{lastContactDate}}.
 
-Depuis, Cerithe est passé en production. C'est le projet dont je vous parlais et il est maintenant en ligne, accessible en démo sur gillescobigo.com. J'ai également mis en ligne Nexio, un CRM de suivi de recherche d'emploi avec extraction IA des profils LinkedIn et scoring automatique des annonces.
+Depuis, Cerithe est passé en production. C'est le projet dont je vous parlais et il est maintenant en ligne, accessible en démo sur gillescobigo.com, aux côtés de Nexio, un CRM de suivi de recherche d'emploi avec extraction IA des profils LinkedIn et scoring automatique des annonces.
 
 Je reste à la recherche d'un poste fullstack dans la région {{locationWithDe}} et {{companyName}} m'intéresse toujours.
 
@@ -152,9 +152,7 @@ Gilles`,
 
 Je me permets de revenir vers vous suite à mon message du {{lastContactDate}}.
 
-Pour vous donner plus de visibilité sur mon profil : développeur fullstack, stack Node.js, TypeScript, React, Postgres. Dispo immédiatement, mobile sur Bordeaux, Pau, Bayonne et Mont-de-Marsan.
-
-Profil hybride avec 10 ans dans le bâtiment, dont BIM Manager sur Mareterra à Monaco. Depuis, j'ai mis en ligne deux projets : Cerithe, un carnet de santé numérique du bâtiment, et Nexio, un CRM de suivi de recherche d'emploi. Démos accessibles directement sur gillescobigo.com.
+Toujours disponible et mobile sur Bordeaux, Pau, Bayonne et Mont-de-Marsan. Mes projets, dont Cerithe (un carnet de santé numérique du bâtiment) et Nexio (un CRM de suivi de recherche d'emploi), sont visibles en démo sur gillescobigo.com.
 
 Si un de vos clients cherche un profil fullstack dans la région, je serais ravi d'échanger.
 
@@ -169,9 +167,9 @@ Gilles`,
 
 Je me permets de revenir vers vous suite à mon message du {{lastContactDate}}.
 
-Cerithe, un de mes projets, est accessible en démo sur gillescobigo.com, aux côtés de Nexio, un CRM de suivi de recherche d'emploi que j'ai également mis en ligne depuis.
+Toujours disponible et mobile sur Bordeaux, Pau, Bayonne et Mont-de-Marsan. Depuis, Cerithe (un de mes projets) est passé en production, accessible en démo sur gillescobigo.com aux côtés de Nexio, un CRM de suivi de recherche d'emploi.
 
-Je reste dispo immédiatement, mobile sur Bordeaux, Pau, Bayonne et Mont-de-Marsan. Si un de vos clients cherche un profil fullstack, je suis preneur d'un échange.
+Si un de vos clients cherche un profil fullstack, je suis preneur d'un échange.
 
 À votre disposition.
 Gilles`,
