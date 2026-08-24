@@ -1,6 +1,6 @@
-import Groq from "groq-sdk";
 import { prisma } from "../lib/prisma";
 import { STATS_CONFIG } from "../data/statsConfig";
+import { createChatCompletion } from "../lib/groqClient";
 
 interface IExtractedSnapshot {
   weekLabel: string;
@@ -13,10 +13,11 @@ interface IExtractedSnapshot {
 }
 
 export async function extractLinkedInSnapshot(rawText: string): Promise<IExtractedSnapshot> {
-  const client = new Groq({ apiKey: process.env.GROQ_API_KEY });
-
-  const message = await client.chat.completions.create({
-    model: "llama-3.3-70b-versatile",
+  // Passe par le wrapper partage (createChatCompletion, cf lib/groqClient.ts) au lieu d'un appel
+  // Groq direct : beneficie du fallback automatique (rate-limit 429 ou modele indisponible),
+  // absent jusqu'ici sur cette route precise (incident du 24/08, cf groqClient.ts).
+  const message = await createChatCompletion({
+    model: "openai/gpt-oss-120b",
     max_tokens: 512,
     messages: [
       {

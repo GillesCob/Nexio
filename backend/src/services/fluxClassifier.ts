@@ -69,7 +69,7 @@ export async function classifyContactFlux(input: IFluxClassifierInput): Promise<
     .replace('{companySector}', input.companySector ?? 'non renseigné')
 
   const message = await createChatCompletion({
-    model: 'llama-3.3-70b-versatile',
+    model: 'openai/gpt-oss-120b',
     max_tokens: 256,
     messages: [{ role: 'user', content: prompt }],
   })

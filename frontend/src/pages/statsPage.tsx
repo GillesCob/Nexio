@@ -50,6 +50,7 @@ const STATUS_LABELS: Record<string, string> = {
 
 export function StatsPage() {
   const [rawText, setRawText] = useState('')
+  const [snapshotError, setSnapshotError] = useState<string | null>(null)
 
   const { data: snapshots, isPending: isSnapshotsPending } = useLinkedInSnapshots()
   const { data: contactStats, isPending: isStatsPending } = useContactStats()
@@ -57,8 +58,19 @@ export function StatsPage() {
 
   function handleSubmit() {
     if (!rawText.trim()) return
+    setSnapshotError(null)
     postSnapshot(rawText, {
       onSuccess: () => setRawText(''),
+      // Absent jusqu'ici (incident du 24/08) : un echec (modele Groq indisponible, parsing
+      // JSON echoue...) repassait le bouton a l'etat normal sans aucun retour, donnant
+      // l'impression que "Enregistrer" ne faisait rien. Meme pattern d'affichage que
+      // contactModal.tsx (companyExtractionError).
+      onError: (err) => {
+        const message =
+          (err as { response?: { data?: { message?: string } } }).response?.data?.message ??
+          "Impossible d'enregistrer ce relevé LinkedIn."
+        setSnapshotError(message)
+      },
     })
   }
 
@@ -81,6 +93,9 @@ export function StatsPage() {
             <Button onClick={handleSubmit} disabled={isPosting || !rawText.trim()}>
               {isPosting ? 'Enregistrement…' : 'Enregistrer'}
             </Button>
+            {snapshotError && (
+              <p className="text-sm text-destructive">{snapshotError}</p>
+            )}
           </div>
 
           {isSnapshotsPending ? (
