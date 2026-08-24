@@ -21,7 +21,7 @@ const groqResponseSchema = z.object({
 
 export async function extractCompanyFromText(rawText: string): Promise<IExtractedCompany> {
   const message = await createChatCompletion({
-    model: "llama-3.3-70b-versatile",
+    model: "openai/gpt-oss-120b",
     max_tokens: 512,
     messages: [
       {

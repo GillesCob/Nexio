@@ -12,7 +12,7 @@ export async function extractContactFromText(rawText: string): Promise<IExtracte
   console.log("extractContactFromText appelé avec:", rawText?.slice(0, 100));
 
   const message = await createChatCompletion({
-    model: "llama-3.3-70b-versatile",
+    model: "openai/gpt-oss-120b",
     max_tokens: 512,
     messages: [
       {

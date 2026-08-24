@@ -13,7 +13,7 @@ export async function scoreJobOfferStack(jobOfferId: string, stack: string[]): P
   const client = new Groq({ apiKey: process.env.GROQ_API_KEY })
 
   const message = await client.chat.completions.create({
-    model: 'llama-3.3-70b-versatile',
+    model: 'openai/gpt-oss-120b',
     max_tokens: 512,
     messages: [
       {
