@@ -60,13 +60,16 @@ Gilles`,
     targetProfile: 'cto_directeur_technique',
     body: `Bonjour {{firstName}},
 
-Je me permets de revenir vers vous suite à mon message du {{lastContactDate}}.
+Je me permets de revenir vers vous suite à mon précédent message.
 
-Nexio, un CRM de suivi de recherche d'emploi avec extraction IA des profils LinkedIn et scoring automatique des annonces, est également accessible en démo sur gillescobigo.com, aux côtés de Cerithe, code sur GitHub et un article par jour qui documente chaque décision technique.
+Cet été, j'ai structuré ma façon de piloter plusieurs projets en parallèle avec des agents IA, ce qui me permet aujourd'hui de faire avancer 3 chantiers de front : Cerithe (carnet de santé numérique du bâtiment), Nexio (CRM qui pilote ma recherche d'emploi avec scoring automatique des annonces) et un nouveau projet de création automatisée de sites vitrine pour des commerces qui n'en ont pas.
 
-Je reste à la recherche d'un poste fullstack dans la région {{locationWithDe}} et {{companyName}} m'intéresse toujours.
+Tout est présenté sur gillescobigo.com.
+
+Je reste intéressé pour rejoindre {{companyName}}. Avez-vous des besoins sur lesquels mon profil pourrait correspondre ?
 
 À votre disposition pour échanger.
+
 Gilles`,
   },
   {
@@ -75,13 +78,16 @@ Gilles`,
     targetProfile: 'cto_directeur_technique',
     body: `Bonjour {{firstName}},
 
-Je me permets de revenir vers vous suite à mon message du {{lastContactDate}}.
+Je me permets de revenir vers vous suite à mon précédent message.
 
-Depuis, Cerithe est passé en production. C'est le projet dont je vous parlais et il est maintenant en ligne, accessible en démo sur gillescobigo.com, aux côtés de Nexio, un CRM de suivi de recherche d'emploi avec extraction IA des profils LinkedIn et scoring automatique des annonces.
+Cet été, j'ai structuré ma façon de piloter plusieurs projets en parallèle avec des agents IA, ce qui me permet aujourd'hui de faire avancer 3 chantiers de front : Cerithe (carnet de santé numérique du bâtiment), Nexio (CRM qui pilote ma recherche d'emploi avec scoring automatique des annonces) et un nouveau projet de création automatisée de sites vitrine pour des commerces qui n'en ont pas.
 
-Je reste à la recherche d'un poste fullstack dans la région {{locationWithDe}} et {{companyName}} m'intéresse toujours.
+Tout est présenté sur gillescobigo.com.
+
+Je reste intéressé pour rejoindre {{companyName}}. Avez-vous des besoins sur lesquels mon profil pourrait correspondre ?
 
 À votre disposition pour échanger.
+
 Gilles`,
   },
   {
