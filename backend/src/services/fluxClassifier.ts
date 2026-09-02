@@ -24,7 +24,12 @@ const CLASSIFICATION_PROMPT = `Tu es un classificateur de profils LinkedIn pour 
 - 1b : RH/Talent Acquisition/Chargé de recrutement travaillant dans une entreprise classique (recrutement interne pour ses propres équipes, pas pour placer chez un tiers)
 - 2 : CTO, VP Engineering, Head of Tech, Directeur technique, ou dirigeant (CEO/fondateur) d'une entreprise non-ESN qui évaluerait un profil technique en direct pour ses propres besoins
 - 3 : Lead Dev, Tech Lead, Engineering Manager (encadrement technique sans être CTO)
-- 4 : Business Manager, Directeur de projets ESN, Account Manager dans une ESN
+- 4 : Business Manager, Directeur de projets ESN, Account Manager dans une ESN — fonction commerciale/staffing (vend des prestations, gère un portefeuille de clients ou de consultants), jamais un poste technique
+
+Attention, piège fréquent : ne classe en flux 4 QUE si les deux conditions suivantes sont vraies EN MÊME TEMPS, jamais une seule des deux.
+1. L'entreprise est réellement une ESN/société de conseil IT qui vend des prestations informatiques à des clients tiers. Une entreprise qui utilise elle-même des prestataires IT, ou une entreprise hors informatique (agricole, BTP, VRD, industrie...) même si sa description mentionne "conseil" ou "transformation numérique", n'est PAS une ESN.
+2. Le titre du contact désigne explicitement une fonction commerciale/staffing (Business Manager, Account Manager, Directeur de projets/agence, Chargé d'affaires, Talent/Resourcing Manager...). Un titre technique (Tech Lead, Ingénieur, Développeur, Responsable technique, Chef de projet technique, Architecte...) n'est JAMAIS flux 4, même dans une ESN confirmée : classe-le selon son rôle réel (flux 3 pour de l'encadrement technique, flux 2 pour un dirigeant/CTO).
+Si une seule des deux conditions est vraie, ne retourne pas flux 4 : classe selon le signal le plus fiable (le poste réel du contact, pas le secteur de l'entreprise seul).
 
 Si tu n'as pas assez d'infos pour trancher, retourne "unknown".
 Si tu hésites entre deux flux, retourne le plus probable mais signale les alternatives.
@@ -70,7 +75,10 @@ export async function classifyContactFlux(input: IFluxClassifierInput): Promise<
 
   const message = await createChatCompletion({
     model: 'openai/gpt-oss-120b',
-    max_tokens: 256,
+    // Prompt resserré le 02/09 (vérification titre + secteur pour le flux 4) : le raisonnement
+    // du modèle est plus long qu'avant, 256 tokens coupait le JSON en plein milieu (reasoning
+    // consommé avant le contenu visible) et faisait tomber en FALLBACK_PARSE_ERROR à tort.
+    max_tokens: 768,
     messages: [{ role: 'user', content: prompt }],
   })
 
