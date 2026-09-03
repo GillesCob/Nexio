@@ -24,9 +24,9 @@ export const templates: ITemplate[] = [
     targetProfile: "cto_directeur_technique",
     body: `Bonjour {{firstName}},
 
-Je construis actuellement Cerithe, un carnet de santé numérique du bâtiment. Stack Node.js, TypeScript, React, Postgres, déployé sur un VPS que j'ai monté from scratch. Je documente chaque décision technique dans un article quotidien.
+Mon parcours est atypique : 10 ans dans le bâtiment, dont BIM Manager sur l'extension en mer de Monaco, à coordonner des équipes et analyser des besoins complexes avant même de savoir coder. J'ai appris à développer pour construire mes propres outils, et c'est devenu mon métier.
 
-Mon parcours est atypique : 10 ans dans le bâtiment, dont BIM Manager sur Mareterra à Monaco. J'ai appris à coder pour construire mes propres outils, et c'est devenu mon métier.
+Ce qui me distingue aujourd'hui, c'est cette double casquette : je sais lire, comprendre et challenger un système technique dans son ensemble, pas seulement écrire du code ligne à ligne. C'est ce que je mets en pratique sur Cerithe, un carnet de santé numérique du bâtiment (Node.js, TypeScript, React, Postgres, déployé sur un VPS que j'ai monté moi-même) : chaque décision technique y est documentée dans une série d'articles.
 
 Pour creuser, tout est sur gillescobigo.com : les projets en démo, le code sur GitHub, les articles, et un visuel interactif qui détaille mes compétences. Je vous ai également fait une courte vidéo de présentation si vous préférez : {{videoLink}}
 
@@ -41,9 +41,9 @@ Gilles`,
     targetProfile: "lead_dev_tech_lead",
     body: `Bonjour {{firstName}},
 
-Je construis actuellement Cerithe, un carnet de santé numérique du bâtiment. Stack Node.js, TypeScript, React, Postgres, déployé sur un VPS que j'ai monté from scratch. Je documente chaque décision technique dans un article quotidien, autant pour ancrer ce que j'apprends que pour partager une démarche.
+Mon parcours est atypique : 10 ans dans le bâtiment, dont BIM Manager sur l'extension en mer de Monaco, à coordonner des équipes et analyser des besoins complexes avant même de savoir coder. J'ai appris à développer pour construire mes propres outils, et c'est devenu mon métier.
 
-Mon parcours est atypique : 10 ans dans le bâtiment, dont BIM Manager sur Mareterra à Monaco. J'ai appris à coder pour construire mes propres outils, et c'est devenu mon métier.
+Ce qui me distingue aujourd'hui, c'est cette double casquette : je sais lire, comprendre et challenger un système technique dans son ensemble, pas seulement écrire du code ligne à ligne. C'est ce que je mets en pratique sur Cerithe, un carnet de santé numérique du bâtiment (Node.js, TypeScript, React, Postgres, déployé sur un VPS que j'ai monté moi-même) : chaque décision technique y est documentée dans une série d'articles.
 
 Pour creuser, tout est sur gillescobigo.com : les projets en démo, le code sur GitHub, les articles, et un visuel interactif qui détaille mes compétences. Je vous ai également fait une courte vidéo de présentation si vous préférez : {{videoLink}}
 
