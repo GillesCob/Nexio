@@ -1,3 +1,5 @@
+import { useState } from 'react'
+import { Clipboard, Check } from 'lucide-react'
 import type { IProspectCompany } from '@/types/prospectCompany'
 import { Navbar } from '@/components/layout/navbar'
 import { Button } from '@/components/ui/button'
@@ -17,6 +19,7 @@ function groupByZone(prospectCompanies: IProspectCompany[]) {
 export function ProspectCompaniesPage() {
   const { data: prospectCompanies = [], isPending } = useProspectCompanies()
   const deleteProspectCompany = useDeleteProspectCompany()
+  const [copiedId, setCopiedId] = useState<string | null>(null)
 
   const groups = groupByZone(prospectCompanies)
 
@@ -46,6 +49,21 @@ export function ProspectCompaniesPage() {
                   <div>
                     <div className="flex items-center gap-2">
                       <span className="font-medium text-foreground">{company.name}</span>
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="icon"
+                        className="h-6 w-6 shrink-0"
+                        onClick={() => {
+                          navigator.clipboard.writeText(company.name)
+                          setCopiedId(company.id)
+                          setTimeout(() => setCopiedId(null), 2000)
+                        }}
+                      >
+                        {copiedId === company.id
+                          ? <Check className="h-3.5 w-3.5" />
+                          : <Clipboard className="h-3.5 w-3.5" />}
+                      </Button>
                       {company.note !== undefined && (
                         <span className="text-xs font-medium bg-muted text-muted-foreground rounded-full px-2 py-0.5">
                           {company.note}/10
