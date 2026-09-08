@@ -69,4 +69,18 @@ Si un de vos clients cherche un profil fullstack dans la région {{locationWithD
 À votre disposition.
 Gilles`,
   },
+  {
+    id: "5_first_contact",
+    label: "Flux 5 : BIM",
+    targetProfile: "bim",
+    body: `Bonjour {{firstName}},
+
+Après 10 ans dans le bâtiment dont 5 ans dans le BIM (coordination chez Bouygues Bâtiment Sud-Est, BIM Manager sur l'extension en mer de Monaco), j'ai développé un outil de coordination BIM pensé pour l'usage terrain. Viewer IFC, détection de collisions, échanges structurés entre acteurs de chantier. Une démonstration est en ligne ici : ouvra.gillescobigo.com.
+
+Vous pouvez aussi voir l'outil en action dans cette courte vidéo, {{videoLink}}.
+
+La partie visualisation 3D s'appuie sur des briques open source, ce qui laisse toute liberté pour l'adapter à vos outils et à votre façon de travailler, sans dépendance à un éditeur propriétaire.
+
+Est-ce que développer un outil comme celui-ci, adapté à vos besoins réels sur vos projets, pourrait vous intéresser ?`,
+  },
 ];
