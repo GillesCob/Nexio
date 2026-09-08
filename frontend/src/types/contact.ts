@@ -18,7 +18,7 @@ export interface ICompany {
   updatedAt: string
 }
 
-export type FluxCode = '1a' | '1b' | '2' | '3' | '4'
+export type FluxCode = '1a' | '1b' | '2' | '3' | '4' | '5'
 
 export type ContactCloseReason = 'not_interested' | 'not_now'
 

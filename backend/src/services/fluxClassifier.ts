@@ -9,22 +9,23 @@ export interface IFluxClassifierInput {
 }
 
 export interface IFluxClassifierResult {
-  flux: '1a' | '1b' | '2' | '3' | '4' | 'unknown'
+  flux: '1a' | '1b' | '2' | '3' | '4' | '5' | 'unknown'
   confidence: number
   reasoning: string
-  alternatives: Array<'1a' | '1b' | '2' | '3' | '4' | 'unknown'>
+  alternatives: Array<'1a' | '1b' | '2' | '3' | '4' | '5' | 'unknown'>
 }
 
-const FLUX_CODES = ['1a', '1b', '2', '3', '4'] as const
+const FLUX_CODES = ['1a', '1b', '2', '3', '4', '5'] as const
 
 const CLASSIFICATION_PROMPT = `Tu es un classificateur de profils LinkedIn pour de la prospection emploi.
 
-À partir des infos suivantes, classe le contact dans UN des 5 flux :
+À partir des infos suivantes, classe le contact dans UN des 6 flux :
 - 1a : RH/Talent Acquisition/Chargé de recrutement dont le métier est de placer des candidats chez des clients, pas de recruter pour ses propres équipes — ESN (entreprise de services numériques, conseil IT, prestation), mais aussi toute agence de staffing/intérim/recrutement généraliste (intérim, portage, cabinet de recrutement, ex. Manpower, Randstad, Crit, Adecco, Happy Job, Leika)
 - 1b : RH/Talent Acquisition/Chargé de recrutement travaillant dans une entreprise classique (recrutement interne pour ses propres équipes, pas pour placer chez un tiers)
 - 2 : CTO, VP Engineering, Head of Tech, Directeur technique, ou dirigeant (CEO/fondateur) d'une entreprise non-ESN qui évaluerait un profil technique en direct pour ses propres besoins
 - 3 : Lead Dev, Tech Lead, Engineering Manager (encadrement technique sans être CTO)
 - 4 : Business Manager, Directeur de projets ESN, Account Manager dans une ESN
+- 5 : tout profil ayant un lien avec le BIM (BIM Manager, AMO BIM, coordinateur BIM, gérant ou dirigeant d'un bureau d'études ou d'une société spécialisée BIM), quel que soit son niveau hiérarchique. Priorité sur 2/3 dès que le lien BIM est explicite dans le titre ou l'activité de l'entreprise.
 
 Si tu n'as pas assez d'infos pour trancher, retourne "unknown".
 Si tu hésites entre deux flux, retourne le plus probable mais signale les alternatives.
