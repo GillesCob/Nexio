@@ -81,6 +81,9 @@ Vous pouvez aussi voir l'outil en action dans cette courte vidéo, {{videoLink}}
 
 La partie visualisation 3D s'appuie sur des briques open source, ce qui laisse toute liberté pour l'adapter à vos outils et à votre façon de travailler, sans dépendance à un éditeur propriétaire.
 
-Est-ce que développer un outil comme celui-ci, adapté à vos besoins réels sur vos projets, pourrait vous intéresser ?`,
+Est-ce que développer un outil comme celui-ci, adapté à vos besoins réels sur vos projets, pourrait vous intéresser ?
+
+À votre disposition pour échanger.
+Gilles`,
   },
 ];
