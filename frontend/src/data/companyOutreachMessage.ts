@@ -5,7 +5,10 @@
 // de messagerie entreprise LinkedIn (contrainte differente du message perso flux 5, plus long).
 export const COMPANY_OUTREACH_MESSAGE = `Bonjour,
 
-Après 10 ans dans le bâtiment dont 5 ans en BIM (coordination chez Bouygues Bâtiment Sud-Est, BIM Manager à Monaco), j'ai développé un outil de coordination BIM pensé pour le terrain : viewer IFC, détection de collisions, échanges structurés entre acteurs de chantier. Démo : ouvra.gillescobigo.com. Vidéo : https://gillescobigo.com/v/IYIzyTPC.
+Après 10 ans dans le bâtiment dont 5 ans en BIM (coordination chez Bouygues Bâtiment Sud-Est, BIM Manager à Monaco), j'ai développé un outil de coordination BIM pensé pour le terrain : viewer IFC, détection de collisions, échanges structurés entre acteurs de chantier.
+
+Démo : ouvra.gillescobigo.com.
+Présentation de l'outil : https://gillescobigo.com/v/IYIzyTPC.
 
 La visualisation 3D s'appuie sur des briques open source, donc aucune dépendance à un éditeur propriétaire.
 
