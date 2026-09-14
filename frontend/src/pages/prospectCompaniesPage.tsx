@@ -1,9 +1,10 @@
 import { useState } from 'react'
-import { Clipboard, Check } from 'lucide-react'
+import { Clipboard, Check, MessageSquare } from 'lucide-react'
 import type { IProspectCompany } from '@/types/prospectCompany'
 import { Navbar } from '@/components/layout/navbar'
 import { Button } from '@/components/ui/button'
 import { useProspectCompanies, useDeleteProspectCompany } from '@/hooks/useProspectCompanies'
+import { COMPANY_OUTREACH_MESSAGE } from '@/data/companyOutreachMessage'
 
 function groupByZone(prospectCompanies: IProspectCompany[]) {
   const groups = new Map<string, IProspectCompany[]>()
@@ -20,6 +21,7 @@ export function ProspectCompaniesPage() {
   const { data: prospectCompanies = [], isPending } = useProspectCompanies()
   const deleteProspectCompany = useDeleteProspectCompany()
   const [copiedId, setCopiedId] = useState<string | null>(null)
+  const [copiedMessageId, setCopiedMessageId] = useState<string | null>(null)
 
   const groups = groupByZone(prospectCompanies)
 
@@ -63,6 +65,22 @@ export function ProspectCompaniesPage() {
                         {copiedId === company.id
                           ? <Check className="h-3.5 w-3.5" />
                           : <Clipboard className="h-3.5 w-3.5" />}
+                      </Button>
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="icon"
+                        className="h-6 w-6 shrink-0"
+                        title="Copier le message de prospection (boite sans contact humain)"
+                        onClick={() => {
+                          navigator.clipboard.writeText(COMPANY_OUTREACH_MESSAGE)
+                          setCopiedMessageId(company.id)
+                          setTimeout(() => setCopiedMessageId(null), 2000)
+                        }}
+                      >
+                        {copiedMessageId === company.id
+                          ? <Check className="h-3.5 w-3.5" />
+                          : <MessageSquare className="h-3.5 w-3.5" />}
                       </Button>
                       {company.note !== undefined && (
                         <span className="text-xs font-medium bg-muted text-muted-foreground rounded-full px-2 py-0.5">
