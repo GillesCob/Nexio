@@ -31,9 +31,10 @@ const FLUX_LABELS: Record<FluxCode, string> = {
   '2': 'CTO / Dirigeant technique',
   '3': 'Lead Dev / Tech Lead',
   '4': 'Business Manager — ESN',
+  '5': 'BIM',
 }
 
-const FLUX_OPTIONS: FluxCode[] = ['1a', '1b', '2', '3', '4']
+const FLUX_OPTIONS: FluxCode[] = ['1a', '1b', '2', '3', '4', '5']
 
 const STATUS_OPTIONS: ContactStatus[] = [
   'to_contact',

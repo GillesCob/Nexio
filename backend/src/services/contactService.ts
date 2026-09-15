@@ -126,7 +126,7 @@ interface IUpdateContactData {
   notes?: string;
   jobOfferId?: string;
   companyId?: string;
-  flux?: "1a" | "1b" | "2" | "3" | "4";
+  flux?: "1a" | "1b" | "2" | "3" | "4" | "5";
   closeReason?: "not_interested" | "not_now";
   remindAt?: string;
 }
