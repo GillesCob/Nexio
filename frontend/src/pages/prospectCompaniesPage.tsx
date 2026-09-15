@@ -6,6 +6,11 @@ import { Button } from '@/components/ui/button'
 import { useProspectCompanies, useDeleteProspectCompany } from '@/hooks/useProspectCompanies'
 import { COMPANY_OUTREACH_MESSAGE } from '@/data/companyOutreachMessage'
 
+function extractLinkedInUrl(why?: string): string | undefined {
+  const match = why?.match(/LinkedIn:\s*(https?:\/\/\S+)/i)
+  return match?.[1]
+}
+
 function groupByZone(prospectCompanies: IProspectCompany[]) {
   const groups = new Map<string, IProspectCompany[]>()
   for (const prospectCompany of prospectCompanies) {
@@ -43,14 +48,27 @@ export function ProspectCompaniesPage() {
           <div key={zone}>
             <h2 className="text-sm font-semibold text-foreground mb-2">{zone}</h2>
             <div className="flex flex-col gap-2">
-              {companies.map((company) => (
+              {companies.map((company) => {
+                const linkedinUrl = extractLinkedInUrl(company.why)
+                return (
                 <div
                   key={company.id}
                   className="rounded-md border bg-card p-3 shadow-sm flex items-start justify-between gap-3"
                 >
                   <div>
                     <div className="flex items-center gap-2">
-                      <span className="font-medium text-foreground">{company.name}</span>
+                      {linkedinUrl ? (
+                        <a
+                          href={linkedinUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="font-medium text-foreground hover:underline"
+                        >
+                          {company.name}
+                        </a>
+                      ) : (
+                        <span className="font-medium text-foreground">{company.name}</span>
+                      )}
                       <Button
                         type="button"
                         variant="ghost"
@@ -102,7 +120,8 @@ export function ProspectCompaniesPage() {
                     Supprimer
                   </Button>
                 </div>
-              ))}
+                )
+              })}
             </div>
           </div>
         ))}
