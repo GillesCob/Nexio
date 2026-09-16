@@ -24,17 +24,26 @@ export async function createMessage(userId: string, contactId: string, content: 
   // envoyer" (cf autoReopenScheduled) puisque la relance elle-même a déjà été envoyée.
   const entersSummerPause = isRelance && newRelanceCount === 1 && new Date() < FLUX_CONFIG.SUMMER_PAUSE_UNTIL
 
+  // La 2e relance (relance_final côté templateSelector) est le dernier message du flux : plus rien
+  // à envoyer après (relanceCount >= 2 => selectTemplate renvoie null). Fermer directement plutôt
+  // que de laisser le contact trainer indéfiniment en "A relancer" une fois promu par
+  // autoPromoteToFollowUp, sans qu'aucune réponse ne puisse jamais le faire progresser. closeReason
+  // 'not_now' (pas 'not_interested') + remindAt non renseigné : pas de réouverture automatique
+  // programmée, seule une réponse du contact (passage manuel en 'replied') le rouvre.
+  const isFinalRelance = isRelance && newRelanceCount === 2 && !entersSummerPause
+
   const [message] = await prisma.$transaction([
     prisma.message.create({ data: { contactId, content } }),
     prisma.contact.update({
       where: { id: contactId },
       data: {
-        status: entersSummerPause ? 'closed' : 'contacted',
+        status: entersSummerPause || isFinalRelance ? 'closed' : 'contacted',
         contactedAt: new Date(),
         ...(isRelance ? { relanceCount: { increment: 1 } } : {}),
         ...(entersSummerPause
           ? { closeReason: 'not_now', remindAt: FLUX_CONFIG.SUMMER_PAUSE_UNTIL }
           : {}),
+        ...(isFinalRelance ? { closeReason: 'not_now' } : {}),
       },
     }),
   ])
