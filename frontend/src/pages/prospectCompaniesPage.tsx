@@ -23,7 +23,7 @@ function groupByZone(prospectCompanies: IProspectCompany[]) {
 }
 
 export function ProspectCompaniesPage() {
-  const { data: prospectCompanies = [], isPending } = useProspectCompanies()
+  const { data: prospectCompanies = [], isPending, isError } = useProspectCompanies()
   const deleteProspectCompany = useDeleteProspectCompany()
   const [copiedId, setCopiedId] = useState<string | null>(null)
   const [copiedMessageId, setCopiedMessageId] = useState<string | null>(null)
@@ -37,7 +37,13 @@ export function ProspectCompaniesPage() {
 
       {isPending && <p className="text-sm text-muted-foreground">Chargement...</p>}
 
-      {!isPending && prospectCompanies.length === 0 && (
+      {isError && (
+        <p className="text-sm text-destructive">
+          Erreur de chargement des entreprises. Réessayez, ou reconnectez-vous si le problème persiste.
+        </p>
+      )}
+
+      {!isPending && !isError && prospectCompanies.length === 0 && (
         <p className="text-sm text-muted-foreground">
           Aucune entreprise en attente. Les nouvelles pistes identifiées en recherche apparaîtront ici.
         </p>
