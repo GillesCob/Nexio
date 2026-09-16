@@ -20,6 +20,7 @@ export function CreateContactModal({ open, onClose, onCreated }: ICreateContactM
   const [rawText, setRawText] = useState("");
   const [scoreResult, setScoreResult] = useState<IScoreResult | null>(null);
   const [scoreError, setScoreError] = useState(false);
+  const [extractError, setExtractError] = useState<string | null>(null);
   const [alreadyContacted, setAlreadyContacted] = useState(false);
 
   const { register, handleSubmit, reset, setValue, getValues } = useForm<ICreateContactPayload>();
@@ -29,6 +30,7 @@ export function CreateContactModal({ open, onClose, onCreated }: ICreateContactM
     setRawText("");
     setScoreResult(null);
     setScoreError(false);
+    setExtractError(null);
     setAlreadyContacted(false);
     onClose();
   };
@@ -47,6 +49,7 @@ export function CreateContactModal({ open, onClose, onCreated }: ICreateContactM
   const handleExtract = () => {
     setScoreResult(null);
     setScoreError(false);
+    setExtractError(null);
     extractContact.mutate(rawText, {
       onSuccess: (data) => {
         if (data.name) setValue("name", data.name);
@@ -72,6 +75,12 @@ export function CreateContactModal({ open, onClose, onCreated }: ICreateContactM
             onError: () => setScoreError(true),
           },
         );
+      },
+      onError: (err) => {
+        const message =
+          (err as { response?: { data?: { message?: string } } }).response?.data?.message ??
+          "Échec de l'extraction. Vérifie le texte saisi.";
+        setExtractError(message);
       },
     });
   };
@@ -111,6 +120,9 @@ export function CreateContactModal({ open, onClose, onCreated }: ICreateContactM
           >
             {extractContact.isPending ? "Extraction…" : "Extraire les infos"}
           </Button>
+          {extractError && (
+            <p className="text-sm text-destructive">{extractError}</p>
+          )}
         </div>
 
         {scoreContact.isPending && (
