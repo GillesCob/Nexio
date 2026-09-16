@@ -32,8 +32,13 @@ function compactCore(name: string) {
 
 // Heuristique de rapprochement entre le nom libre d'un ProspectCompany et le nom libre
 // (souvent abrege/varie) d'un Contact.company : identiques une fois compactes, ou coeur
-// significatif (mots-outils retires) de l'un contenu dans l'autre. Seuil de 4 caracteres
-// pour eviter qu'un coeur trop court (ex. "sy") ne matche par hasard n'importe quoi.
+// significatif (mots-outils retires) strictement identique. Le fallback "l'un contient
+// l'autre" a ete retire le 16/09 (decision de Gilles) : il produisait trop de faux
+// positifs sur un mot commun trop generique (ex. "Link-BIM SA" masque a tort par
+// "Sogelink", "Bim Building" par "My Digital Buildings", "BIMTECH (Monaco)" par "BIM
+// Expert Monaco" a cause du seul "monaco" partage). Consequence acceptee : des variantes
+// du meme nom (ex. "Dougs" vs "Dougs Compta") ne sont plus rapprochees automatiquement,
+// preference donnee a moins de faux positifs plutot qu'a plus de deduplication.
 function companiesMatch(a: string, b: string) {
   const rawA = compactAll(a)
   const rawB = compactAll(b)
@@ -42,7 +47,7 @@ function companiesMatch(a: string, b: string) {
   const coreB = compactCore(b)
   if (!coreA || !coreB) return false
   if (Math.min(coreA.length, coreB.length) < 4) return false
-  return coreA === coreB || coreA.includes(coreB) || coreB.includes(coreA)
+  return coreA === coreB
 }
 
 async function assertOwnership(userId: string, prospectCompanyId: string) {
