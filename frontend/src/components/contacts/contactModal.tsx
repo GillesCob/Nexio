@@ -28,13 +28,12 @@ const STATUS_LABELS: Record<ContactStatus, string> = {
 const FLUX_LABELS: Record<FluxCode, string> = {
   '1a': 'RH / Recrutement — ESN',
   '1b': 'RH / Recrutement — Entreprise classique',
-  '2': 'CTO / Dirigeant technique',
-  '3': 'Lead Dev / Tech Lead',
+  '2': 'CTO / Dirigeant technique / Lead Dev / Tech Lead',
   '4': 'Business Manager — ESN',
   '5': 'BIM',
 }
 
-const FLUX_OPTIONS: FluxCode[] = ['1a', '1b', '2', '3', '4', '5']
+const FLUX_OPTIONS: FluxCode[] = ['1a', '1b', '2', '4', '5']
 
 const STATUS_OPTIONS: ContactStatus[] = [
   'to_contact',
