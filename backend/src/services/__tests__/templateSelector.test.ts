@@ -23,10 +23,6 @@ describe("selectTemplate", () => {
     expect(selectTemplate({ flux: "2", contactedAt: null, relanceCount: 0 })).toBe("2_first_contact");
   });
 
-  it("cas 6 : flux 3, contactedAt null → 3_first_contact", () => {
-    expect(selectTemplate({ flux: "3", contactedAt: null, relanceCount: 0 })).toBe("3_first_contact");
-  });
-
   it("cas 7 : flux 4, contactedAt null → 4_first_contact", () => {
     expect(selectTemplate({ flux: "4", contactedAt: null, relanceCount: 0 })).toBe("4_first_contact");
   });
@@ -58,10 +54,6 @@ describe("selectTemplate", () => {
     expect(selectTemplate({ flux: "2", contactedAt: new Date("2026-06-01"), relanceCount: 0 })).toBe("2_relance_after_17_07");
   });
 
-  it("cas 14 : flux 3, 1er contact la veille de PROD_DATE, relanceCount 0 → 3_relance_after_17_07", () => {
-    expect(selectTemplate({ flux: "3", contactedAt: new Date("2026-07-16"), relanceCount: 0 })).toBe("3_relance_after_17_07");
-  });
-
   it("cas 15 : flux 4, 1er contact avant PROD_DATE, relanceCount 0 → 4_relance_after_17_07", () => {
     expect(selectTemplate({ flux: "4", contactedAt: new Date("2026-06-15"), relanceCount: 0 })).toBe("4_relance_after_17_07");
   });
@@ -75,10 +67,6 @@ describe("selectTemplate", () => {
 
   it("cas 17 : flux 2, 1er contact après PROD_DATE, relanceCount 0 → 2_relance_before_17_07", () => {
     expect(selectTemplate({ flux: "2", contactedAt: new Date("2026-08-01"), relanceCount: 0 })).toBe("2_relance_before_17_07");
-  });
-
-  it("cas 18 : flux 3, 1er contact après PROD_DATE, relanceCount 0 → 3_relance_before_17_07", () => {
-    expect(selectTemplate({ flux: "3", contactedAt: new Date("2026-09-15"), relanceCount: 0 })).toBe("3_relance_before_17_07");
   });
 
   it("cas 19 : flux 4, 1er contact après PROD_DATE, relanceCount 0 → 4_relance_before_17_07", () => {
@@ -96,10 +84,6 @@ describe("selectTemplate", () => {
 
   it("cas 21 : flux 2, relanceCount 1, après la pause → 2_relance_final", () => {
     expect(selectTemplate({ flux: "2", contactedAt: new Date("2026-08-01"), relanceCount: 1 }, new Date("2026-09-10"))).toBe("2_relance_final");
-  });
-
-  it("cas 22 : flux 3, relanceCount 1, après la pause → 3_relance_final", () => {
-    expect(selectTemplate({ flux: "3", contactedAt: new Date("2026-06-01"), relanceCount: 1 }, new Date("2026-09-10"))).toBe("3_relance_final");
   });
 
   it("cas 23 : flux 4, relanceCount 1, après la pause → 4_relance_final", () => {
@@ -128,7 +112,4 @@ describe("selectTemplate", () => {
     expect(selectTemplate({ flux: "1a", contactedAt: new Date("2026-06-01"), relanceCount: 1 }, new Date("2026-08-01"))).toBe("1a_relance_final");
   });
 
-  it("cas 29 : flux 3, relanceCount 1, contact devenu éligible pendant l'été → null tant que le 1er août n'est pas atteint", () => {
-    expect(selectTemplate({ flux: "3", contactedAt: new Date("2026-07-10"), relanceCount: 1 }, new Date("2026-07-25"))).toBeNull();
-  });
 });

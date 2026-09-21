@@ -290,7 +290,7 @@ async function main() {
       notes: "Agence locale Pau/Bayonne. Premier message sans réponse.",
       contactedAt: daysAgo(12),
       relanceCount: 1,
-      flux: "3",
+      flux: "2",
       fluxConfidence: 0.82,
       location: "Pau",
       updatedAt: daysAgo(12),

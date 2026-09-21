@@ -36,23 +36,6 @@ Je cherche un poste fullstack dans la région {{locationWithDe}} et {{companyNam
 Gilles`,
   },
   {
-    id: "3_first_contact",
-    label: "Flux 3 : Lead Dev / Tech Lead",
-    targetProfile: "lead_dev_tech_lead",
-    body: `Bonjour {{firstName}},
-
-Mon parcours est atypique : 10 ans dans le bâtiment, dont BIM Manager sur l'extension en mer de Monaco, à coordonner des équipes et analyser des besoins complexes avant même de savoir coder. J'ai appris à développer pour construire mes propres outils, et c'est devenu mon métier.
-
-Ce qui me distingue aujourd'hui, c'est cette double casquette : je sais lire, comprendre et challenger un système technique dans son ensemble, pas seulement écrire du code ligne à ligne. C'est ce que je mets en pratique sur Cerithe, un carnet de santé numérique du bâtiment (Node.js, TypeScript, React, Postgres, déployé sur un VPS que j'ai monté moi-même) : chaque décision technique y est documentée dans une série d'articles.
-
-Pour creuser, tout est sur gillescobigo.com : les projets en démo, le code sur GitHub, les articles, et un visuel interactif qui détaille mes compétences. Je vous ai également fait une courte vidéo de présentation si vous préférez : {{videoLink}}
-
-Je cherche un poste fullstack dans la région {{locationWithDe}} et {{companyName}} m'intéresse.
-
-À votre disposition pour échanger.
-Gilles`,
-  },
-  {
     id: "4_first_contact",
     label: "Flux 4 : Business Manager / Directeur de projets ESN",
     targetProfile: "business_manager_esn",

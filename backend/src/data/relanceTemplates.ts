@@ -106,56 +106,6 @@ Bonne continuation.
 Gilles`,
   },
   {
-    id: '3_relance_before_17_07',
-    label: 'Flux 3 : Relance avant 17/07',
-    targetProfile: 'lead_dev_tech_lead',
-    body: `Bonjour {{firstName}},
-
-Je me permets de revenir vers vous suite à mon précédent message.
-
-Cet été, j'ai structuré ma façon de piloter plusieurs projets en parallèle avec des agents IA, ce qui me permet aujourd'hui de faire avancer 3 chantiers de front : Cerithe (carnet de santé numérique du bâtiment), Nexio (CRM qui pilote ma recherche d'emploi avec scoring automatique des annonces) et un nouveau projet de création automatisée de sites vitrine pour des commerces qui n'en ont pas.
-
-Tout est présenté sur gillescobigo.com.
-
-Je reste intéressé pour rejoindre {{companyName}}. Avez-vous des besoins sur lesquels mon profil pourrait correspondre ?
-
-À votre disposition pour échanger.
-
-Gilles`,
-  },
-  {
-    id: '3_relance_after_17_07',
-    label: 'Flux 3 : Relance après 17/07',
-    targetProfile: 'lead_dev_tech_lead',
-    body: `Bonjour {{firstName}},
-
-Je me permets de revenir vers vous suite à mon précédent message.
-
-Cet été, j'ai structuré ma façon de piloter plusieurs projets en parallèle avec des agents IA, ce qui me permet aujourd'hui de faire avancer 3 chantiers de front : Cerithe (carnet de santé numérique du bâtiment), Nexio (CRM qui pilote ma recherche d'emploi avec scoring automatique des annonces) et un nouveau projet de création automatisée de sites vitrine pour des commerces qui n'en ont pas.
-
-Tout est présenté sur gillescobigo.com.
-
-Je reste intéressé pour rejoindre {{companyName}}. Avez-vous des besoins sur lesquels mon profil pourrait correspondre ?
-
-À votre disposition pour échanger.
-
-Gilles`,
-  },
-  {
-    id: '3_relance_final',
-    label: 'Flux 3 : Relance finale',
-    targetProfile: 'lead_dev_tech_lead',
-    body: `Bonjour {{firstName}},
-
-Dernier message de ma part pour ne pas encombrer votre boîte.
-
-Mon site gillescobigo.com reste à jour si vous souhaitez suivre mes projets ou me recontacter à l'avenir.
-
-Bonne continuation.
-
-Gilles`,
-  },
-  {
     id: '4_relance_before_17_07',
     label: 'Flux 4 : Relance avant 17/07',
     targetProfile: 'business_manager_esn',
