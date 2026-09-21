@@ -343,8 +343,14 @@ export function ContactModal({ contact, onClose }: IContactModalProps) {
     setTemplateError(null)
     suggestTemplate.mutate(contact.id, {
       onSuccess: (data) => {
-        createMessage.mutate({ contactId: contact.id, content: data.message })
-        handleStatusChange('contacted')
+        // Pas de handleStatusChange('contacted') en parallèle : createMessage passe déjà le contact en
+        // 'contacted' et renseigne contactedAt dans sa propre transaction. Une 2e requête concurrente
+        // (updateContact) pouvait renseigner contactedAt avant l'arrivée du message, qui était alors
+        // compté comme une relance (relanceCount 1 au lieu de 0).
+        createMessage.mutate(
+          { contactId: contact.id, content: data.message },
+          { onSuccess: () => setLocalStatus('contacted') }
+        )
         navigator.clipboard
           .writeText(data.message)
           .then(onClose)
