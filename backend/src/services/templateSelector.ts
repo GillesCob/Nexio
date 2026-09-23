@@ -24,6 +24,9 @@ export function selectTemplate(contact: TemplateSelectorInput, now: Date = new D
 
   if (flux === "1b") return "1b_relance";
 
+  // Flux 5 créé le 08/09, bien après PROD_DATE : une seule relance, pas de variante before/after.
+  if (flux === "5") return "5_relance";
+
   // Un contact d'abord messagé AVANT le lancement (17/07) reçoit la relance "after" : Cerithe y
   // est annoncé comme une nouveauté légitime, puisque le 1er message ne pouvait pas le montrer en
   // ligne. Un contact d'abord messagé APRÈS le lancement reçoit la relance "before" (générique,
