@@ -150,4 +150,18 @@ Si une mission se présente côté client, je suis preneur d'un échange.
 Bonne continuation.
 Gilles`,
   },
+  {
+    id: '5_relance',
+    label: 'Flux 5 : Relance BIM',
+    targetProfile: 'bim',
+    body: `Bonjour {{firstName}},
+
+Je reviens vers vous suite à mon message sur l'outil de coordination BIM que j'ai développé (ouvra.gillescobigo.com). Il a évolué depuis. Il s'utilise maintenant sur mobile pour consulter la maquette sur chantier et chaque intervenant dispose d'une vue adaptée à son rôle.
+
+Je cherche à rejoindre une équipe où mon double profil BIM Manager et développeur serait utile, que ce soit pour automatiser des tâches de coordination ou pour développer des outils internes.
+
+Si le sujet se pose chez vous, je serais content d'en discuter.
+
+Gilles`,
+  },
 ]
