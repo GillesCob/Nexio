@@ -49,6 +49,10 @@ describe("selectTemplate", () => {
     expect(selectTemplate({ flux: "5", contactedAt: new Date("2026-09-08"), relanceCount: 0 })).toBe("5_relance");
   });
 
+  it("cas 11c : flux 5, relanceCount 1, après la pause estivale → 5_relance_final", () => {
+    expect(selectTemplate({ flux: "5", contactedAt: new Date("2026-09-08"), relanceCount: 1 }, new Date("2026-09-23"))).toBe("5_relance_final");
+  });
+
   // --- contact d'abord messagé avant PROD_DATE (17/07/2026) : Cerithe pas encore en ligne au 1er
   // message, la relance l'annonce comme une vraie nouveauté → variante "after_17_07" ---
   it("cas 12 : flux 1a, 1er contact avant PROD_DATE, relanceCount 0 → 1a_relance_after_17_07", () => {

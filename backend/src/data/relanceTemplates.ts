@@ -164,4 +164,19 @@ Si le sujet se pose chez vous, je serais content d'en discuter.
 
 Gilles`,
   },
+  {
+    id: '5_relance_final',
+    label: 'Flux 5 : Relance finale',
+    targetProfile: 'bim',
+    body: `Bonjour {{firstName}},
+
+Dernier message de ma part pour ne pas encombrer votre boîte.
+
+L'outil reste en ligne sur ouvra.gillescobigo.com et mon parcours complet est sur gillescobigo.com, si vous souhaitez y jeter un œil plus tard.
+
+Si un besoin se présente dans votre structure, que ce soit un outil BIM sur mesure ou un poste où mon double profil serait utile, je reste preneur d'un échange.
+
+Bonne continuation.
+Gilles`,
+  },
 ]
