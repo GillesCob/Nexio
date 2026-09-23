@@ -371,8 +371,12 @@ export function ContactModal({ contact, onClose }: IContactModalProps) {
     setRelanceError(null)
     suggestRelance.mutate(contact.id, {
       onSuccess: (data) => {
+        // Même course que celle corrigée sur handleSuggestTemplate : createMessage fixe déjà le statut
+        // dans sa transaction ('contacted', ou 'closed' à la relance finale). Un updateContact('contacted')
+        // en parallèle arrivait après et rouvrait le contact qui venait d'être fermé. Pas de statut local
+        // forcé ici : seul le backend sait si cette relance ferme le contact, l'invalidation des contacts
+        // ramène le vrai statut.
         createMessage.mutate({ contactId: contact.id, content: data.message })
-        handleStatusChange('contacted')
         navigator.clipboard
           .writeText(data.message)
           .then(onClose)
