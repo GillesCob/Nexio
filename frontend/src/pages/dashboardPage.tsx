@@ -3,7 +3,6 @@ import type { IContact } from "@/types/contact";
 import { KanbanBoard } from "@/components/contacts/kanbanBoard";
 import { ContactModal } from "@/components/contacts/contactModal";
 import { CreateContactModal } from "@/components/contacts/createContactModal";
-import { RelanceBanner } from "@/components/contacts/relanceBanner";
 import { LinkedInReminderBanner } from "@/components/stats/linkedinReminderBanner";
 import { Navbar } from "@/components/layout/navbar";
 import { Button } from "@/components/ui/button";
@@ -30,7 +29,6 @@ export function DashboardPage() {
       </div>
 
       <LinkedInReminderBanner />
-      <RelanceBanner onOpenContact={setSelectedContact} />
       <div className="flex-1 min-h-0">
         <KanbanBoard onOpenContact={setSelectedContact} />
       </div>
