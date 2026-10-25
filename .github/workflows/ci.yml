@@ -1,0 +1,55 @@
+name: CI Nexio
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - run: npm ci
+
+      - run: npx prisma generate
+
+      # Audit de sécurité des dépendances : bloque la CI dès qu'une vulnérabilité haute ou critique
+      # est présente (règle « Harnais de tests » point 3).
+      - name: npm audit (backend)
+        run: npm audit --audit-level=high
+
+      # Aucune clé réelle ni accès réseau : Groq, Prisma et l'email sont mockés
+      # (les cas Groq réels sont derrière RUN_GROQ_LIVE=1, jamais en CI).
+      - run: npm test
+
+      - run: npm run build
+
+  frontend:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - run: npm ci
+
+      - name: npm audit (frontend)
+        run: npm audit --audit-level=high
+
+      - run: npm run build
