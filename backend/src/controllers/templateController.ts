@@ -13,7 +13,7 @@ export async function suggestTemplateController(req: Request, res: Response, nex
     res.json({ message })
   } catch (err) {
     if (err instanceof z.ZodError) {
-      next(new AppError(400, err.errors[0].message))
+      next(new AppError(400, err.issues[0].message))
     } else {
       next(err)
     }

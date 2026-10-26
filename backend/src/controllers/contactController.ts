@@ -40,7 +40,7 @@ const paramsSchema = z.object({ id: z.string() })
 
 function handleZod(err: unknown, next: NextFunction) {
   if (err instanceof z.ZodError) {
-    next(new AppError(400, err.errors[0].message))
+    next(new AppError(400, err.issues[0].message))
   } else {
     next(err)
   }

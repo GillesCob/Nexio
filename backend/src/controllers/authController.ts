@@ -47,7 +47,7 @@ export async function login(req: Request, res: Response, next: NextFunction): Pr
     res.json({ accessToken, user })
   } catch (err) {
     if (err instanceof z.ZodError) {
-      next(new AppError(400, err.errors[0].message))
+      next(new AppError(400, err.issues[0].message))
     } else {
       next(err)
     }
@@ -110,7 +110,7 @@ export async function forgotPassword(
     res.json({ message: 'If this email exists, a reset link has been sent.' })
   } catch (err) {
     if (err instanceof z.ZodError) {
-      next(new AppError(400, err.errors[0].message))
+      next(new AppError(400, err.issues[0].message))
     } else {
       next(err)
     }
@@ -128,7 +128,7 @@ export async function resetPassword(
     res.json({ message: 'Password reset successfully.' })
   } catch (err) {
     if (err instanceof z.ZodError) {
-      next(new AppError(400, err.errors[0].message))
+      next(new AppError(400, err.issues[0].message))
     } else {
       next(err)
     }

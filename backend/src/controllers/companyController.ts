@@ -51,7 +51,7 @@ export async function extractCompany(req: Request, res: Response, next: NextFunc
     res.status(existing ? 200 : 201).json({ ...company, warning })
   } catch (err) {
     if (err instanceof z.ZodError) {
-      next(new AppError(400, err.errors[0].message))
+      next(new AppError(400, err.issues[0].message))
     } else if (err instanceof SyntaxError) {
       next(new AppError(422, 'Impossible de parser la réponse du modèle'))
     } else if (err instanceof APIError) {
@@ -71,7 +71,7 @@ export async function enrichCompany(req: Request, res: Response, next: NextFunct
     res.json({ ...company, warning })
   } catch (err) {
     if (err instanceof z.ZodError) {
-      next(new AppError(400, err.errors[0].message))
+      next(new AppError(400, err.issues[0].message))
     } else if (err instanceof APIError) {
       next(toGroqAppError(err))
     } else {
@@ -91,7 +91,7 @@ export async function updateCompany(req: Request, res: Response, next: NextFunct
     res.json(company)
   } catch (err) {
     if (err instanceof z.ZodError) {
-      next(new AppError(400, err.errors[0].message))
+      next(new AppError(400, err.issues[0].message))
     } else {
       next(err)
     }

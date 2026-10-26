@@ -21,7 +21,7 @@ export async function scoreContactController(
     res.json(result)
   } catch (err) {
     if (err instanceof z.ZodError) {
-      next(new AppError(400, err.errors[0].message))
+      next(new AppError(400, err.issues[0].message))
     } else if (err instanceof SyntaxError) {
       next(new AppError(422, 'Impossible de parser la réponse du modèle'))
     } else {

@@ -98,7 +98,7 @@ export async function classifyContactFlux(input: IFluxClassifierInput): Promise<
 
   const result = fluxResultSchema.safeParse(parsed)
   if (!result.success) {
-    console.error('[fluxClassifier] Zod validation failed:', { parsed, errors: result.error.errors })
+    console.error('[fluxClassifier] Zod validation failed:', { parsed, errors: result.error.issues })
     return FALLBACK_VALIDATION_ERROR
   }
 
