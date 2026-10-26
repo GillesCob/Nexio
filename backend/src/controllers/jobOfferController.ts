@@ -35,7 +35,7 @@ const searchSchema = z.object({ motsCles: z.string().min(1).optional() })
 
 function handleZod(err: unknown, next: NextFunction) {
   if (err instanceof z.ZodError) {
-    next(new AppError(400, err.errors[0].message))
+    next(new AppError(400, err.issues[0].message))
   } else {
     next(err)
   }
@@ -56,7 +56,7 @@ export async function extractAndCreateJobOffer(
     res.status(201).json(scored)
   } catch (err) {
     if (err instanceof z.ZodError) {
-      next(new AppError(400, err.errors[0].message))
+      next(new AppError(400, err.issues[0].message))
     } else if (err instanceof Error && err.message === 'Parsing JSON échoué') {
       next(new AppError(422, 'Impossible de parser la réponse du modèle'))
     } else {

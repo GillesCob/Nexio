@@ -25,7 +25,7 @@ export async function createProspectCompany(
     res.status(201).json(prospectCompany)
   } catch (err) {
     if (err instanceof z.ZodError) {
-      next(new AppError(400, err.errors[0].message))
+      next(new AppError(400, err.issues[0].message))
     } else {
       next(err)
     }
@@ -58,7 +58,7 @@ export async function deleteProspectCompany(
     res.status(204).send()
   } catch (err) {
     if (err instanceof z.ZodError) {
-      next(new AppError(400, err.errors[0].message))
+      next(new AppError(400, err.issues[0].message))
     } else {
       next(err)
     }
